@@ -1,3 +1,4 @@
+alert("1");
 let OccasionClient = new Occasion.Client('463436b5ebf74b42873aaa544801f91a');
 
 var app = angular.module('StickyBooking', []);
