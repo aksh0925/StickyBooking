@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StickyFolios</title>
+    <script src="https://use.fontawesome.com/c385cd600f.js"></script>
+    <link rel="stylesheet" media="all" href="assets/css/booking-new.css">
+    <link rel="stylesheet" media="all" href="../global-assets/css/animate.css">
+  </head>
+  <body class="booking-ui-body-padding body-scroll-lock">
+
+    <main class="booking-page-container">
+      <div class="booking-sidebar">
+        <h3 class="booking-page-photographer-name">Sarah Cho Photography</h3>
+        <div class="booking-page-welcome-message">
+          <p>Welcome to the online booking tool. This platform will allow you to schedule, book, &amp; pay for your session.</p>
+        </div>
+
+        <ol class="booking-process" id="booking-process-status">
+          <li class="booking-step-1 booking-step">Get Started</li>
+          <li class="booking-step-2 booking-step">Select a Date</li>
+          <li class="booking-step-3 booking-step">Select a Time</li>
+          <li class="booking-step-4 booking-step">Your Information</li>
+        </ol>
+      </div>
+      <div class="booking-content">
+        <div class="booking-page-hero" style="background-image: url(assets/images/hero.jpg);">
+          <div class="booking-page-hero-content">
+            <h6 class="get-started-title">Get Started</h6>
+            <h1 class="page-title">Family Mini-Sessions</h1>
+            <h6 class="session-length">Session Length: 1 hour</h6>
+            <button class="get-started animated tada infinite">Book Now</button>
+          </div>
+        </div>
+
+        <!-- calendar pane -->
+        <a name="step-1-scroller"></a>
+        <div class="pane-calendar active-pane" id="step-2">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Availability</h6>
+                  <h3>Select a date on the calendar below to view my availability:</h3>
+                </div>
+                <div class="col-md-6">
+                  <div class="session-duration text-right">
+                    <h4 class="duration-count">1 hour</h4>
+                    <h6>Session Duration</h6>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              <div class="row month-navigator">
+                <div class="col-xs-3">
+                  <a class="btn btn-defult"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                </div>
+                <div class="col-xs-6 text-center">
+                  <h6>January</h6>
+                </div>
+                <div class="col-xs-3 text-right">
+                  <a class="btn btn-defult"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                </div>
+              </div>
+              <table class="calendar-table">
+                  <thead>
+                    <tr>
+                      <td>S</td>
+                      <td>M</td>
+                      <td>T</td>
+                      <td>W</td>
+                      <td>T</td>
+                      <td>F</td>
+                      <td>S</td>
+                    </tr>
+                  </thead>
+                  <tr class="calendar-dates">
+                    <td class="empty-date"></td>
+                    <td class="empty-date"></td>
+                    <td class="unavailable-day">1</td>
+                    <td class="unavailable-day">2</td>
+                    <td class="unavailable-day">3</td>
+                    <td class="unavailable-day">4</td>
+                    <td class="unavailable-day">5</td>
+                  </tr>
+                  <tr class="calendar-dates">
+                    <td class="unavailable-day">6</td>
+                    <td class="available-time-slot">7</td>
+                    <td class="available-time-slot">8</td>
+                    <td class="available-time-slot">9</td>
+                    <td class="available-time-slot">10</td>
+                    <td class="available-time-slot">11</td>
+                    <td class="unavailable-day">12</td>
+                  </tr>
+                  <tr class="calendar-dates">
+                    <td class="unavailable-day">13</td>
+                    <td class="available-time-slot">14</td>
+                    <td class="available-time-slot">15</td>
+                    <td class="available-time-slot">16</td>
+                    <td class="available-time-slot">17</td>
+                    <td class="available-time-slot">18</td>
+                    <td class="unavailable-day">19</td>
+                  </tr>
+                  <tr class="calendar-dates">
+                    <td class="unavailable-day">20</td>
+                    <td class="available-time-slot">21</td>
+                    <td class="available-time-slot">22</td>
+                    <td class="available-time-slot">23</td>
+                    <td class="available-time-slot">24</td>
+                    <td class="available-time-slot">25</td>
+                    <td class="unavailable-day">26</td>
+                  </tr>
+                  <tr class="calendar-dates">
+                    <td class="unavailable-day">27</td>
+                    <td class="available-time-slot">28</td>
+                    <td class="available-time-slot">29</td>
+                    <td class="available-time-slot">30</td>
+                    <td class="empty-date"></td>
+                    <td class="empty-date"></td>
+                    <td class="empty-date"></td>
+                  </tr>
+              </table>
+              <a name="time-slot-scroll"></a>
+              <div class="available-times row">
+                <div class="col-md-12">
+                  <h6>Available Time Slots</h6>
+                  <h3>Select a time slot on {{ SELECTED DATE }} to continue booking:</h3>
+                  <hr />
+                </div>
+                <div class="col-md-4 time-slot-buttons">
+                  <h6>Morning</h6>
+                  <button class="btn btn-primary time-slot">9:00am</button>
+                  <button class="btn btn-primary time-slot unavailable">10:00am</button>
+                  <button class="btn btn-primary time-slot">11:00am</button>
+                </div>
+                <div class="col-md-4 time-slot-buttons">
+                  <h6>Afternoon</h6>
+                  <button class="btn btn-primary time-slot">12:00pm</button>
+                  <button class="btn btn-primary time-slot">1:00pm</button>
+                  <button class="btn btn-primary time-slot">2:00pm</button>
+                  <button class="btn btn-primary time-slot">3:00pm</button>
+                  <button class="btn btn-primary time-slot">4:00pm</button>
+                </div>
+                <div class="col-md-4 time-slot-buttons">
+                  <h6>Evening</h6>
+                  <button class="btn btn-primary time-slot">7:00pm</button>
+                  <button class="btn btn-primary time-slot">8:00pm</button>
+                  <button class="btn btn-primary time-slot">9:00pm</button>
+                  <button class="btn btn-primary time-slot">10:00pm</button>
+                </div>
+              </div>
+            </div>
+
+        <!--customer information pane -->
+        <a name="customer-info-pane-scroller"></a>
+        <div class="pane-customer-information">
+          <h6>Your Info</h6>
+          <h3>We need to collect some information from you to confirm booking:</h3>
+          <hr />
+          <div class="form-group">
+            <label class="control-label" for="order_customer_email">Your Name</label>
+            <input id="email" placeholder="Your Name" required="required" type="email" ng-model="order.customer.email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required" name="order[customer][email]"><span class="message"></span>
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="order_customer_email">Your E-mail Address</label>
+            <input id="email" placeholder="E-mail" required="required" type="email" ng-model="order.customer.email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required" name="order[customer][email]"><span class="message"></span>
+          </div>
+          <div class="form-group">
+          <label>
+          text area
+          </label>
+          <textarea class="form-control ng-pristine ng-valid ng-empty ng-touched" data-placeholder="text area" name="order[attributes][419022]" ng-model="order.attributes.attribute_419022" rows="4"></textarea>
+          </div>
+          <div class="alert alert-warning">No payment required at this time. Payment will be collected at the venue.</div>
+          <div class="form-submit">
+            <a href="index-confirm-booking.html" class="btn-primary btn animated pulse infinite">Finalize Booking</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+    <script
+    src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+    crossorigin="anonymous"></script>
+    <script
+    src="assets/scripts/min/main-min.js"></script>
+  </body>
+</html>
