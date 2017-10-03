@@ -1,18 +1,23 @@
-alert("1");
-let OccasionClient = new Occasion.Client('463436b5ebf74b42873aaa544801f91a');
+var initializeAngular = function(){
 
-var app = angular.module('StickyBooking', []);
+    console.log("Initialize Angular Function Ran");
 
-app.controller('BookingController', function($scope, $http) {
+    let OccasionClient = new Occasion.Client('463436b5ebf74b42873aaa544801f91a');
 
-    //OnInit
-    this.$onInit = function(){
-        
-    }
+    var app = angular.module('StickyBooking', []);
 
-    //Function to load field data from database
-    $scope.testFunction = function(){
-    
-    }
+    app.controller('BookingController', function($scope, $http) {
 
-});
+        //OnInit
+        this.$onInit = function(){
+            console.log("Angular On Init Function Ran");
+        }
+
+        //Function to load field data from database
+        $scope.testFunction = function(){
+            console.log("Test Function");
+        }
+
+    });
+
+}

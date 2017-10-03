@@ -30,7 +30,7 @@
             <h6 class="get-started-title">Get Started</h6>
             <h1 class="page-title">Family Mini-Sessions</h1>
             <h6 class="session-length">Session Length: 1 hour</h6>
-            <button class="get-started animated tada infinite">Book Now</button>
+            <button class="get-started animated tada infinite" ng-click="testFunction()">Book Now</button>
           </div>
         </div>
 
@@ -178,53 +178,15 @@
       </div>
     </main>
 
-    <!-- jQuery -->
-    <script
-      src="https://code.jquery.com/jquery-2.2.4.min.js"
-      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-      crossorigin="anonymous">
-    </script>
+    <!-- Require Dependencies -->
+    <script src="require.js"></script>
+    <script src="require-config.js"></script>
+
+    <!-- Angular Based Script -->
+    <script src="index.js"></script>
 
     <!-- Main JS Script -->
-    <script
-      src="assets/scripts/min/main-min.js">
-    </script>
-
-    <!-- Occasion SDK and Dependencies-->
-    <script src="require.js"></script>
-    <script>
-        require.onError = function(error) {
-          var message = error.requireType + ': ';
-          if (error.requireType === 'scripterror' || error.requireType === 'notloaded' && error.requireModules) {
-            message += 'Illegal path or script error: ' + '[\'' + error.requireModules.join("', '") + '\']';
-          } else {
-            message += error.message;
-          }
-          throw Error(message);
-        };
-        require.config({
-          "baseUrl": "/",
-          "paths": {
-            "axios": '/node_modules/axios/dist/axios',
-            "qs": '/node_modules/qs/dist/qs',
-            "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
-            "underscore": '/node_modules/underscore/underscore-min',
-            "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
-            "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
-            "active-resource": '/node_modules/active-resource/dist/active-resource.min',
-            "occasion-sdk": '/node_modules/occasion-sdk/dist/occasion-sdk.min',
-            "angular": 'node_modules/angular/angular.min.js'
-          }
-        });
-        require([], function() {
-          /* scripts loaded */
-          alert("loaded");
-        });
-    </script>
-
-
-    <!-- Angular.js -->
-    <script src="index.js"></script>
+    <script src="assets/scripts/min/main-min.js"></script>
 
   </body>
 </html>
