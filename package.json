@@ -1,0 +1,18 @@
+{
+  "name": "sticky-booking",
+  "version": "1.0.0",
+  "description": "StickyBooking Checkout Experience",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcd123/StickyBooking.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marcd123/StickyBooking/issues"
+  },
+  "homepage": "https://github.com/marcd123/StickyBooking#readme",
+  "dependencies": {
+    "angular": "^1.6.6"
+  }
+}

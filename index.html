@@ -6,11 +6,11 @@
     <title>StickyFolios</title>
     <script src="https://use.fontawesome.com/c385cd600f.js"></script>
     <link rel="stylesheet" media="all" href="assets/css/booking-new.css">
-    <link rel="stylesheet" media="all" href="../global-assets/css/animate.css">
+    <link rel="stylesheet" media="all" href="assets/css/animate.css">
   </head>
-  <body class="booking-ui-body-padding body-scroll-lock">
+  <body class="booking-ui-body-padding body-scroll-lock" ng-app="StickyBooking">
 
-    <main class="booking-page-container">
+    <main class="booking-page-container" ng-controller="BookingController">
       <div class="booking-sidebar">
         <h3 class="booking-page-photographer-name">Sarah Cho Photography</h3>
         <div class="booking-page-welcome-message">
@@ -123,7 +123,7 @@
               <div class="available-times row">
                 <div class="col-md-12">
                   <h6>Available Time Slots</h6>
-                  <h3>Select a time slot on {{ SELECTED DATE }} to continue booking:</h3>
+                  <h3>Select a time slot on -- SELECTED DATE -- to continue booking:</h3>
                   <hr />
                 </div>
                 <div class="col-md-4 time-slot-buttons">
@@ -178,12 +178,21 @@
       </div>
     </main>
 
+    <!-- jQuery -->
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous">
+    </script>
 
+    <!-- Main JS Script -->
     <script
-    src="https://code.jquery.com/jquery-2.2.4.min.js"
-    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-    crossorigin="anonymous"></script>
-    <script
-    src="assets/scripts/min/main-min.js"></script>
+      src="assets/scripts/min/main-min.js">
+    </script>
+    
+    <!-- Angular.js -->
+    <script src="node_modules/angular/angular.min.js"></script>
+    <script src="index.js"></script>
+
   </body>
 </html>
