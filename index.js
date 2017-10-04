@@ -30,6 +30,12 @@ let initializeAngular = function(){
                             $scope.mainProduct = product;
                             console.log("Main Product", $scope.mainProduct);
 
+                            $scope.mainProduct.timeSlots().where({ status: 'bookable' }).perPage(10).all()
+                                .then((timeslots) => {
+                                    console.log("time slots", timeslots);
+                                });
+                           
+
                             $scope.occasionClient.Product.includes('merchant', 'venue')
                                 .find($scope.mainProduct.id)
                                 .then((product) => {
@@ -41,6 +47,8 @@ let initializeAngular = function(){
                                     $scope.occasionClient.Order.construct({ product: $scope.productWithIncludes })
                                         .then((order) => {
                                             console.log("Order created", order);
+
+                                            console.log("Customer attr", order.customer().attributes());
                                         });
                                 });
                         });
