@@ -7,6 +7,7 @@ require.onError = function(error) {
     }
     throw Error(message);
 };
+
 require.config({
     "baseUrl": "/",
     "paths": {
@@ -22,9 +23,18 @@ require.config({
     "angular": '/node_modules/angular/angular.min'
     }
 });
-require(['jquery', 'axios', 'qs', 'es6-promise', 'underscore', 'underscore.string', 'underscore.inflection', 'active-resource','occasion-sdk', 'angular'], function() {
-    /* scripts loaded */
-    console.log("All Require Scripts Loaded");
+
+require([ 'jquery', 
+          'axios', 
+          'qs', 
+          'es6-promise', 
+          'underscore', 
+          'underscore.string', 
+          'underscore.inflection', 
+          'active-resource',
+          'occasion-sdk', 
+          'angular'], 
+function() {
     initializeAngular();
     initializeMain();
 });
