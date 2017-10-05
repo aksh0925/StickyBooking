@@ -50,105 +50,85 @@
                 </div>
               </div>
               <hr />
-              <div class="row month-navigator">
-                <div class="col-xs-3">
-                  <a class="btn btn-defult"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
-                </div>
-                <div class="col-xs-6 text-center">
-                  <h6>January</h6>
-                </div>
-                <div class="col-xs-3 text-right">
-                  <a class="btn btn-defult"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+              <div ng-repeat="(yearIndex, year) in allDates" ng-if="year.year == activeCalendarYear">
+                <div ng-repeat="(monthIndex, month) in year.months" ng-if="month.month == activeCalendarMonth">
+                  <div class="row month-navigator">
+                    <div class="col-xs-3">
+                      <a class="btn btn-defult" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="col-xs-6 text-center">
+                      <h6>{{ month.monthName }} {{ year.year }}</h6>
+                    </div>
+                    <div class="col-xs-3 text-right">
+                      <a class="btn btn-defult" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                  </div>
+                  <table class="calendar-table">
+                    <thead>
+                      <tr>
+                        <td>S</td>
+                        <td>M</td>
+                        <td>T</td>
+                        <td>W</td>
+                        <td>T</td>
+                        <td>F</td>
+                        <td>S</td>
+                      </tr>
+                    </thead>
+                    <tr></tr>
+                    <tr class="calendar-dates" ng-repeat="(weekIndex, week) in month.weeks">
+                      
+                      <!-- Empty space at the begining of the month -->
+                      <!-- If it is the first week of the month, and the first day of the month is not on a Sunday, print as many empty blocks as there are missing days at the start of the week -->
+                      <td ng-if="weekIndex == 0 && week[0].thisDay.dayOfWeek != 0" ng-repeat="times in returnRange( (week[0].thisDay.dayOfWeek + 1) - week[0].thisDay.date )" class="empty-date"></td>  
+                      
+                      <!-- If the starting calendar date is not the first day of the week or month -->
+                      <td ng-if="monthIndex == 0 && weekIndex == 0 && week[0].thisDay.date != 1" ng-repeat="(timeIndex, time) in returnRange(week[0].thisDay.date - 1)" class="unavailable-day">{{ timeIndex + 1 }}</td>
+
+                      <!-- All days within the month -->
+                      <!-- Classes that distinguish availability are added by the getDisplayClasses function-->
+                      <td ng-repeat="(dayIndex, day) in week" class="{{ getDisplayClasses(day) }}" ng-click="onDateSelection($event, day)">{{ day.thisDay.date }}</td>
+                      
+                      <!-- Empty space at the end of the month -->
+                      <!-- If it is the last week of the month, and the last day of the month is not on a Saturday, print as many empty blocks as there are missing days at the end of the week -->
+                      <td ng-if="weekIndex == (month.weeks.length - 1)"  ng-repeat="times in returnRange( 6 - (week[week.length - 1].thisDay.dayOfWeek) )" class="empty-date"></td>  
+                      
+                    </tr>
+                  </table>
                 </div>
               </div>
-              <table class="calendar-table">
-                  <thead>
-                    <tr>
-                      <td>S</td>
-                      <td>M</td>
-                      <td>T</td>
-                      <td>W</td>
-                      <td>T</td>
-                      <td>F</td>
-                      <td>S</td>
-                    </tr>
-                  </thead>
-                  <tr class="calendar-dates">
-                    <td class="empty-date"></td>
-                    <td class="empty-date"></td>
-                    <td class="unavailable-day">1</td>
-                    <td class="unavailable-day">2</td>
-                    <td class="unavailable-day">3</td>
-                    <td class="unavailable-day">4</td>
-                    <td class="unavailable-day">5</td>
-                  </tr>
-                  <tr class="calendar-dates">
-                    <td class="unavailable-day">6</td>
-                    <td class="available-time-slot">7</td>
-                    <td class="available-time-slot">8</td>
-                    <td class="available-time-slot">9</td>
-                    <td class="available-time-slot">10</td>
-                    <td class="available-time-slot">11</td>
-                    <td class="unavailable-day">12</td>
-                  </tr>
-                  <tr class="calendar-dates">
-                    <td class="unavailable-day">13</td>
-                    <td class="available-time-slot">14</td>
-                    <td class="available-time-slot">15</td>
-                    <td class="available-time-slot">16</td>
-                    <td class="available-time-slot">17</td>
-                    <td class="available-time-slot">18</td>
-                    <td class="unavailable-day">19</td>
-                  </tr>
-                  <tr class="calendar-dates">
-                    <td class="unavailable-day">20</td>
-                    <td class="available-time-slot">21</td>
-                    <td class="available-time-slot">22</td>
-                    <td class="available-time-slot">23</td>
-                    <td class="available-time-slot">24</td>
-                    <td class="available-time-slot">25</td>
-                    <td class="unavailable-day">26</td>
-                  </tr>
-                  <tr class="calendar-dates">
-                    <td class="unavailable-day">27</td>
-                    <td class="available-time-slot">28</td>
-                    <td class="available-time-slot">29</td>
-                    <td class="available-time-slot">30</td>
-                    <td class="empty-date"></td>
-                    <td class="empty-date"></td>
-                    <td class="empty-date"></td>
-                  </tr>
-              </table>
-              <a name="time-slot-scroll"></a>
-              <div class="available-times row">
-                <div class="col-md-12">
-                  <h6>Available Time Slots</h6>
-                  <h3>Select a time slot on -- SELECTED DATE -- to continue booking:</h3>
-                  <hr />
-                </div>
-                <div class="col-md-4 time-slot-buttons">
-                  <h6>Morning</h6>
-                  <button class="btn btn-primary time-slot">9:00am</button>
-                  <button class="btn btn-primary time-slot unavailable">10:00am</button>
-                  <button class="btn btn-primary time-slot">11:00am</button>
-                </div>
-                <div class="col-md-4 time-slot-buttons">
-                  <h6>Afternoon</h6>
-                  <button class="btn btn-primary time-slot">12:00pm</button>
-                  <button class="btn btn-primary time-slot">1:00pm</button>
-                  <button class="btn btn-primary time-slot">2:00pm</button>
-                  <button class="btn btn-primary time-slot">3:00pm</button>
-                  <button class="btn btn-primary time-slot">4:00pm</button>
-                </div>
-                <div class="col-md-4 time-slot-buttons">
-                  <h6>Evening</h6>
-                  <button class="btn btn-primary time-slot">7:00pm</button>
-                  <button class="btn btn-primary time-slot">8:00pm</button>
-                  <button class="btn btn-primary time-slot">9:00pm</button>
-                  <button class="btn btn-primary time-slot">10:00pm</button>
-                </div>
+
+            <!-- available times-->
+            <a name="time-slot-scroll"></a>
+            <div class="available-times row">
+              <div class="col-md-12">
+                <h6>Available Time Slots</h6>
+                <h3>Select a time slot on {{ formatDate(selectedDate.stringDate) }} to continue booking:</h3>
+                <hr />
+              </div>
+              <div class="col-md-4 time-slot-buttons">
+                <h6>Morning</h6>
+                <button class="btn btn-primary time-slot">9:00am</button>
+                <button class="btn btn-primary time-slot unavailable">10:00am</button>
+                <button class="btn btn-primary time-slot">11:00am</button>
+              </div>
+              <div class="col-md-4 time-slot-buttons">
+                <h6>Afternoon</h6>
+                <button class="btn btn-primary time-slot">12:00pm</button>
+                <button class="btn btn-primary time-slot">1:00pm</button>
+                <button class="btn btn-primary time-slot">2:00pm</button>
+                <button class="btn btn-primary time-slot">3:00pm</button>
+                <button class="btn btn-primary time-slot">4:00pm</button>
+              </div>
+              <div class="col-md-4 time-slot-buttons">
+                <h6>Evening</h6>
+                <button class="btn btn-primary time-slot">7:00pm</button>
+                <button class="btn btn-primary time-slot">8:00pm</button>
+                <button class="btn btn-primary time-slot">9:00pm</button>
+                <button class="btn btn-primary time-slot">10:00pm</button>
               </div>
             </div>
+        </div>
 
         <!--customer information pane -->
         <a name="customer-info-pane-scroller"></a>
@@ -186,7 +166,7 @@
     <script src="index.js"></script>
 
     <!-- Main JS Script -->
-    <script src="assets/scripts/min/main-min.js"></script>
+    <script src="assets/scripts/main.js"></script>
 
   </body>
 </html>

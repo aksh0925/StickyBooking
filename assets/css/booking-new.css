@@ -6559,7 +6559,8 @@ label {
         text-align: left; }
       .pane-calendar .calendar-table tr .empty-date {
         background-color: #f3f3f6;
-        border-bottom: 1px solid #c8cad4; }
+        border-bottom: 1px solid #c8cad4;
+        cursor: not-allowed !important; }
       .pane-calendar .calendar-table tr .selected-date {
         background-color: #3C9FF3 !important;
         color: #fff !important;
@@ -6574,7 +6575,8 @@ label {
       border: 1px solid #c8cad4 !important;
       color: #5a6076; }
     .pane-calendar .calendar-table .unavailable-day {
-      background-color: #f3f3f6; }
+      background-color: #f3f3f6;
+      cursor: not-allowed !important; }
   .pane-calendar .available-times {
     display: none;
     padding-top: 40px;
