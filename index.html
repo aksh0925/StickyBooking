@@ -3,20 +3,21 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>StickyFolios</title>
-    <script src="https://use.fontawesome.com/c385cd600f.js"></script>
-    <link rel="stylesheet" media="all" href="assets/css/booking-new.css">
+    
+    <link rel="stylesheet" media="all" href="assets/css/booking.css">
     <link rel="stylesheet" media="all" href="assets/css/animate.css">
   </head>
   <body class="booking-ui-body-padding body-scroll-lock" ng-app="StickyBooking">
 
     <main class="booking-page-container" ng-controller="BookingController">
+
       <div class="booking-sidebar">
         <h3 class="booking-page-photographer-name">Sarah Cho Photography</h3>
         <div class="booking-page-welcome-message">
           <p>Welcome to the online booking tool. This platform will allow you to schedule, book, &amp; pay for your session.</p>
         </div>
-
         <ol class="booking-process" id="booking-process-status">
           <li class="booking-step-1 booking-step">Get Started</li>
           <li class="booking-step-2 booking-step">Select a Date</li>
@@ -24,149 +25,157 @@
           <li class="booking-step-4 booking-step">Your Information</li>
         </ol>
       </div>
+
       <div class="booking-content">
-        <div class="booking-page-hero" style="background-image: url(assets/images/hero.jpg);">
-          <div class="booking-page-hero-content">
-            <h6 class="get-started-title">Get Started</h6>
-            <h1 class="page-title">Family Mini-Sessions</h1>
-            <h6 class="session-length">Session Length: 1 hour</h6>
-            <button class="get-started animated tada infinite">Book Now</button>
-          </div>
-        </div>
-
-        <!-- calendar pane -->
-        <a name="step-1-scroller"></a>
-        <div class="pane-calendar active-pane" id="step-2">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6>Availability</h6>
-                  <h3>Select a date on the calendar below to view my availability:</h3>
-                </div>
-                <div class="col-md-6">
-                  <div class="session-duration text-right">
-                    <h4 class="duration-count">1 hour</h4>
-                    <h6>Session Duration</h6>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div ng-repeat="(yearIndex, year) in allDates" ng-if="year.year == activeCalendarYear">
-                <div ng-repeat="(monthIndex, month) in year.months" ng-if="month.month == activeCalendarMonth">
-                  <div class="row month-navigator">
-                    <div class="col-xs-3">
-                      <a class="btn btn-defult" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
-                    </div>
-                    <div class="col-xs-6 text-center">
-                      <h6>{{ month.monthName }} {{ year.year }}</h6>
-                    </div>
-                    <div class="col-xs-3 text-right">
-                      <a class="btn btn-defult" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-                    </div>
-                  </div>
-                  <table class="calendar-table">
-                    <thead>
-                      <tr>
-                        <td>S</td>
-                        <td>M</td>
-                        <td>T</td>
-                        <td>W</td>
-                        <td>T</td>
-                        <td>F</td>
-                        <td>S</td>
-                      </tr>
-                    </thead>
-                    <tr></tr>
-                    <tr class="calendar-dates" ng-repeat="(weekIndex, week) in month.weeks">
-                      
-                      <!-- Empty space at the begining of the month -->
-                      <!-- If it is the first week of the month, and the first day of the month is not on a Sunday, print as many empty blocks as there are missing days at the start of the week -->
-                      <td ng-if="weekIndex == 0 && week[0].thisDay.dayOfWeek != 0" ng-repeat="times in returnRange( (week[0].thisDay.dayOfWeek + 1) - week[0].thisDay.date )" class="empty-date"></td>  
-                      
-                      <!-- If the starting calendar date is not the first day of the week or month -->
-                      <td ng-if="monthIndex == 0 && weekIndex == 0 && week[0].thisDay.date != 1" ng-repeat="(timeIndex, time) in returnRange(week[0].thisDay.date - 1)" class="unavailable-day">{{ timeIndex + 1 }}</td>
-
-                      <!-- All days within the month -->
-                      <!-- Classes that distinguish availability are added by the getDisplayClasses function-->
-                      <td ng-repeat="(dayIndex, day) in week" class="{{ getDisplayClasses(day) }}" ng-click="onDateSelection($event, day)">{{ day.thisDay.date }}</td>
-                      
-                      <!-- Empty space at the end of the month -->
-                      <!-- If it is the last week of the month, and the last day of the month is not on a Saturday, print as many empty blocks as there are missing days at the end of the week -->
-                      <td ng-if="weekIndex == (month.weeks.length - 1)"  ng-repeat="times in returnRange( 6 - (week[week.length - 1].thisDay.dayOfWeek) )" class="empty-date"></td>  
-                      
-                    </tr>
-                  </table>
-                </div>
-              </div>
-
-            <!-- available times-->
-            <a name="time-slot-scroll"></a>
-            <div class="available-times row">
-              <div class="col-md-12">
-                <h6>Available Time Slots</h6>
-                <h3>Select a time slot on {{ formatDate(selectedDate.stringDate) }} to continue booking:</h3>
-                <hr />
-              </div>
-              <div class="col-md-4 time-slot-buttons">
-                <h6>Morning</h6>
-                <button class="btn btn-primary time-slot">9:00am</button>
-                <button class="btn btn-primary time-slot unavailable">10:00am</button>
-                <button class="btn btn-primary time-slot">11:00am</button>
-              </div>
-              <div class="col-md-4 time-slot-buttons">
-                <h6>Afternoon</h6>
-                <button class="btn btn-primary time-slot">12:00pm</button>
-                <button class="btn btn-primary time-slot">1:00pm</button>
-                <button class="btn btn-primary time-slot">2:00pm</button>
-                <button class="btn btn-primary time-slot">3:00pm</button>
-                <button class="btn btn-primary time-slot">4:00pm</button>
-              </div>
-              <div class="col-md-4 time-slot-buttons">
-                <h6>Evening</h6>
-                <button class="btn btn-primary time-slot">7:00pm</button>
-                <button class="btn btn-primary time-slot">8:00pm</button>
-                <button class="btn btn-primary time-slot">9:00pm</button>
-                <button class="btn btn-primary time-slot">10:00pm</button>
-              </div>
+        
+          <!--Get Started section -->
+          <div class="booking-page-hero" style="background-image: url(assets/images/hero.jpg);">
+            <div class="booking-page-hero-content">
+              <h6 class="get-started-title">Get Started</h6>
+              <h1 class="page-title">Family Mini-Sessions</h1>
+              <h6 class="session-length">Session Length: 1 hour</h6>
+              <button class="get-started animated tada infinite" ng-click="getStarted()">Book Now</button>
             </div>
-        </div>
+          </div>
 
-        <!--customer information pane -->
-        <a name="customer-info-pane-scroller"></a>
-        <div class="pane-customer-information">
-          <h6>Your Info</h6>
-          <h3>We need to collect some information from you to confirm booking:</h3>
-          <hr />
-          <div class="form-group">
-            <label class="control-label" for="order_customer_email">Your Name</label>
-            <input id="email" placeholder="Your Name" required="required" type="email" ng-model="order.customer.email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required" name="order[customer][email]"><span class="message"></span>
+          <!-- Calendar pane -->
+          <a name="step-1-scroller"></a>
+          <div class="pane-calendar" id="step-2" style="display:none;">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h6>Availability</h6>
+                    <h3>Select a date on the calendar below to view my availability:</h3>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="session-duration text-right">
+                      <h4 class="duration-count">1 hour</h4>
+                      <h6>Session Duration</h6>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                <div ng-repeat="(yearIndex, year) in allDates" ng-if="year.year == activeCalendarYear">
+                  <div ng-repeat="(monthIndex, month) in year.months" ng-if="month.month == activeCalendarMonth">
+                    <div class="row month-navigator">
+                      <div class="col-xs-3">
+                        <a class="btn btn-defult" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                      </div>
+                      <div class="col-xs-6 text-center">
+                        <h6>{{ month.monthName }} {{ year.year }}</h6>
+                      </div>
+                      <div class="col-xs-3 text-right">
+                        <a class="btn btn-defult" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                      </div>
+                    </div>
+                    <table class="calendar-table">
+                      <thead>
+                        <tr>
+                          <td>S</td>
+                          <td>M</td>
+                          <td>T</td>
+                          <td>W</td>
+                          <td>T</td>
+                          <td>F</td>
+                          <td>S</td>
+                        </tr>
+                      </thead>
+                      <tr></tr>
+                      <tr class="calendar-dates" ng-repeat="(weekIndex, week) in month.weeks">
+                        
+                        <!-- Empty space at the begining of the month -->
+                        <!-- If it is the first week of the month, and the first day of the month is not on a Sunday, print as many empty blocks as there are missing days at the start of the week -->
+                        <td ng-if="weekIndex == 0 && week[0].thisDay.dayOfWeek != 0" ng-repeat="times in returnRange( (week[0].thisDay.dayOfWeek + 1) - week[0].thisDay.date )" class="empty-date"></td>  
+                        
+                        <!-- If the starting calendar date is not the first day of the week or month -->
+                        <td ng-if="monthIndex == 0 && weekIndex == 0 && week[0].thisDay.date != 1" ng-repeat="(timeIndex, time) in returnRange(week[0].thisDay.date - 1)" class="unavailable-day">Un{{ timeIndex + 1 }}</td>
+
+                        <!-- All days within the month -->
+                        <!-- Classes that distinguish availability are added by the getDisplayClasses function-->
+                        <td ng-repeat="(dayIndex, day) in week" class="{{ getDisplayClasses(day) }}" ng-click="onDateSelection($event, day)">{{ day.thisDay.date }}</td>
+                        
+                        <!-- Empty space at the end of the month -->
+                        <!-- If it is the last week of the month, and the last day of the month is not on a Saturday, print as many empty blocks as there are missing days at the end of the week -->
+                        <td ng-if="weekIndex == (month.weeks.length - 1)"  ng-repeat="times in returnRange( 6 - (week[week.length - 1].thisDay.dayOfWeek) )" class="empty-date"></td>  
+                        
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+              <!-- available times-->
+              <a name="time-slot-scroll"></a>
+              <div class="available-times row" style="display:none;">
+                <div class="col-md-12">
+                  <h6>Available Time Slots</h6>
+                  <h3>Select a time slot on {{ formatDate(selectedDate.stringDate) }} to continue booking:</h3>
+                  <hr />
+                </div>
+                <div class="col-md-4 time-slot-buttons">
+                  <h6>Morning</h6>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '9:00am')">9:00am</button>
+                  <button class="btn btn-primary time-slot unavailable">10:00am</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '11:00am')">11:00am</button>
+                </div>
+                <div class="col-md-4 time-slot-buttons">
+                  <h6>Afternoon</h6>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '12:00pm')">12:00pm</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '1:00pm')">1:00pm</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '2:00pm')">2:00pm</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '3:00pm')">3:00pm</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '4:00pm')">4:00pm</button>
+                </div>
+                <div class="col-md-4 time-slot-buttons">
+                  <h6>Evening</h6>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '7:00pm')">7:00pm</button>
+                  <button class="btn btn-primary time-slot unavailable">8:00pm</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '9:00pm')">9:00pm</button>
+                  <button class="btn btn-primary time-slot" ng-click="onTimeSlotSelection($event, '10:00pm')">10:00pm</button>
+                </div>
+              </div>
           </div>
-          <div class="form-group">
-            <label class="control-label" for="order_customer_email">Your E-mail Address</label>
-            <input id="email" placeholder="E-mail" required="required" type="email" ng-model="order.customer.email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required" name="order[customer][email]"><span class="message"></span>
+
+          <!--Customer information pane -->
+          <a name="customer-info-pane-scroller"></a>
+          <div class="pane-customer-information" style="display:none;">
+            <h6>Your Info</h6>
+            <h3>We need to collect some information from you to confirm booking:</h3>
+            <hr />
+            <div class="form-group">
+              <label class="control-label" for="order_customer_email">Your Name</label>
+              <input id="email" placeholder="Your Name" required="required" type="email" ng-model="order.customer.email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required" name="order[customer][email]"><span class="message"></span>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="order_customer_email">Your E-mail Address</label>
+              <input id="email" placeholder="E-mail" required="required" type="email" ng-model="order.customer.email" class="form-control ng-pristine ng-untouched ng-empty ng-valid-email ng-invalid ng-invalid-required" name="order[customer][email]"><span class="message"></span>
+            </div>
+            <div class="form-group">
+            <label>
+            text area
+            </label>
+            <textarea class="form-control ng-pristine ng-valid ng-empty ng-touched" data-placeholder="text area" name="order[attributes][419022]" ng-model="order.attributes.attribute_419022" rows="4"></textarea>
+            </div>
+            <div class="alert alert-warning">No payment required at this time. Payment will be collected at the venue.</div>
+            <div class="form-submit">
+              <a href="index-confirm-booking.html" class="btn-primary btn animated pulse infinite">Finalize Booking</a>
+            </div>
           </div>
-          <div class="form-group">
-          <label>
-          text area
-          </label>
-          <textarea class="form-control ng-pristine ng-valid ng-empty ng-touched" data-placeholder="text area" name="order[attributes][419022]" ng-model="order.attributes.attribute_419022" rows="4"></textarea>
-          </div>
-          <div class="alert alert-warning">No payment required at this time. Payment will be collected at the venue.</div>
-          <div class="form-submit">
-            <a href="index-confirm-booking.html" class="btn-primary btn animated pulse infinite">Finalize Booking</a>
-          </div>
-        </div>
+      
       </div>
+
     </main>
 
     <!-- Require Dependencies -->
     <script src="require.js"></script>
     <script src="require-config.js"></script>
 
-    <!-- Angular Based Script -->
-    <script src="index.js"></script>
+    <!-- Require Font-Awesome -->
+    <script src="https://use.fontawesome.com/c385cd600f.js"></script>
 
-    <!-- Main JS Script -->
-    <script src="assets/scripts/main.js"></script>
+    <!-- Require Date Helper Functions -->
+    <script src="assets/js/date-helpers.js"></script>
+
+    <!-- Angular Controller Script -->
+    <script src="index.js"></script>
 
   </body>
 </html>

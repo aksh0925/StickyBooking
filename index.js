@@ -1,43 +1,5 @@
 let initializeAngular = function(){
 
-    //Added function to Date object to allow adjusting a date by a number of date part units
-    Date.prototype.adjust = function(part, amount){
-        part = part.toLowerCase();
-        
-        var map = { 
-                    years: 'FullYear', months: 'Month', weeks: 'Hours', days: 'Hours', hours: 'Hours', 
-                    minutes: 'Minutes', seconds: 'Seconds', milliseconds: 'Milliseconds',
-                    utcyears: 'UTCFullYear', utcmonths: 'UTCMonth', weeks: 'UTCHours', utcdays: 'UTCHours', 
-                    utchours: 'UTCHours', utcminutes: 'UTCMinutes', utcseconds: 'UTCSeconds', utcmilliseconds: 'UTCMilliseconds'
-                },
-            mapPart = map[part];
-
-        if(part == 'weeks' || part == 'utcweeks')
-            amount *= 168;
-        if(part == 'days' || part == 'utcdays')
-            amount *= 24;
-        
-        this['set'+ mapPart]( this['get'+ mapPart]() + amount );
-
-        return this;
-    }
-    
-    //Added function to Date object to allow iterating between two dates
-    Date.prototype.each = function(endDate, part, step, fn, bind){
-        let fromDate = new Date(this.getTime());
-        let toDate = new Date(endDate.getTime());
-        let pm = fromDate <= toDate? 1:-1;
-        let i = 0;
-        
-        while( (pm === 1 && fromDate <= toDate) || (pm === -1 && fromDate >= toDate) ){
-            if(fn.call(bind, fromDate, i, this) === false) break;
-            i += step;
-            fromDate.adjust(part, step*pm);
-        }
-
-        return this;
-    }
-
     //Create angular module attached to the element with attribute ng-app = StickyBooking
     let app = angular.module('StickyBooking', []);
 
@@ -46,21 +8,24 @@ let initializeAngular = function(){
 
         //OnInit
         this.$onInit = function(){
-            //Create Connection to Occasion SDK
+            //Create Connection to Occasion SDK using Merchant API Key
             $scope.occasionClient = new Occasion.Client('463436b5ebf74b42873aaa544801f91a');
 
-            //Create element references
+            //Create important HTML element references
+            $scope.paneCalendar = document.getElementsByClassName("pane-calendar")
             $scope.paneTimeSlots = document.getElementsByClassName("available-times");
             $scope.paneCustomerInformation = document.getElementsByClassName("pane-customer-information");
 
             //Hide certain panes
+            $scope.paneCalendar[0].style.display = 'none';
             $scope.paneTimeSlots[0].style.display = 'none';
             $scope.paneCustomerInformation[0].style.display = 'none';
 
-
-            //Find the first and last booking dates available
-            let startDate = new Date('October 1 2017');
-            let endDate = new Date('December 10 2018');
+            //Configure calendar to display up to 6 months from today
+            let startDate = new Date ( (1 + new Date().getMonth()) + '/01/' + new Date().getFullYear() );
+            let endDate = new Date(startDate);
+            endDate.adjust('months', 6);
+            endDate.adjust('days', -1);
 
             //Set starting month and year for the calendar to display
             $scope.activeCalendarMonth = new Date().getMonth();
@@ -72,12 +37,13 @@ let initializeAngular = function(){
             $scope.maxCalendarMonth = endDate.getMonth();
             $scope.maxCalendarYear = endDate.getFullYear();
 
-            //Build calendar object array based on the first and last day of booking availability
+            //Build calendar object array based on startDate and endDate from above
             $scope.buildCalendarObjectArray(startDate, endDate, function(){
-                console.log("allDates Array Configured", $scope.allDates);
+                console.log("Calendar Array Configured", $scope.allDates);
             });
             
-            /*$scope.occasionClient.Merchant.first()
+            /*
+            $scope.occasionClient.Merchant.first()
                 .then((merchant) => {
                     $scope.Merchant = merchant;
                     console.log("Merchant", $scope.Merchant);
@@ -122,7 +88,8 @@ let initializeAngular = function(){
                                 });
                         });
 
-                });*/
+                });
+            */
         }
 
         //Function takes in the first and last date of booking availability and 
@@ -233,18 +200,18 @@ let initializeAngular = function(){
 
         //Moves the activeCalendar month forward to display the next month
         $scope.moveMonthAhead = function(){
-            if($scope.activeCalendarMonth < 11){
-                if( (($scope.activeCalendarMonth + 1) <= $scope.maxCalendarMonth) && ($scope.activeCalendarYear <= $scope.maxCalendarYear) ){
+            if( $scope.activeCalendarMonth < 11 ){
+                if( $scope.activeCalendarYear < $scope.maxCalendarYear ){
                     $scope.activeCalendarMonth++;
-                }else{
-                    console.log("out of bounds forward case 1");
+                }else if( $scope.activeCalendarYear == $scope.maxCalendarYear ){
+                    if( ($scope.activeCalendarMonth + 1) <= $scope.maxCalendarMonth ){
+                        $scope.activeCalendarMonth++;
+                    }
                 }
             }else{
                 if( (0 <= $scope.maxCalendarMonth) && (($scope.activeCalendarYear + 1) <= $scope.maxCalendarYear) ){
                     $scope.activeCalendarMonth = 0;
                     $scope.activeCalendarYear++;
-                }else{
-                    console.log("out of bounds forward case 2");
                 }
             }
         }
@@ -257,21 +224,18 @@ let initializeAngular = function(){
                 }else if( $scope.activeCalendarYear == $scope.minCalendarYear ){
                     if( ($scope.activeCalendarMonth - 1) >= $scope.minCalendarMonth){
                         $scope.activeCalendarMonth--;
-                    }else if( ($scope.activeCalendarMonth - 1) < $scope.minCalendarMonth ){
-                        console.log("out of bounds backward case 1");
                     }
                 }
             }else if( $scope.activeCalendarMonth == 0 ){
                 if( (11 >= $scope.minCalendarMonth) && ( ($scope.activeCalendarYear - 1) >= $scope.minCalendarYear) ){
                     $scope.activeCalendarMonth = 11;
                     $scope.activeCalendarYear--;
-                }else{
-                    console.log("out of bounds backward case 2");
                 }
             }
         }
 
         //Returns a collection of a given length
+        //For use in the calendar in ng-repeat
         $scope.returnRange = function(n) {
             var range = [];
             for(var i = 0; i < n; i++){
@@ -296,6 +260,7 @@ let initializeAngular = function(){
                 classString = "unavailable-day";
             }
 
+            //Return the class to be applied to the element
             return classString;
         }
 
@@ -303,24 +268,51 @@ let initializeAngular = function(){
         $scope.getClickableStatus = function(passDay){
             let day = passDay.thisDay;
             let dayOfWeek = day.dayOfWeek;
-            let clickable = null;
+            let clickable = true;
 
             //Set weekends to be unavailable
             if( dayOfWeek == '0' || dayOfWeek == '6' ){
                 clickable = false;
-            }else{
-                clickable = true;
             }
 
             //Set days before today as unavailable
-            if( new Date(day.stringDate) >= new Date() ){
-                clickable = true;
-            }else{
+            if( new Date(day.stringDate) < new Date() ){
                 clickable = false;
             }
 
             //Return the clickable status
             return clickable;
+        }
+
+        //Scroll to specified anchor tag
+        $scope.scrollToAnchor = function(aid){
+            var aTag = $("a[name='"+ aid +"']");
+            $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+        }
+
+        //Format date to be legible and friendly
+        $scope.formatDate = function(date) {
+            var monthNames = [
+                "January", "February", "March",
+                "April", "May", "June", "July",
+                "August", "September", "October",
+                "November", "December"
+            ];
+
+            var date = new Date(date);
+            var day = date.getDate();
+            var monthIndex = date.getMonth();
+            var year = date.getFullYear();
+
+            return monthNames[monthIndex] + ' ' + day + ' ' + year;
+        }
+
+        //When a user clicks get started
+        $scope.getStarted = function(){
+            $(".pane-calendar").fadeIn();
+            $scope.scrollToAnchor('step-1-scroller');
+            $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
+            $("#booking-process-status .booking-step-2").addClass("booking-step-active");
         }
 
         //When date is selected from calendar
@@ -345,27 +337,24 @@ let initializeAngular = function(){
             }
         }
 
-        //Scroll to specified anchor tag
-        $scope.scrollToAnchor = function(aid){
-            var aTag = $("a[name='"+ aid +"']");
-            $('html,body').animate({scrollTop: aTag.offset().top},'slow');
-        }
+        //When time slot is selected
+        $scope.onTimeSlotSelection = function(event, passTime){
+            event.preventDefault();
 
-        //Format date to be legible and friendly
-        $scope.formatDate = function(date) {
-            var monthNames = [
-                "January", "February", "March",
-                "April", "May", "June", "July",
-                "August", "September", "October",
-                "November", "December"
-            ];
+            let time = passTime;
 
-            var date = new Date(date);
-            var day = date.getDate();
-            var monthIndex = date.getMonth();
-            var year = date.getFullYear();
+            $scope.selectedTimeSlot = time;
+            $scope.selectedTimeSlotElement = event.currentTarget;
 
-            return monthNames[monthIndex] + ' ' + day + ' ' + year;
+            $(".time-slot-buttons button").removeClass("time-slot-active");
+            $scope.selectedTimeSlotElement.className += " time-slot-active";
+
+            $('.pane-customer-information').addClass("step-visible");
+
+            $scope.scrollToAnchor('customer-info-pane-scroller');
+
+            $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
+            $("#booking-process-status .booking-step-4").addClass("booking-step-active");
         }
 
     });

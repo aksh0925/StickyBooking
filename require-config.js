@@ -11,20 +11,20 @@ require.onError = function(error) {
 require.config({
     "baseUrl": "/",
     "paths": {
-    "jquery": '/node_modules/jquery/dist/jquery.min',
-    "axios": '/node_modules/axios/dist/axios',
-    "qs": '/node_modules/qs/dist/qs',
-    "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
-    "underscore": '/node_modules/underscore/underscore-min',
-    "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
-    "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
-    "active-resource": '/node_modules/active-resource/dist/active-resource.min',
-    "occasion-sdk": '/node_modules/occasion-sdk/dist/occasion-sdk.min',
-    "angular": '/node_modules/angular/angular.min'
+        "jquery": '/node_modules/jquery/dist/jquery.min',
+        "axios": '/node_modules/axios/dist/axios',
+        "qs": '/node_modules/qs/dist/qs',
+        "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
+        "underscore": '/node_modules/underscore/underscore-min',
+        "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
+        "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
+        "active-resource": '/node_modules/active-resource/dist/active-resource.min',
+        "occasion-sdk": '/node_modules/occasion-sdk/dist/occasion-sdk.min',
+        "angular": '/node_modules/angular/angular.min'
     }
 });
 
-require([ 'jquery', 
+require([ 'jquery',
           'axios', 
           'qs', 
           'es6-promise', 
@@ -36,5 +36,4 @@ require([ 'jquery',
           'angular'], 
 function() {
     initializeAngular();
-    initializeMain();
 });
