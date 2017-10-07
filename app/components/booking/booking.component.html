@@ -1,0 +1,144 @@
+<main class="booking-page-container">
+
+    <div class="booking-sidebar">
+        <h3 class="booking-page-photographer-name animated slideInLeft">{{ merchant.name }}</h3>
+        <div class="booking-page-welcome-message animated slideInLeft">
+            <p>Welcome to the online booking tool. This platform will allow you to schedule, book, &amp; pay for your session.</p>
+        </div>
+        <ol class="booking-process animated slideInLeft" id="booking-process-status">
+            <li class="booking-step-1 booking-step">Get Started</li>
+            <li class="booking-step-2 booking-step">Select a Date</li>
+            <li class="booking-step-3 booking-step">Select a Time</li>
+            <li class="booking-step-4 booking-step">Your Information</li>
+        </ol>
+    </div>
+
+    <div class="booking-content">
+    
+        <!--Get Started section -->
+        <div class="booking-page-hero" style="background-image: url('{{ product.image.url }}');">
+            <div class="booking-page-hero-content animated slideInRight">
+                <h6 class="get-started-title">Get Started</h6>
+                <h1 class="page-title">{{ product.title }}</h1>
+                <h6 class="session-length" ng-if="durations.length == 1">Session Length: {{ durations[0] }} minutes</h6>
+                <h6 class="session-length" ng-if="durations.length > 1">Session Lengths: {{ document.write(durations.join(", ")) }} minutes</h6>
+                <button class="get-started animated tada infinite" ng-click="getStarted()">{{ product.orderButtonText }}</button>
+            </div>
+        </div>
+
+        <!-- Calendar pane -->
+        <a name="step-1-scroller"></a>
+        <div class="pane-calendar" id="step-2" style="display:none;">
+            <div class="row">
+                <div class="col-md-6">
+                <h6>Availability</h6>
+                <h3>Select a date on the calendar below to view availability:</h3>
+                </div>
+                <div class="col-md-6">
+                <div class="session-duration text-right">
+                    <h4 class="duration-count">{{ durations[0] }} minutes</h4>
+                    <h6>Session Duration</h6>
+                </div>
+                </div>
+            </div>
+            <hr />
+            
+            <booking-calendar></booking-calendar>
+        </div>
+
+        <!-- available times-->
+        <a name="time-slot-scroll"></a>
+        <div class="available-times row" style="display:none;">
+            <div class="col-md-12">
+                <h6>Available Time Slots</h6>
+                <h3>Select a time slot on {{ friendlyDate }} to continue booking:</h3>
+                <hr />
+            </div>
+            <div class="col-md-4 time-slot-buttons">
+                <h6>Morning</h6>
+                <button class="btn btn-primary time-slot" ng-repeat="(slotIndex, slotValue) in availableSlots" ng-if="splitByTimeOfDay(slotValue.startsAt, 'morning')" ng-click="onTimeSlotSelection($event, slotValue)">{{ formatToTime(slotValue.startsAt) }}</button>
+            </div>
+            <div class="col-md-4 time-slot-buttons">
+                <h6>Afternoon</h6>
+                <button class="btn btn-primary time-slot" ng-repeat="(slotIndex, slotValue) in availableSlots" ng-if="splitByTimeOfDay(slotValue.startsAt, 'afternoon')" ng-click="onTimeSlotSelection($event, slotValue)">{{ formatToTime(slotValue.startsAt) }}</button>
+            </div>
+            <div class="col-md-4 time-slot-buttons">
+                <h6>Evening</h6>
+                <button class="btn btn-primary time-slot" ng-repeat="(slotIndex, slotValue) in availableSlots" ng-if="splitByTimeOfDay(slotValue.startsAt, 'evening')" ng-click="onTimeSlotSelection($event, slotValue)">{{ formatToTime(slotValue.startsAt) }}</button>
+            </div>
+        </div>
+
+        <!--Customer information pane -->
+        <a name="customer-info-pane-scroller"></a>
+        <div class="pane-customer-information" style="display:none;">
+            <h6>Your Info</h6>
+            <h3>We need to collect some information from you to confirm booking:</h3>
+            <hr />
+            <!-- Static Questions, Always Required -->
+            <div class="form-group">
+                <label class="control-label" for="order_customer_email">First Name*</label>
+                <input id="lastName" placeholder="First Name" required="required" type="text" ng-model="order.customer().firstName" name="firstName" class="form-control"><span class="message"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="order_customer_email">Last Name*</label>
+                <input id="firstName" placeholder="Last Name" required="required" type="text" ng-model="order.customer().lastName" name="lastName" class="form-control"><span class="message"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="order_customer_email">Your E-mail Address*</label>
+                <input id="email" placeholder="E-mail" required="required" type="email" ng-model="order.customer().email" name="email" class="form-control"><span class="message"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="order_customer_email">Your Zip Code*</label>
+                <input id="zip" placeholder="Zip Code" required="required" type="number" ng-model="order.customer().zip" name="zip" class="form-control"><span class="message"></span>
+            </div>
+
+            <!-- Dynamic Questions, Set by Merchant -->
+            <div class="form-group" ng-repeat="(index, answer) in returnAsArray(order.answers().target())">
+                <div ng-if="answer.question().formControl != 'separator'">
+                    <label ng-if="answer.question().formControl != 'checkbox' && answer.question().formControl != 'text_output' && answer.question().formControl != 'waiver'">
+                        {{ answer.question().attributes().title }}<span ng-if='answer.question().required'>*</span>
+                    </label>
+                    <!-- Render different from control based on answer.question.formControl type -->
+                    <!-- Text Input -->
+                        <input class="form-control" type="text" ng-model="answer.value" ng-if="answer.question().formControl == 'text_input'" placeholder="{{ answer.question().attributes().title }}" />
+                    <!-- Text Area -->
+                        <textarea class="form-control" rows="4" ng-model="answer.value" ng-if="answer.question().formControl == 'text_area'" placeholder="Your Response"></textarea>
+                    <!-- Option List -->
+                        <div ng-if="answer.question().formControl == 'option_list'">
+                            <div ng-repeat="option in returnAsArray(answer.question().options().target())">
+                                <input class="question-radio" type="radio" ng-model="answer.option" value="{{option.title}}" /> {{option.title}} 
+                            </div>
+                        </div>
+                    <!-- Drop Down -->
+                        <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="answer.option">
+                            <option value="default-option" disabled selected>Select an option</option>
+                            <option ng-repeat="option in returnAsArray(answer.question().options().target())" value="{{option.title}}">{{option.title}}</option>
+                        </select>
+                    <!-- Checkbox -->
+                        <div ng-if="answer.question().formControl == 'checkbox'" >
+                            <input class="question-checkbox" type="checkbox" ng-model="answer.value" />{{ answer.question().attributes().title }}<span ng-if='answer.question().mustBeChecked'>*</span>
+                        </div>
+                    <!-- Waiver -->
+                        <div ng-if="answer.question().formControl == 'waiver'">
+                            <div class="well well-sm waiver">{{ answer.question().waiverText }}</div>
+                            <input class="question-checkbox" type="checkbox" ng-model="answer.value" />{{ answer.question().attributes().title }}*
+                        </div>
+                    <!-- Text Output -->
+                        <p ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</p>
+                        <h3 ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</h3>
+                </div>
+                <div ng-if="answer.question().formControl == 'separator'">
+                    <hr>
+                </div>
+            </div>
+            <!-- End of Questions -->
+
+            <div class="alert alert-warning">No payment required at this time. Payment will be collected at the venue.</div>
+
+            <div class="form-submit">
+                <a class="btn-primary btn animated pulse infinite" ng-click="submitOrder()">Finalize Booking</a>
+            </div>
+        </div>
+        
+    </div>
+</main>

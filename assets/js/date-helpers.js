@@ -8,8 +8,8 @@ Date.prototype.adjust = function(part, amount){
                 minutes: 'Minutes', seconds: 'Seconds', milliseconds: 'Milliseconds',
                 utcyears: 'UTCFullYear', utcmonths: 'UTCMonth', weeks: 'UTCHours', utcdays: 'UTCHours', 
                 utchours: 'UTCHours', utcminutes: 'UTCMinutes', utcseconds: 'UTCSeconds', utcmilliseconds: 'UTCMilliseconds'
-            },
-        mapPart = map[part];
+            };
+    var mapPart = map[part];
 
     if(part == 'weeks' || part == 'utcweeks')
         amount *= 168;
@@ -35,4 +35,26 @@ Date.prototype.each = function(endDate, part, step, fn, bind){
     }
 
     return this;
+}
+
+//Format date to be legible and friendly
+Date.prototype.formatDate = function(){
+    var date = this;
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+
+    return this.getMonthName() + ' ' + day + ', ' + year;
+}
+
+//Return the full name of the month
+Date.prototype.getMonthName = function(){
+    let monthNames = [
+        "January", "February", "March", 
+        "April", "May", "June", "July", 
+        "August", "September", "October", 
+        "November", "December"
+    ];
+
+    return monthNames[ this.getMonth() ];
 }

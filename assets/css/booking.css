@@ -148,6 +148,27 @@ input[type="radio"] {
   box-sizing: border-box;
   padding: 0; }
 
+.question-radio, .question-checkbox{
+  vertical-align: middle;
+  width: 30px !important;
+  height: 30px !important;
+  margin-right: 10px !important;
+  display: inline-block !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  border: none !important;
+  margin-left: 20px !important;
+}
+
+.question-text-output{
+  margin: 50px 0px;
+}
+
+.waiver {
+    max-height: 135px;
+    overflow-y: scroll;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   height: auto; }
@@ -6403,7 +6424,8 @@ label {
       text-align: left; } }
   .booking-page-container .booking-sidebar .booking-page-photographer-name {
     margin-bottom: 40px;
-    margin-top: 0; }
+    margin-top: 0;
+    min-height: 30px; }
   .booking-page-container .booking-sidebar .booking-process {
     display: none; }
     @media (min-width: 992px) {

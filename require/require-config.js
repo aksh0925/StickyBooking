@@ -35,5 +35,8 @@ require([ 'jquery',
           'occasion-sdk', 
           'angular'], 
 function() {
-    initializeAngular();
+    initializeAppModule();
+    initializeBookingComponent();
+    initializeCalendarComponent();
+    initializeSDKService();
 });
