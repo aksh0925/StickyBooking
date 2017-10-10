@@ -48,7 +48,7 @@
 
         <!-- available times-->
         <a name="time-slot-scroll"></a>
-        <div class="available-times row" style="display:none;">
+        <div class="available-times" style="display:none;">
             <div class="col-md-12">
                 <h6>Available Time Slots</h6>
                 <h3>Select a time slot on {{ friendlyDate }} to continue booking:</h3>
@@ -93,8 +93,8 @@
             </div>
 
             <!-- Dynamic Questions, Set by Merchant -->
-            <div class="form-group" ng-repeat="(index, answer) in returnAsArray(order.answers().target())">
-                <div ng-if="answer.question().formControl != 'separator'">
+            <div ng-repeat="(index, answer) in returnAsArray(order.answers().target())">
+                <div class="form-group" ng-if="answer.question().formControl != 'separator'">
                     <label ng-if="answer.question().formControl != 'checkbox' && answer.question().formControl != 'text_output' && answer.question().formControl != 'waiver'">
                         {{ answer.question().attributes().title }}<span ng-if='answer.question().required'>*</span>
                     </label>
@@ -106,18 +106,30 @@
                     <!-- Option List -->
                         <div ng-if="answer.question().formControl == 'option_list'">
                             <div ng-repeat="option in returnAsArray(answer.question().options().target())">
-                                <input class="question-radio" type="radio" ng-model="answer.option" value="{{option.title}}" /> {{option.title}} 
+                                <input class="question-radio" type="radio" ng-model="answer.option" value="{{option.title}}" ng-change="questionValueChanged(answer)"/> {{option.title}} 
                             </div>
                         </div>
                     <!-- Drop Down -->
-                        <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="answer.option">
+                        <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="answer.option" ng-change="questionValueChanged(answer)">
                             <option value="default-option" disabled selected>Select an option</option>
                             <option ng-repeat="option in returnAsArray(answer.question().options().target())" value="{{option.title}}">{{option.title}}</option>
                         </select>
                     <!-- Checkbox -->
                         <div ng-if="answer.question().formControl == 'checkbox'" >
-                            <input class="question-checkbox" type="checkbox" ng-model="answer.value" />{{ answer.question().attributes().title }}<span ng-if='answer.question().mustBeChecked'>*</span>
+                            <input class="question-checkbox" type="checkbox" ng-model="answer.value" ng-change="questionValueChanged(answer)"/>{{ answer.question().attributes().title }}<span ng-if='answer.question().mustBeChecked'>*</span>
                         </div>
+                    <!-- Spin Button -->
+                        <ul class="spinner-input list-inline" ng-if="answer.question().formControl == 'spin_button'">
+                            <li>
+                                <input class="form-control value-input" ng-model="answer.value" readonly="" type="text" ng-init="answer.value = 1">
+                            </li>
+                            <li>
+                                <div class="btn-group btn-group-lg">
+                                    <button class="btn btn-info update-price stepper-minus" ng-click="answer.value = answer.value - 1; questionValueChanged(answer)" ng-disabled="answer.value === 1" type="button" disabled="disabled">-</button>
+                                    <button class="btn btn-info update-price stepper-plus" ng-click="answer.value = answer.value + 1; questionValueChanged(answer)" ng-disabled="answer.value >= answer.question().max" type="button">+</button>
+                                </div>
+                            </li>
+                        </ul>
                     <!-- Waiver -->
                         <div ng-if="answer.question().formControl == 'waiver'">
                             <div class="well well-sm waiver">{{ answer.question().waiverText }}</div>
@@ -127,9 +139,7 @@
                         <p ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</p>
                         <h3 ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</h3>
                 </div>
-                <div ng-if="answer.question().formControl == 'separator'">
-                    <hr>
-                </div>
+                <hr ng-if="answer.question().formControl == 'separator'">
             </div>
             <!-- End of Questions -->
 

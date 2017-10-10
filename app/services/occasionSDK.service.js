@@ -33,19 +33,71 @@ let initializeSDKService = function(){
         });
 
         //Private Functions
+        this.queryTimeSlotsByMonth = (allTimeSlots, month) => {        
+            return new Promise( (resolve, reject) => {
+
+                this.queryNextTimeSlotsPage(allTimeSlots)
+                    .then( (newTimeSlots) => {
+
+                        if( new Date(newTimeSlots.__collection[newTimeSlots.__collection.length - 1].startsAt).getMonth() == month ){
+                            newTimeSlots.__collection.unshift( ...allTimeSlots.__collection );
+                            this.queryTimeSlotsByMonth(newTimeSlots, month)
+                                .then( (finalTimeSlots) => {
+                                    resolve(finalTimeSlots);
+                                })
+                                .catch( (error) => reject(error) );
+                        }else{
+                            if( new Date(newTimeSlots.__collection[0].startsAt).getMonth() == month ){
+                                newTimeSlots.__collection.unshift( ...allTimeSlots.__collection );
+                                this.queryTimeSlotsByMonth(newTimeSlots, month)
+                                    .then( (finalTimeSlots) => {
+                                        resolve(finalTimeSlots);
+                                    })
+                                    .catch( (error) => reject(error) );
+                            }else{
+                                resolve(allTimeSlots);
+                            }
+                        }
+
+                    })
+                    .catch( (data) => {
+                        if(data.hasNextPage == false){
+                            resolve(allTimeSlots);
+                        }else{
+                            reject(error);
+                        }
+                    });
+                    
+            });
+        }
+
         this.queryTimeSlotsForProduct = (product) => {
             return new Promise( (resolve, reject) => {
                 this.queryMyMerchant
                     .then( (merchant) => {
                         merchant.products().find(product.id)
                         .then( (product) => {
-                            product.timeSlots().where({ status: 'bookable' }).all()
+                            product.timeSlots().where({ status: 'bookable' }).perPage(100).all()
                             .then( (timeSlots) => resolve(timeSlots) )
                             .catch( (error) => reject(error) );
                         })
                     });
             });
-        };
+        }
+
+        this.queryNextTimeSlotsPage = (timeSlots) => {
+            return new Promise( (resolve, reject) => {
+                if( timeSlots.hasNextPage() ){
+                    timeSlots.nextPage()
+                        .then( (nextTimeSlotsPage) => resolve(nextTimeSlotsPage) )
+                        .catch( (error) => reject({ error: error, hasNextPage: true }) );
+                }else{
+                    reject({
+                        hasNextPage: false
+                    });
+                }
+            });
+        }
 
         this.queryProductById = (id) => {
             return new Promise( (resolve, reject) => {
@@ -86,8 +138,14 @@ let initializeSDKService = function(){
             getProductById: (id) => {
                 return this.queryProductById(id);
             },
+            getTimeSlotsByMonth: (timeSlots, month) => {
+                return this.queryTimeSlotsByMonth(timeSlots, month);
+            },
             getTimeSlotsForProduct: (product) => {
                 return this.queryTimeSlotsForProduct(product);
+            },
+            getNextTimeSlotsPage: (timeSlots) => {
+                return this.queryNextTimeSlotsPage(timeSlots);
             },
             createOrderForProduct: (product) => {
                 return this.queryToCreateOrderForProduct(product);

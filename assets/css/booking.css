@@ -6543,7 +6543,7 @@ label {
   margin-right: auto;
   padding: 40px; }
   @media (min-width: 992px) {
-    .pane-calendar {
+    .pane-calendar, .available-times {
       padding: 90px 10vw 0px 10vw;
       min-height: 100vh; } }
   .pane-calendar .month-navigator {
@@ -6599,18 +6599,18 @@ label {
     .pane-calendar .calendar-table .unavailable-day {
       background-color: #f3f3f6;
       cursor: not-allowed !important; }
-  .pane-calendar .available-times {
+  .available-times {
     display: none;
     padding-top: 40px;
     margin-bottom: 40px; }
     @media (min-width: 992px) {
-      .pane-calendar .available-times {
+      .available-times {
         padding-top: 5vw;
         padding-bottom: 5vw; } }
-    .pane-calendar .available-times .unavailable {
+    .available-times .unavailable {
       background-color: #e4e6eb;
       color: #a1a6b7; }
-      .pane-calendar .available-times .unavailable:hover {
+    .available-times .unavailable:hover {
         cursor: not-allowed; }
 
 .pane-customer-information {

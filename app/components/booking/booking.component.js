@@ -37,32 +37,31 @@ let initializeBookingComponent = function(){
                     $scope.timeSlots = values[2];
                     $scope.order = values[3];
 
-                    $scope.order.answers().target().map( (answer) => {
-                        console.log("Question", answer.question());
-                        console.log("Attr", answer.question().attributes());
-                        console.log("Options", answer.question().options());
-                        console.log("Options Target", answer.question().options().target());
-                    });
-                    
-                    //Find all possible durations
-                    $scope.durations = [];
-                    $scope.timeSlots.map( (timeSlot) => {
-                        if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
-                            $scope.durations.push(timeSlot.attributes().duration);
-                        }
-                    });
+                    occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
+                        .then( (timeSlotsByMonth) => {
+                            $scope.timeSlots = timeSlotsByMonth;
 
-                    //Manually refresh DOM
-                    $scope.initialDataLoaded = true;
-                    $scope.$apply();
+                            //Find all possible durations
+                            $scope.durations = [];
+                            $scope.timeSlots.map( (timeSlot) => {
+                                if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
+                                    $scope.durations.push(timeSlot.attributes().duration);
+                                }
+                            });
 
-                    //Pass data to child components and initiate their processing
-                    $scope.$broadcast('initialDataLoaded', {
-                        merchant: $scope.merchant,
-                        product: $scope.product,
-                        timeSlots: $scope.timeSlots,
-                        durations: $scope.durations
-                    });
+                            //Manually refresh DOM
+                            $scope.initialDataLoaded = true;
+                            $scope.$apply();
+
+                            //Pass data to child components and initiate their processing
+                            $scope.$broadcast('initialDataLoaded', {
+                                merchant: $scope.merchant,
+                                product: $scope.product,
+                                timeSlots: $scope.timeSlots,
+                                durations: $scope.durations
+                            });
+                        })
+                        .catch( (error) => console.log(error) );
                 }).catch( (error) => console.log(error) );
             }
 
@@ -92,6 +91,12 @@ let initializeBookingComponent = function(){
                 $scope.availableSlots.reverse();
             });
 
+            //When new time slots are loaded
+            $scope.$on('timeSlotsUpdated', function(event, data){
+                $scope.timeSlots = data.timeSlots;
+                $scope.$apply();
+            });
+
             //When time slot is selected
             $scope.onTimeSlotSelection = function(event, passTime){
                 event.preventDefault();
@@ -108,6 +113,19 @@ let initializeBookingComponent = function(){
 
                 $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
                 $("#booking-process-status .booking-step-4").addClass("booking-step-active");
+
+                $scope.order.answers().target().map( (answer) => {
+                    console.log("Answer", answer.question());
+                });
+            }
+
+            //When a question value changes
+            $scope.questionValueChanged = function(answer){
+                if(answer.question().priceCalculating){
+                    console.log("calc");
+                }else{
+                    console.log("not calc");
+                }
             }
 
             //When users submits order form
@@ -156,6 +174,7 @@ let initializeBookingComponent = function(){
                 }
             }
 
+            //Return an object collection as an array
             $scope.returnAsArray = function(unmapped) {
                 let items = [];
                 if($scope.initialDataLoaded){

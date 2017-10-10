@@ -17,6 +17,8 @@ let initializeCalendarComponent = function(){
                     //Set starting month and year for the calendar to display
                     $scope.activeCalendarMonth = new Date().getMonth();
                     $scope.activeCalendarYear = new Date().getFullYear();
+                    $scope.highestMonthLoaded = $scope.activeCalendarMonth;
+                    $scope.highestYearLoaded = $scope.activeCalendarYear;
 
                     //Set max and min range for the calendar in terms of month and year
                     $scope.minCalendarMonth = startDate.getMonth();
@@ -29,6 +31,7 @@ let initializeCalendarComponent = function(){
                         $scope.product = data.product;
                         $scope.timeSlots = data.timeSlots;
                         $scope.durations = data.durations;
+                        //$scope.timeSlotsByMonthArray = data.timeSlotsByMonthArray;
 
                         //Build calendar object array based on startDate and endDate from above
                         $scope.allDatesArrayLoaded = false;
@@ -149,15 +152,18 @@ let initializeCalendarComponent = function(){
                     if( $scope.activeCalendarMonth < 11 ){
                         if( $scope.activeCalendarYear < $scope.maxCalendarYear ){
                             $scope.activeCalendarMonth++;
+                            $scope.getNewTimeSlots();
                         }else if( $scope.activeCalendarYear == $scope.maxCalendarYear ){
                             if( ($scope.activeCalendarMonth + 1) <= $scope.maxCalendarMonth ){
                                 $scope.activeCalendarMonth++;
+                                $scope.getNewTimeSlots();
                             }
                         }
                     }else{
                         if( (0 <= $scope.maxCalendarMonth) && (($scope.activeCalendarYear + 1) <= $scope.maxCalendarYear) ){
                             $scope.activeCalendarMonth = 0;
                             $scope.activeCalendarYear++;
+                            $scope.getNewTimeSlots();
                         }
                     }
                 }
@@ -177,6 +183,22 @@ let initializeCalendarComponent = function(){
                             $scope.activeCalendarMonth = 11;
                             $scope.activeCalendarYear--;
                         }
+                    }
+                }
+
+                //Gets new month of time slots on month change
+                $scope.getNewTimeSlots = function(){
+                    if( ($scope.activeCalendarMonth > $scope.highestMonthLoaded && $scope.activeCalendarYear == $scope.highestYearLoaded) || $scope.activeCalendarYear > $scope.highestYearLoaded){
+                        occasionSDKService.getTimeSlotsByMonth($scope.timeSlots, $scope.activeCalendarMonth, $scope.activeCalendarYear)
+                            .then( (newTimeSlots) => {
+                                console.log("Time slots by month", newTimeSlots);
+                                $scope.timeSlots = newTimeSlots;
+                                $scope.highestMonthLoaded = $scope.activeCalendarMonth;
+                                $scope.highestYearLoaded = $scope.activeCalendarYear;
+                                $scope.$emit('timeSlotsUpdated', { timeSlots: $scope.timeSlots});
+                                $scope.$apply();
+                            })
+                            .catch( (error) => console.log("Error", error) );
                     }
                 }
 
