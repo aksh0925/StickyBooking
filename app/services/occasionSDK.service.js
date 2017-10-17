@@ -118,6 +118,10 @@ let initializeSDKService = function(){
             });
         }
 
+        this.queryBuildCard = (token) =>{
+            return occsn.CreditCard.build({ id: token });
+        }
+
 
         //Set merchant variable locally
         this.queryMyMerchant
@@ -149,6 +153,9 @@ let initializeSDKService = function(){
             },
             createOrderForProduct: (product) => {
                 return this.queryToCreateOrderForProduct(product);
+            },
+            buildCard: (token) => {
+                return this.queryBuildCard(token);
             }
         }
 

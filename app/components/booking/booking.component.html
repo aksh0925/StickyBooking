@@ -77,7 +77,7 @@
             <!-- Static Questions, Always Required -->
             <div class="form-group">
                 <label class="control-label" for="order_customer_email">First Name*</label>
-                <input id="lastName" placeholder="First Name" required="required" type="text" ng-model="order.customer().firstName" name="firstName" class="form-control"><span class="message"></span>
+                <input id="lastName" placeholder="First Name" required="required" type="text" ng-model="order.customer().firstName" name="firstName" class="form-control" autofocus><span class="message"></span>
             </div>
             <div class="form-group">
                 <label class="control-label" for="order_customer_email">Last Name*</label>
@@ -96,7 +96,7 @@
             <div ng-repeat="(index, answer) in returnAsArray(order.answers().target())">
                 <div class="form-group" ng-if="answer.question().formControl != 'separator'">
                     <label ng-if="answer.question().formControl != 'checkbox' && answer.question().formControl != 'text_output' && answer.question().formControl != 'waiver'">
-                        {{ answer.question().attributes().title }}<span ng-if='answer.question().required'>*</span>
+                        {{ answer.question().attributes().title }}<span ng-if='answer.question().required || answer.question().priceCalculating'>*</span>
                     </label>
                     <!-- Render different from control based on answer.question.formControl type -->
                     <!-- Text Input -->
@@ -106,13 +106,12 @@
                     <!-- Option List -->
                         <div ng-if="answer.question().formControl == 'option_list'">
                             <div ng-repeat="option in returnAsArray(answer.question().options().target())">
-                                <input class="question-radio" type="radio" ng-model="answer.option" value="{{option.title}}" ng-change="questionValueChanged(answer)"/> {{option.title}} 
+                                <input class="question-radio" type="radio" ng-value="option.title" name="{{answer.question().id}}" ng-model="optionsHolder[answer.question().id]" ng-change="radioChanged(answer, option)" /> {{option.title}} 
                             </div>
                         </div>
                     <!-- Drop Down -->
-                        <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="answer.option" ng-change="questionValueChanged(answer)">
-                            <option value="default-option" disabled selected>Select an option</option>
-                            <option ng-repeat="option in returnAsArray(answer.question().options().target())" value="{{option.title}}">{{option.title}}</option>
+                        <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="optionsHolder[answer.question().id]" ng-change="selectChanged(answer)">
+                            <option ng-repeat="(optionIndex, option) in returnAsArray(answer.question().options().target())" value="{{option.id}}">{{option.title}}</option>
                         </select>
                     <!-- Checkbox -->
                         <div ng-if="answer.question().formControl == 'checkbox'" >
@@ -143,10 +142,45 @@
             </div>
             <!-- End of Questions -->
 
-            <div class="alert alert-warning">No payment required at this time. Payment will be collected at the venue.</div>
+            <div class="alert alert-success priceTable">
+                <table>
+                    <tr>
+                        <td>Subtotal:</td>
+                        <td>{{ order.attributes().subtotal }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tax:</td>
+                        <td>{{ order.attributes().tax }}</td>
+                    </tr>
+                    <tr style="border-top:2px solid #666">
+                        <td><strong>Total:</strong></td>
+                        <td>{{ order.attributes().total }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <div class="form-group">
+                    <label class="control-label" for="card-number">Card Number*</label>
+                    <input type="text" name="card-number" placeholder="Card Number" ng-model="card.number"/>
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label class="control-label">Expiration*</label>
+                    <input type="text" name="card-month" placeholder="MM" ng-model="card.month"/>
+                    <input type="text" name="card-year" placeholder="YYYY" ng-model="card.year"/>
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label class="control-label" for="card-number">Verification Code*</label>
+                    <input type="text" name="card-verification" placeholder="CVC" ng-model="card.verification"/>
+                </div>
+            </div>
 
             <div class="form-submit">
-                <a class="btn-primary btn animated pulse infinite" ng-click="submitOrder()">Finalize Booking</a>
+                <a class="btn-primary btn animated pulse infinite" ng-click="submitCardData()">Finalize Booking</a>
             </div>
         </div>
         
