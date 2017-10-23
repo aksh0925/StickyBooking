@@ -33,7 +33,7 @@ let initializeSDKService = function(){
         });
 
         //Private Functions
-        this.queryTimeSlotsByMonth = (allTimeSlots, month) => {        
+        this.queryTimeSlotsByMonth = (allTimeSlots, month) => {
             return new Promise( (resolve, reject) => {
 
                 this.queryNextTimeSlotsPage(allTimeSlots)

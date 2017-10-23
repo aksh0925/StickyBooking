@@ -15,7 +15,9 @@ let initializeBookingComponent = function(){
         //Runs On Init
         this.$onInit = function(){
             //Call function to load data from SDK Service
+            $scope.displayLoading = true;
             $scope.initialDataLoaded = false;
+            $scope.orderLoaded = false;
             $scope.staticProductID = 'ahtdt9cutawrxuwieabgyq';
             $scope.loadSDKData();
         }
@@ -23,59 +25,66 @@ let initializeBookingComponent = function(){
         $scope.loadSDKData = function(){
             $scope.merchant = null;
             $scope.product = null;
-            $scope.timeSlots = null;
 
             //Initiate several promises at once, wait for all of them to respond before continuing
             Promise.all([
                 occasionSDKService.getMyMerchant(),
-                occasionSDKService.getProductById($scope.staticProductID),
                 occasionSDKService.getProductById($scope.staticProductID)
-                    .then( (product) => occasionSDKService.getTimeSlotsForProduct(product) ),
-                occasionSDKService.getProductById($scope.staticProductID)
-                    .then( (product) => occasionSDKService.createOrderForProduct(product) )
             ]).then( (values) => {
                 console.log("Promise.All Finished", values);
 
                 //Populate global variables with returns from promises above
                 $scope.merchant = values[0];
                 $scope.product = values[1];
-                $scope.timeSlots = values[2];
-                $scope.order = values[3];
 
-                occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
-                    .then( (timeSlotsByMonth) => {
-                        $scope.timeSlots = timeSlotsByMonth;
+                //Manually refresh DOM
+                $scope.initialDataLoaded = true;
+                $scope.displayLoading = false;
+                $scope.$apply();
 
-                        //Find all possible durations
-                        $scope.durations = [];
-                        $scope.timeSlots.map( (timeSlot) => {
-                            if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
-                                $scope.durations.push(timeSlot.attributes().duration);
-                            }
-                        });
-
-                        //Manually refresh DOM
-                        $scope.initialDataLoaded = true;
-                        $scope.$apply();
-
-                        //Pass data to child components and initiate their processing
-                        $scope.$broadcast('initialDataLoaded', {
-                            merchant: $scope.merchant,
-                            product: $scope.product,
-                            timeSlots: $scope.timeSlots,
-                            durations: $scope.durations
-                        });
-                    })
-                    .catch( (error) => console.log(error) );
             }).catch( (error) => console.log(error) );
         }
 
         //When a user clicks get started
         $scope.getStarted = function(){
-            $(".pane-calendar").fadeIn();
-            $scope.scrollToAnchor('step-1-scroller');
-            $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
-            $("#booking-process-status .booking-step-2").addClass("booking-step-active");
+            $scope.displayLoading = true;
+
+            occasionSDKService.getTimeSlotsForProduct($scope.product)
+                .then( (timeSlots) => {
+                    $scope.timeSlots = timeSlots;
+
+                    occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
+                        .then( (timeSlotsByMonth) => {
+                            $scope.timeSlots = timeSlotsByMonth;
+
+                            //Find all possible durations
+                            $scope.durations = [];
+                            $scope.timeSlots.map( (timeSlot) => {
+                                if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
+                                    $scope.durations.push(timeSlot.attributes().duration);
+                                }
+                            });
+
+                            //Manually refresh DOM
+                            $scope.displayLoading = false;
+                            $scope.$apply();
+
+                            //Pass data to child components and initiate their processing
+                            $scope.$broadcast('timeSlotDataLoaded', {
+                                merchant: $scope.merchant,
+                                product: $scope.product,
+                                timeSlots: $scope.timeSlots,
+                                durations: $scope.durations
+                            });
+
+                            //Scroll Calendar into view
+                            $(".pane-calendar").fadeIn();
+                            $scope.scrollToAnchor('step-1-scroller');
+                            $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
+                            $("#booking-process-status .booking-step-2").addClass("booking-step-active");
+                        })
+                        .catch( (error) => console.log(error) );
+                });
         }
 
         //When date is selected from calendar
@@ -99,24 +108,43 @@ let initializeBookingComponent = function(){
         //When new time slots are loaded
         $scope.$on('timeSlotsUpdated', function(event, data){
             $scope.timeSlots = data.timeSlots;
+            $scope.displayLoading = false;
             $scope.$apply();
+        });
+
+        //When loading animation is started from sub component
+        $scope.$on("startLoading", function(event){
+            $scope.displayLoading = true;
+        });
+
+        //When loading animation is stopped from sub component
+        $scope.$on("stopLoading", function(event){
+            $scope.displayLoading = false;
         });
 
         //When time slot is selected
         $scope.onTimeSlotSelection = function(event, passTime){
             event.preventDefault();
+            $scope.displayLoading = true;
             let time = passTime;
             $scope.selectedTimeSlot = time;
             $scope.selectedTimeSlotElement = event.currentTarget;
-
-            $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
-
             $(".time-slot-buttons button").removeClass("time-slot-active");
             $scope.selectedTimeSlotElement.className += " time-slot-active";
 
-            console.log("Time Slot selected");
-            
-            $scope.startOrder();
+            if($scope.orderLoaded){
+                $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
+                $scope.startOrder();
+            }else{
+                occasionSDKService.createOrderForProduct($scope.product)
+                    .then( (order) => {
+                        $scope.order = order;
+                        $scope.orderLoaded = true;
+
+                        $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
+                        $scope.startOrder();
+                    });
+            }
         }
 
         //When Order and Answers must be configured
@@ -167,6 +195,7 @@ let initializeBookingComponent = function(){
             $scope.order.calculatePrice()
                 .then( (order) => {
                     console.log("Order after first calc", $scope.order.attributes());
+                    $scope.displayLoading = false;
                     $scope.$apply();
 
                     $('.pane-customer-information').addClass("step-visible");

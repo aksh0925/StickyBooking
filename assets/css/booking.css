@@ -6,6 +6,20 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+.loadingAnimation {
+    background: rgba(46, 49, 60, 0.75);
+    position: fixed;
+    z-index: 999999;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+.loadingAnimation img {
+    margin: 0 auto;
+    max-width: 300px;
+}
+
 html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
@@ -28,6 +42,11 @@ nav,
 section,
 summary {
   display: block; }
+
+  .clickable-label{
+    margin: 0 !important;
+    display: block !important;
+  }
 
 audio,
 canvas,
@@ -157,7 +176,7 @@ input[type="radio"] {
   margin-top: 10px !important;
   margin-bottom: 10px !important;
   border: none !important;
-  margin-left: 20px !important;
+  margin-left: 0px !important;
 }
 
 .question-text-output{

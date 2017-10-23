@@ -26,7 +26,7 @@ let initializeCalendarComponent = function(){
                     $scope.maxCalendarMonth = endDate.getMonth();
                     $scope.maxCalendarYear = endDate.getFullYear();
 
-                    $scope.$on('initialDataLoaded', function(event, data){
+                    $scope.$on('timeSlotDataLoaded', function(event, data){
                         $scope.merchant = data.merchant;
                         $scope.product = data.product;
                         $scope.timeSlots = data.timeSlots;
@@ -189,6 +189,7 @@ let initializeCalendarComponent = function(){
                 //Gets new month of time slots on month change
                 $scope.getNewTimeSlots = function(){
                     if( ($scope.activeCalendarMonth > $scope.highestMonthLoaded && $scope.activeCalendarYear == $scope.highestYearLoaded) || $scope.activeCalendarYear > $scope.highestYearLoaded){
+                        $scope.$emit('startLoading');
                         occasionSDKService.getTimeSlotsByMonth($scope.timeSlots, $scope.activeCalendarMonth, $scope.activeCalendarYear)
                             .then( (newTimeSlots) => {
                                 console.log("Time slots by month", newTimeSlots);
