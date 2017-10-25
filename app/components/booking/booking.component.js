@@ -17,8 +17,9 @@ let initializeBookingComponent = function(){
             //Call function to load data from SDK Service
             $scope.displayLoading = true;
             $scope.initialDataLoaded = false;
+            $scope.calendarDataLoaded = false;
             $scope.orderLoaded = false;
-            $scope.staticProductID = 'ahtdt9cutawrxuwieabgyq';
+            $scope.staticProductID = window.OCCSN.product_id;
             $scope.loadSDKData();
         }
 
@@ -37,54 +38,81 @@ let initializeBookingComponent = function(){
                 $scope.merchant = values[0];
                 $scope.product = values[1];
 
+                $scope.psp = $scope.merchant.pspName;
+
                 //Manually refresh DOM
+                $scope.$emit('initialDataLoaded', { product: $scope.product } );
                 $scope.initialDataLoaded = true;
                 $scope.displayLoading = false;
                 $scope.$apply();
+
+                //Eager load calendar data
+                console.log("Calendar data loading");
+                occasionSDKService.getTimeSlotsForProduct($scope.product)
+                    .then( (timeSlots) => {
+                        $scope.timeSlots = timeSlots;
+
+                        occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
+                            .then( (timeSlotsByMonth) => {
+                                $scope.timeSlots = timeSlotsByMonth;
+
+                                //Find all possible durations
+                                $scope.durations = [];
+                                $scope.timeSlots.map( (timeSlot) => {
+                                    if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
+                                        $scope.durations.push(timeSlot.attributes().duration);
+                                    }
+                                });
+
+                                //Manually refresh DOM
+                                console.log("Calendar data loaded");
+                                $scope.calendarDataLoaded = true;
+                                $scope.$apply();
+
+                                //Pass data to child components and initiate their processing
+                                $scope.$broadcast('timeSlotDataLoaded', {
+                                    merchant: $scope.merchant,
+                                    product: $scope.product,
+                                    timeSlots: $scope.timeSlots,
+                                    durations: $scope.durations
+                                });
+                            })
+                            .catch( (error) => console.log(error) );
+                    });
+
+                //Eager load Order resource
+                console.log("Order data loading");
+                occasionSDKService.createOrderForProduct($scope.product)
+                    .then( (order) => {
+                        console.log("Order data loaded");
+                        $scope.order = order;
+                        $scope.orderLoaded = true;
+                    });
 
             }).catch( (error) => console.log(error) );
         }
 
         //When a user clicks get started
         $scope.getStarted = function(){
-            $scope.displayLoading = true;
-
-            occasionSDKService.getTimeSlotsForProduct($scope.product)
-                .then( (timeSlots) => {
-                    $scope.timeSlots = timeSlots;
-
-                    occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
-                        .then( (timeSlotsByMonth) => {
-                            $scope.timeSlots = timeSlotsByMonth;
-
-                            //Find all possible durations
-                            $scope.durations = [];
-                            $scope.timeSlots.map( (timeSlot) => {
-                                if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
-                                    $scope.durations.push(timeSlot.attributes().duration);
-                                }
-                            });
-
-                            //Manually refresh DOM
-                            $scope.displayLoading = false;
-                            $scope.$apply();
-
-                            //Pass data to child components and initiate their processing
-                            $scope.$broadcast('timeSlotDataLoaded', {
-                                merchant: $scope.merchant,
-                                product: $scope.product,
-                                timeSlots: $scope.timeSlots,
-                                durations: $scope.durations
-                            });
-
-                            //Scroll Calendar into view
-                            $(".pane-calendar").fadeIn();
-                            $scope.scrollToAnchor('step-1-scroller');
-                            $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
-                            $("#booking-process-status .booking-step-2").addClass("booking-step-active");
-                        })
-                        .catch( (error) => console.log(error) );
+            if($scope.calendarDataLoaded){
+                //Scroll Calendar into view
+                $(".pane-calendar").fadeIn();
+                $scope.scrollToAnchor('step-1-scroller');
+                $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
+                $("#booking-process-status .booking-step-2").addClass("booking-step-active");
+            }else{
+                $scope.displayLoading = true;
+                $scope.$watch('calendarDataLoaded', function(newValue, oldValue, scope){
+                    if(newValue == true){
+                        $scope.displayLoading = false;
+                        //Scroll Calendar into view
+                        $(".pane-calendar").fadeIn();
+                        $scope.scrollToAnchor('step-1-scroller');
+                        $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
+                        $("#booking-process-status .booking-step-2").addClass("booking-step-active");
+                    }
                 });
+            }
         }
 
         //When date is selected from calendar
@@ -125,25 +153,24 @@ let initializeBookingComponent = function(){
         //When time slot is selected
         $scope.onTimeSlotSelection = function(event, passTime){
             event.preventDefault();
-            $scope.displayLoading = true;
             let time = passTime;
             $scope.selectedTimeSlot = time;
             $scope.selectedTimeSlotElement = event.currentTarget;
             $(".time-slot-buttons button").removeClass("time-slot-active");
             $scope.selectedTimeSlotElement.className += " time-slot-active";
 
+            $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
+
             if($scope.orderLoaded){
-                $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
                 $scope.startOrder();
             }else{
-                occasionSDKService.createOrderForProduct($scope.product)
-                    .then( (order) => {
-                        $scope.order = order;
-                        $scope.orderLoaded = true;
-
-                        $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
+                $scope.displayLoading = true;
+                $scope.$watch('orderLoaded', function(newValue, oldValue, scope){
+                    if(newValue){
+                        $scope.displayLoading = false;
                         $scope.startOrder();
-                    });
+                    }
+                });
             }
         }
 
@@ -191,17 +218,17 @@ let initializeBookingComponent = function(){
                 }
             });
 
+            //Scroll into customer info pane and hide the animation spinner
+            $('.pane-customer-information').addClass("step-visible");
+            $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
+            $("#booking-process-status .booking-step-4").addClass("booking-step-active");
+            $scope.scrollToAnchor('customer-info-pane-scroller');
+
             //Calculate starting price
             $scope.order.calculatePrice()
                 .then( (order) => {
                     console.log("Order after first calc", $scope.order.attributes());
-                    $scope.displayLoading = false;
                     $scope.$apply();
-
-                    $('.pane-customer-information').addClass("step-visible");
-                    $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
-                    $("#booking-process-status .booking-step-4").addClass("booking-step-active");
-                    $scope.scrollToAnchor('customer-info-pane-scroller');
                 });
         }
 
@@ -242,58 +269,67 @@ let initializeBookingComponent = function(){
 
         //Submit credit card data to Spreedly
         $scope.submitCardData = function(){
-            var url = "https://core.spreedly.com/v1/payment_methods.json?environment_key=J4XjKQ4nkytJD7qm8ajmjM19Lpv";
-
-            //Test purchase details
-            $scope.order.customer().firstName = "Joe";
-            $scope.order.customer().lastName = "Jones";
-            $scope.order.customer().email = "joey@example.com";
-            $scope.card = {
-                number: '5555555555554444',
-                month: '3',
-                year: '2032',
-                verification: '423'
+            if($scope.psp == 'cash'){
+                $scope.submitOrder();
             }
 
-            var card = {
-                "payment_method":{
-                    "credit_card":{
-                        "first_name": $scope.order.customer().firstName,
-                        "last_name": $scope.order.customer().lastName,
-                        "number": $scope.card.number,
-                        "verification_value": $scope.card.verification,
-                        "month": $scope.card.month,
-                        "year": $scope.card.year,
-                        "email": $scope.order.customer().email
-                    }
-                }
-            } 
+            if($scope.psp == 'spreedly'){
+                var url = "https://core.spreedly.com/v1/payment_methods.json?environment_key=CYJy65Wq5dmc2dGFVQOp6eci1Ka";
 
-            $http.post(url, card)
-                .then( (data) => {
-                    $scope.cardToken = data.data;
-                    console.log("Card Token", $scope.cardToken);
-                    $scope.submitOrder();
-                })
-                .catch( (error) => {
-                    console.log("Fail", error);
-                    return alert("There was an error processing your credit card information. Please try again.");
-                });
+                //Test purchase details
+                $scope.order.customer().firstName = "Joe";
+                $scope.order.customer().lastName = "Jones";
+                $scope.order.customer().email = "joey@example.com";
+                $scope.card = {
+                    number: '5555555555554444',
+                    month: '3',
+                    year: '2032',
+                    verification: '423'
+                }
+
+                var card = {
+                    "payment_method":{
+                        "credit_card":{
+                            "first_name": $scope.order.customer().firstName,
+                            "last_name": $scope.order.customer().lastName,
+                            "number": $scope.card.number,
+                            "verification_value": $scope.card.verification,
+                            "month": $scope.card.month,
+                            "year": $scope.card.year,
+                            "email": $scope.order.customer().email
+                        }
+                    }
+                } 
+
+                $http.post(url, card)
+                    .then( (data) => {
+                        $scope.cardToken = data.data;
+                        console.log("Card Token", $scope.cardToken);
+                        console.log("Token", $scope.cardToken.transaction.payment_method.token);
+
+                        var creditCard = occasionSDKService.buildCard($scope.cardToken.transaction.payment_method.token);
+
+                        console.log("outstanding before charge", $scope.order.outstandingBalance);
+
+                        $scope.order.charge( creditCard, $scope.order.outstandingBalance );
+
+                        console.log("outstanding after charge", $scope.order.outstandingBalance);
+                        $scope.submitOrder();
+                    })
+                    .catch( (error) => {
+                        console.log("Fail", error);
+                        return alert("There was an error processing your credit card information. Please try again.");
+                    });
+            }
+
+            if($scope.psp == 'square'){
+
+            }
         }
 
         //When users submits order form
         $scope.submitOrder = function() {
             console.log("Order Submit", $scope.order);
-
-            console.log("Token", $scope.cardToken.transaction.payment_method.token);
-
-            var creditCard = occasionSDKService.buildCard($scope.cardToken.transaction.payment_method.token);
-
-            console.log("outstanding before charge", $scope.order.outstandingBalance);
-
-            $scope.order.charge( creditCard, $scope.order.outstandingBalance );
-
-            console.log("outstanding after charge", $scope.order.outstandingBalance);
 
             $scope.order.save( () => {
                 if($scope.order.persisted()){

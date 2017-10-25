@@ -150,7 +150,7 @@
             </div>
             <!-- End of Questions -->
 
-            <div class="alert alert-success priceTable">
+            <div class="alert alert-success priceTable" ng-if="psp != 'cash'">
                 <table>
                     <tr>
                         <td>Subtotal:</td>
@@ -167,28 +167,49 @@
                 </table>
             </div>
 
-            <div>
-                <div class="form-group">
-                    <label class="control-label" for="card-number">Card Number*</label>
-                    <input type="text" name="card-number" placeholder="Card Number" ng-model="card.number"/>
-                </div>
+            <div class="alert alert-warning priceTable" ng-if="psp == 'cash'">
+                <strong>No payment required now. Payment will be collected at the venue.</strong>
+                <br><br>
+                <table>
+                    <tr>
+                        <td>Subtotal:</td>
+                        <td>{{ order.attributes().subtotal }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tax:</td>
+                        <td>{{ order.attributes().tax }}</td>
+                    </tr>
+                    <tr style="border-top:2px solid #666">
+                        <td><strong>Total:</strong></td>
+                        <td>{{ order.attributes().total }}</td>
+                    </tr>
+                </table>
             </div>
-            <div>
-                <div class="form-group">
-                    <label class="control-label">Expiration*</label>
-                    <input type="text" name="card-month" placeholder="MM" ng-model="card.month"/>
-                    <input type="text" name="card-year" placeholder="YYYY" ng-model="card.year"/>
+
+            <div class="ccForm" ng-if="psp != 'cash'">
+                <div>
+                    <div class="form-group">
+                        <label class="control-label" for="card-number">Card Number*</label>
+                        <input type="text" name="card-number" placeholder="Card Number" ng-model="card.number" class="form-control"/>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <div class="form-group">
-                    <label class="control-label" for="card-number">Verification Code*</label>
-                    <input type="text" name="card-verification" placeholder="CVC" ng-model="card.verification"/>
+                <div>
+                    <div class="form-group">
+                        <label class="control-label">Expiration*</label>
+                        <input type="text" name="card-month" placeholder="MM" ng-model="card.month" class="form-control"/>
+                        <input type="text" name="card-year" placeholder="YYYY" ng-model="card.year" class="form-control"/>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label class="control-label" for="card-number">Verification Code*</label>
+                        <input type="text" name="card-verification" placeholder="CVC" ng-model="card.verification" class="form-control"/>
+                    </div>
                 </div>
             </div>
 
             <div class="form-submit">
-                <a class="btn-primary btn animated pulse infinite" ng-click="submitCardData()">Finalize Booking</a>
+                <a class="btn-primary btn animated pulse infinite" ng-click="submitCardData()">{{ product.orderButtonText }}</a>
             </div>
         </div>
         

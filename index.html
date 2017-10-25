@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="StickyBooking" ng-controller="AppController">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>StickyFolios</title>
+    <title>Loading...</title>
 
     <link rel="stylesheet" media="all" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" media="all" href="assets/css/booking.css">
     <link rel="stylesheet" media="all" href="assets/css/animate.css">
   </head>
-  <body class="booking-ui-body-padding body-scroll-lock" ng-app="StickyBooking">
+  <body class="booking-ui-body-padding body-scroll-lock">
 
     <booking-page></booking-page>
+
+    <!-- Set Static API Key and Product ID -->
+    <script>
+      window.OCCSN = {
+        api_key: '463436b5ebf74b42873aaa544801f91a',
+        product_id: 'ahtdt9cutawrxuwieabgyq'
+      };
+      console.log("window.OCCSN", window.OCCSN);
+    </script>
 
     <!-- Font-Awesome -->
     <script src="https://use.fontawesome.com/c385cd600f.js"></script>
