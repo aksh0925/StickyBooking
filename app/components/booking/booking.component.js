@@ -20,6 +20,13 @@ let initializeBookingComponent = function(){
             $scope.calendarDataLoaded = false;
             $scope.orderLoaded = false;
             $scope.staticProductID = window.OCCSN.product_id;
+             //Test purchase details
+                $scope.card = {
+                    number: null,
+                    month: null,
+                    year: null,
+                    verification: null
+                }
             $scope.loadSDKData();
         }
 
@@ -278,17 +285,6 @@ let initializeBookingComponent = function(){
             if($scope.psp == 'spreedly'){
                 var url = "https://core.spreedly.com/v1/payment_methods.json?environment_key=CYJy65Wq5dmc2dGFVQOp6eci1Ka";
 
-                //Test purchase details
-                $scope.order.customer().firstName = "Joe";
-                $scope.order.customer().lastName = "Jones";
-                $scope.order.customer().email = "joey@example.com";
-                $scope.card = {
-                    number: '4111111111111111',
-                    month: '3',
-                    year: '2032',
-                    verification: '423'
-                }
-
                 var card = {
                     "payment_method":{
                         "credit_card":{
@@ -320,9 +316,12 @@ let initializeBookingComponent = function(){
 
                         $scope.order.charge( creditCard, $scope.order.outstandingBalance );
 
-                        console.log("outstanding after charge", $scope.order.outstandingBalance);
-                        $scope.submitOrder();
-                      
+                        $scope.order.calculatePrice()
+                            .then( (order) => {
+                                console.log("Order attributes after charge", $scope.order.attributes());
+                                console.log("Order outstanding after charge", $scope.order.outstandingBalance)
+                                $scope.submitOrder();
+                            });
                     })
                     .catch( (error) => {
                         console.log("Fail", error);
