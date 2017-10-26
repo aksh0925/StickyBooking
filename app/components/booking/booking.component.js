@@ -23,6 +23,7 @@ let initializeBookingComponent = function(){
             $scope.loadSDKData();
         }
 
+        //Make initial calls for data and subsequent eager loaded calls
         $scope.loadSDKData = function(){
             $scope.merchant = null;
             $scope.product = null;
@@ -39,6 +40,7 @@ let initializeBookingComponent = function(){
                 $scope.product = values[1];
 
                 $scope.psp = $scope.merchant.pspName;
+                console.log("PSP:", $scope.psp);
 
                 //Manually refresh DOM
                 $scope.$emit('initialDataLoaded', { product: $scope.product } );
@@ -281,7 +283,7 @@ let initializeBookingComponent = function(){
                 $scope.order.customer().lastName = "Jones";
                 $scope.order.customer().email = "joey@example.com";
                 $scope.card = {
-                    number: '5555555555554444',
+                    number: '4111111111111111',
                     month: '3',
                     year: '2032',
                     verification: '423'
@@ -297,6 +299,9 @@ let initializeBookingComponent = function(){
                             "month": $scope.card.month,
                             "year": $scope.card.year,
                             "email": $scope.order.customer().email
+                        },
+                        "data":{
+                            "zip_code": $scope.order.customer().zip
                         }
                     }
                 } 
@@ -309,12 +314,15 @@ let initializeBookingComponent = function(){
 
                         var creditCard = occasionSDKService.buildCard($scope.cardToken.transaction.payment_method.token);
 
+                        console.log("Credit Card", creditCard);
+
                         console.log("outstanding before charge", $scope.order.outstandingBalance);
 
                         $scope.order.charge( creditCard, $scope.order.outstandingBalance );
 
                         console.log("outstanding after charge", $scope.order.outstandingBalance);
                         $scope.submitOrder();
+                      
                     })
                     .catch( (error) => {
                         console.log("Fail", error);
