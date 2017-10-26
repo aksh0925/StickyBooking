@@ -283,7 +283,7 @@ let initializeBookingComponent = function(){
             }
 
             if($scope.psp == 'spreedly'){
-                var url = "https://core.spreedly.com/v1/payment_methods.json?environment_key=CYJy65Wq5dmc2dGFVQOp6eci1Ka";
+                var url = "https://core.spreedly.com/v1/payment_methods.json?environment_key=UnQhm0g7l3nOIz2hmAoV3eqm26k";
 
                 var card = {
                     "payment_method":{
