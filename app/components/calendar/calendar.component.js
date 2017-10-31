@@ -8,6 +8,7 @@ let initializeCalendarComponent = function(){
             controller: function($scope, occasionSDKService){
 
                 this.$onInit = function(){
+                    console.log("Calendar Component Init");
                     //Configure calendar to display up to 6 months from today
                     let startDate = new Date ( (1 + new Date().getMonth()) + '/01/' + new Date().getFullYear() );
                     let endDate = new Date(startDate);

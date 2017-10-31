@@ -6,7 +6,9 @@ let initializeAppModule = function(){
     app.controller('AppController', function($scope){
         
         //Runs On Init
-        this.$onInit = function(){}
+        this.$onInit = function(){
+            console.log("App Module Init");
+        }
 
         $scope.$on('initialDataLoaded', function(event, data){
             document.title = data.product.title;

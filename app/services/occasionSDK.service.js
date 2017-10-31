@@ -4,6 +4,8 @@ let initializeSDKService = function(){
     //Occasion SDK Service
     angular.module('StickyBooking').factory('occasionSDKService', () => {
 
+        console.log("SDK Service Init");
+
         //Private Variables
         this.occsnKey = window.OCCSN.api_key;
         this.myMerchant;

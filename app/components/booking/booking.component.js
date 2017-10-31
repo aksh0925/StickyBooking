@@ -14,6 +14,7 @@ let initializeBookingComponent = function(){
 
         //Runs On Init
         this.$onInit = function(){
+            console.log("Booking Component Init");
             //Call function to load data from SDK Service
             $scope.displayLoading = true;
             $scope.initialDataLoaded = false;
