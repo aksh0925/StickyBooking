@@ -11,7 +11,7 @@ let initializeSDKService = function(){
         this.myMerchant;
 
         //Create Connection to Occasion SDK using Merchant API Key
-        this.occsn = new Occasion.Client(occsnKey);
+        this.occsn = new Occasion.Client({ token: occsnKey });
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
