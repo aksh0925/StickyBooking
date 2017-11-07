@@ -21,6 +21,17 @@
     max-width: 300px;
 }
 
+.finishButton{
+  display: table !important;
+  margin: 0 auto !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+}
+
+.spreedly-input iframe{
+  max-height: 50px;
+}
+
 html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;

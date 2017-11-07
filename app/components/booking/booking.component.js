@@ -186,6 +186,11 @@ let initializeBookingComponent = function(){
 
         //When Order and Answers must be configured
         $scope.startOrder = function(){
+            
+            if($scope.psp == "spreedly"){
+                $scope.useSpreedly();
+            }
+
             $scope.optionsHolder = {};
             
             //Set default values
@@ -239,7 +244,81 @@ let initializeBookingComponent = function(){
                 .then( (order) => {
                     console.log("Order after first calc", $scope.order.attributes());
                     $scope.$apply();
+                })
+                .catch( (error) => {
+                    console.log("Error from calc start price", error);
                 });
+        }
+        
+
+        $scope.useSpreedly = function(){
+            //Init Spreedly card values
+            Spreedly.init("UnQhm0g7l3nOIz2hmAoV3eqm26k", {
+                "numberEl": "spreedly-number",
+                "cvvEl": "spreedly-cvv"
+            });
+
+            Spreedly.on("ready", function () {
+                var submitButton = document.getElementById('submit-button');
+                submitButton.disabled = false;
+                Spreedly.setFieldType("number", "text");
+                Spreedly.setNumberFormat("prettyFormat");
+                Spreedly.setPlaceholder("number", "Card Number");
+                Spreedly.setPlaceholder("cvv", "CVV");
+                Spreedly.setStyle("number", 'display: block; width: 95%; height: 36px; padding: 6px 12px; font-size: 16px; line-height: 1.428571429; color: #7b829a; background-color: #fff; background-image: none; border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
+                Spreedly.setStyle("cvv", 'display: block; width: 60px; height: 36px; padding: 6px 12px; font-size: 16px; line-height: 1.428571429; color: #7b829a; background-color: #fff; background-image: none; border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
+            });
+
+            Spreedly.on('fieldEvent', function(name, type, activeEl, inputProperties) {
+                if(type == 'focus'){
+                    Spreedly.setStyle(name,'border-color: #66afe9; outline: 0; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6)');
+                }
+                if(type == 'blur'){
+                    Spreedly.setStyle(name, 'border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
+                }
+            });
+            
+            Spreedly.on('errors', function(errors) {
+                for (var i=0; i < errors.length; i++) {
+                    var error = errors[i];
+                    console.log(error);
+                };
+            });
+
+            Spreedly.on('paymentMethod', function(token, pmData) {
+                console.log("Card Token", token);
+                console.log("pmData", pmData);
+
+                var creditCard = occasionSDKService.buildCard(token);
+
+                console.log("Credit Card", creditCard);
+
+                console.log("outstanding before charge", $scope.order.outstandingBalance);
+
+                $scope.order.charge( creditCard, $scope.order.outstandingBalance );
+
+                $scope.order.calculatePrice()
+                    .then( (order) => {
+                        console.log("Order attributes after charge", $scope.order.attributes());
+                        console.log("Order outstanding after charge", $scope.order.outstandingBalance)
+                        $scope.submitOrder();
+                    })
+                    .catch( (error) => {
+                        console.log("Errors with final calc price", error);
+                    });
+            });
+        }
+
+        $scope.submitPaymentForm = function(){
+            console.log("Submit payment form");
+            var requiredFields = {};
+
+            // Get required, non-sensitive, values from host page
+            requiredFields["full_name"] = document.getElementById("full_name").value;
+            requiredFields["month"] = document.getElementById("month").value;
+            requiredFields["year"] = document.getElementById("year").value;
+
+            Spreedly.tokenizeCreditCard(requiredFields);
         }
 
         //When the value of a radio selector changes
@@ -273,65 +352,10 @@ let initializeBookingComponent = function(){
                     .then( (order) => {
                         console.log("Order after calc", $scope.order.attributes());
                         $scope.$apply();
-                    });
-            }
-        }
-
-        //Submit credit card data to Spreedly
-        $scope.submitCardData = function(){
-            if($scope.psp == 'cash'){
-                $scope.submitOrder();
-            }
-
-            if($scope.psp == 'spreedly'){
-                var url = "https://core.spreedly.com/v1/payment_methods.json?environment_key=UnQhm0g7l3nOIz2hmAoV3eqm26k";
-
-                var card = {
-                    "payment_method":{
-                        "credit_card":{
-                            "first_name": $scope.order.customer().firstName,
-                            "last_name": $scope.order.customer().lastName,
-                            "number": $scope.card.number,
-                            "verification_value": $scope.card.verification,
-                            "month": $scope.card.month,
-                            "year": $scope.card.year,
-                            "email": $scope.order.customer().email
-                        },
-                        "data":{
-                            "zip_code": $scope.order.customer().zip
-                        }
-                    }
-                } 
-
-                $http.post(url, card)
-                    .then( (data) => {
-                        $scope.cardToken = data.data;
-                        console.log("Card Token", $scope.cardToken);
-                        console.log("Token", $scope.cardToken.transaction.payment_method.token);
-
-                        var creditCard = occasionSDKService.buildCard($scope.cardToken.transaction.payment_method.token);
-
-                        console.log("Credit Card", creditCard);
-
-                        console.log("outstanding before charge", $scope.order.outstandingBalance);
-
-                        $scope.order.charge( creditCard, $scope.order.outstandingBalance );
-
-                        $scope.order.calculatePrice()
-                            .then( (order) => {
-                                console.log("Order attributes after charge", $scope.order.attributes());
-                                console.log("Order outstanding after charge", $scope.order.outstandingBalance)
-                                $scope.submitOrder();
-                            });
                     })
                     .catch( (error) => {
-                        console.log("Fail", error);
-                        return alert("There was an error processing your credit card information. Please try again.");
+                        console.log("Error with recalc", error);
                     });
-            }
-
-            if($scope.psp == 'square'){
-
             }
         }
 

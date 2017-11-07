@@ -184,9 +184,15 @@
                         <td>{{ order.attributes().total }}</td>
                     </tr>
                 </table>
+
+                <div class="form-submit">
+                    <a class="btn-primary btn animated pulse infinite" ng-click="submitOrder()">{{ product.orderButtonText }}</a>
+                </div>
             </div>
 
-            <div class="ccForm" ng-if="psp != 'cash'">
+
+
+            <!--<div class="ccForm" ng-if="psp != 'cash'">
                 <div>
                     <div class="form-group">
                         <label class="control-label" for="card-number">Card Number*</label>
@@ -211,7 +217,36 @@
             <div class="form-submit">
                 <a class="btn-primary btn animated pulse infinite" ng-click="submitCardData()">{{ product.orderButtonText }}</a>
             </div>
-        </div>
+        </div>-->
+
+        <form id="payment-form" class="ccForm" ng-if="psp != 'cash'">
+            <input type="hidden"  name="payment_method_token" id="payment_method_token">
+
+            <div class="form-group">
+                <label class="control-label" for="full_name">Name On Card</label>
+                <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Credit Card Number</label>
+                <div id="spreedly-number" class="spreedly-input"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
+                <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
+                <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">CVV</label>
+                <div id="spreedly-cvv" class="spreedly-input"></div>
+            </div>
+
+            <div class="form-submit">
+                <input type="button" class="btn-primary btn animated pulse infinite finishButton" id="submit-button" ng-click="submitPaymentForm()" value='{{ product.orderButtonText }}' disabled />
+            </div>
+        </form>
         
     </div>
 </main>
