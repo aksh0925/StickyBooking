@@ -19,7 +19,7 @@ require.config({
         "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
         "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
         "active-resource": '/node_modules/active-resource/build/active-resource.min',
-        "occasion-sdk": '/node_modules/occasion-sdk/dist/occasion-sdk.min',
+        "occasion-sdk": '/node_modules/occasion-sdk/build/occasion-sdk.min',
         "angular": '/node_modules/angular/angular.min'
     }
 });
