@@ -48,6 +48,7 @@ let initializeBookingComponent = function(){
                 $scope.product = values[1];
 
                 $scope.psp = $scope.merchant.pspName;
+                $scope.psp = 'square';
                 console.log("PSP:", $scope.psp);
 
                 //Manually refresh DOM
@@ -186,10 +187,6 @@ let initializeBookingComponent = function(){
 
         //When Order and Answers must be configured
         $scope.startOrder = function(){
-            
-            if($scope.psp == "spreedly"){
-                $scope.useSpreedly();
-            }
 
             $scope.optionsHolder = {};
             
@@ -244,12 +241,160 @@ let initializeBookingComponent = function(){
                 .then( (order) => {
                     console.log("Order after first calc", $scope.order.attributes());
                     $scope.$apply();
+
+                    if($scope.psp == "spreedly"){
+                        $scope.useSpreedly();
+                    }
+
+                    if($scope.psp == "square"){
+                        $scope.useSquare();
+                    }
                 })
                 .catch( (error) => {
                     console.log("Error from calc start price", error);
                 });
         }
         
+        $scope.useSquare = function() {
+            console.log("Use Square");
+            // Set the application ID
+            var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g";
+
+            // Set the location ID
+            var locationId = "CBASEPCUENvvoTglXMqmVTIUaUwgAQ";
+
+            // Create and initialize a payment form object
+            $scope.paymentForm = new SqPaymentForm({
+
+                // Initialize the payment form elements
+                applicationId: applicationId,
+                locationId: locationId,
+                inputClass: 'form-control',
+
+                applePay: false,
+                masterpass: false,
+
+                // Customize the CSS for SqPaymentForm iframe elements
+                inputStyles: [{
+                    fontSize: '19px'
+                }],
+
+                // Initialize Apple Pay placeholder ID
+                applePay: {
+                    elementId: 'sq-apple-pay'
+                },
+
+                // Initialize Masterpass placeholder ID
+                masterpass: {
+                    elementId: 'sq-masterpass'
+                },
+
+                // Initialize the credit card placeholders
+                cardNumber: {
+                    elementId: 'sq-card-number',
+                    placeholder: '•••• •••• •••• ••••'
+                },
+                cvv: {
+                    elementId: 'sq-cvv',
+                    placeholder: 'CVV'
+                },
+                expirationDate: {
+                    elementId: 'sq-expiration-date',
+                    placeholder: 'MM/YY'
+                },
+                postalCode: {
+                    elementId: 'sq-postal-code',
+                    placeholder: '#####'
+                },
+
+                // SqPaymentForm callback functions
+                callbacks: {
+                    methodsSupported: function (methods) {
+                        var applePayBtn = document.getElementById('sq-apple-pay');
+                        var applePayLabel = document.getElementById('sq-apple-pay-label');
+                        var masterpassBtn = document.getElementById('sq-masterpass');
+                        var masterpassLabel = document.getElementById('sq-masterpass-label');
+
+                        applePayBtn.style.display = 'none';
+                        applePayLabel.style.display = 'none';
+                        masterpassBtn.style.display = 'none';
+                        masterpassLabel.style.display = 'none';
+                        // Only show the button if Apple Pay for Web is enabled
+                        // Otherwise, display the wallet not enabled message.
+                        /*if (methods.applePay === true) {
+                            applePayBtn.style.display = 'inline-block';
+                            applePayLabel.style.display = 'none' ;
+                        }
+                        // Only show the button if Masterpass is enabled
+                        // Otherwise, display the wallet not enabled message.
+                        if (methods.masterpass === true) {
+                            masterpassBtn.style.display = 'inline-block';
+                            masterpassLabel.style.display = 'none';
+                        }*/
+                    },
+                    createPaymentRequest: function () {
+                        var paymentRequestJson ;
+                        return paymentRequestJson ;
+                    },
+                    cardNonceResponseReceived: function(errors, nonce, cardData) {
+                        if (errors) {
+                            console.log("Encountered errors:");
+                            errors.forEach(function(error) {
+                                console.log('  ' + error.message);
+                            });
+                        }else{
+                            console.log('Nonce received: ', nonce);
+
+                            var creditCard = occasionSDKService.buildCard({ id: nonce});
+
+                            console.log("Credit Card", creditCard);
+
+                            $scope.order.charge( creditCard, $scope.order.outstandingBalance );
+
+                            $scope.order.calculatePrice()
+                                .then( (order) => {
+                                    $scope.submitOrder();
+                                })
+                                .catch( (error) => {
+                                    console.log("Errors with final calc price", error);
+                                });
+                        }
+                    },
+                    unsupportedBrowserDetected: function() {},
+                    inputEventReceived: function(inputEvent) {
+                        switch (inputEvent.eventType) {
+                            case 'focusClassAdded':
+                            /* HANDLE AS DESIRED */
+                            break;
+                            case 'focusClassRemoved':
+                            /* HANDLE AS DESIRED */
+                            break;
+                            case 'errorClassAdded':
+                            /* HANDLE AS DESIRED */
+                            break;
+                            case 'errorClassRemoved':
+                            /* HANDLE AS DESIRED */
+                            break;
+                            case 'cardBrandChanged':
+                            /* HANDLE AS DESIRED */
+                            break;
+                            case 'postalCodeChanged':
+                            /* HANDLE AS DESIRED */
+                            break;
+                        }
+                    },
+                    paymentFormLoaded: function() {
+                        console.log("Form loaded");
+                    }
+                }
+            });
+            $scope.paymentForm.build();
+        }
+
+        $scope.requestCardNonce = function(event) {
+            event.preventDefault();
+            $scope.paymentForm.requestCardNonce();
+        }
 
         $scope.useSpreedly = function(){
             //Init Spreedly card values

@@ -167,6 +167,7 @@
                 </table>
             </div>
 
+            
             <div class="alert alert-warning priceTable" ng-if="psp == 'cash'">
                 <strong>No payment required now. Payment will be collected at the venue.</strong>
                 <br><br>
@@ -191,62 +192,79 @@
             </div>
 
 
+            <!-- Spreedly Checkout Form -->
+            <form id="payment-form" class="ccForm" ng-if="psp == 'cash'">
+                <input type="hidden"  name="payment_method_token" id="payment_method_token">
 
-            <!--<div class="ccForm" ng-if="psp != 'cash'">
-                <div>
-                    <div class="form-group">
-                        <label class="control-label" for="card-number">Card Number*</label>
-                        <input type="text" name="card-number" placeholder="Card Number" ng-model="card.number" class="form-control"/>
-                    </div>
+                <div class="form-group">
+                    <label class="control-label" for="full_name">Name On Card</label>
+                    <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
                 </div>
-                <div>
-                    <div class="form-group">
-                        <label class="control-label">Expiration*</label>
-                        <input type="text" name="card-month" placeholder="MM" ng-model="card.month" class="form-control"/>
-                        <input type="text" name="card-year" placeholder="YYYY" ng-model="card.year" class="form-control"/>
-                    </div>
+
+                <div class="form-group">
+                    <label class="control-label">Credit Card Number</label>
+                    <div id="spreedly-number" class="spreedly-input"></div>
                 </div>
-                <div>
-                    <div class="form-group">
-                        <label class="control-label" for="card-number">Verification Code*</label>
-                        <input type="text" name="card-verification" placeholder="CVC" ng-model="card.verification" class="form-control"/>
-                    </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
+                    <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
+                    <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
                 </div>
+
+                <div class="form-group">
+                    <label class="control-label">CVV</label>
+                    <div id="spreedly-cvv" class="spreedly-input"></div>
+                </div>
+
+                <div class="form-submit">
+                    <input type="button" class="btn-primary btn animated pulse infinite finishButton" id="submit-button" ng-click="submitPaymentForm()" value='{{ product.orderButtonText }}' disabled />
+                </div>
+            </form>
+
+
+            <!-- Square Checkout Form -->
+            <div id="sq-ccbox" ng-if="psp == 'square'">
+                <form id="nonce-form" novalidate>
+
+                    <div class="form-group">
+                        <label class="control-label">Card Number:</label>
+                        <div id="sq-card-number"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">CVV:</label>
+                        <div id="sq-cvv"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label">Expiration Date:</label>
+                        <div id="sq-expiration-date"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label">Postal Code:</label>
+                        <div id="sq-postal-code"></div>
+                    </div>
+
+                    <div class="form-submit">
+                        <input type="button" class="btn-primary btn animated pulse infinite finishButton" id="sq-creditcard" ng-click="requestCardNonce($event)" value='{{ product.orderButtonText }}' />
+                    </div>
+
+                    <input type="hidden" id="card-nonce" name="nonce">
+                </form>
             </div>
 
-            <div class="form-submit">
-                <a class="btn-primary btn animated pulse infinite" ng-click="submitCardData()">{{ product.orderButtonText }}</a>
-            </div>
-        </div>-->
+            <div id="sq-walletbox" ng-if="psp == 'square'">
+                <div id="sq-apple-pay-label" class="wallet-not-enabled">Apple Pay for Web not enabled</div>
+                <!-- Placholder for Apple Pay for Web button -->
+                <button id="sq-apple-pay" class="button-apple-pay"></button>
 
-        <form id="payment-form" class="ccForm" ng-if="psp != 'cash'">
-            <input type="hidden"  name="payment_method_token" id="payment_method_token">
-
-            <div class="form-group">
-                <label class="control-label" for="full_name">Name On Card</label>
-                <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
+                <div id="sq-masterpass-label" class="wallet-not-enabled">Masterpass not enabled</div>
+                <!-- Placholder for Masterpass button -->
+                <button id="sq-masterpass" class="button-masterpass"></button>
             </div>
-
-            <div class="form-group">
-                <label class="control-label">Credit Card Number</label>
-                <div id="spreedly-number" class="spreedly-input"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
-                <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
-                <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
-            </div>
-
-            <div class="form-group">
-                <label class="control-label">CVV</label>
-                <div id="spreedly-cvv" class="spreedly-input"></div>
-            </div>
-
-            <div class="form-submit">
-                <input type="button" class="btn-primary btn animated pulse infinite finishButton" id="submit-button" ng-click="submitPaymentForm()" value='{{ product.orderButtonText }}' disabled />
-            </div>
-        </form>
         
     </div>
+
 </main>
