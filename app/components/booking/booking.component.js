@@ -297,6 +297,8 @@ let initializeBookingComponent = function(){
 
                 $scope.order.charge( creditCard, $scope.order.outstandingBalance );
 
+                console.log("outstanding after charge but before calc price", $scope.order.outstandingBalance);
+
                 $scope.order.calculatePrice()
                     .then( (order) => {
                         console.log("Order attributes after charge", $scope.order.attributes());
