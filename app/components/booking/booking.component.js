@@ -48,7 +48,6 @@ let initializeBookingComponent = function(){
                 $scope.product = values[1];
 
                 $scope.psp = $scope.merchant.pspName;
-                $scope.psp = 'square';
                 console.log("PSP:", $scope.psp);
 
                 //Manually refresh DOM
@@ -243,10 +242,12 @@ let initializeBookingComponent = function(){
                     $scope.$apply();
 
                     if($scope.psp == "spreedly"){
+                        console.log("Use Spreedly");
                         $scope.useSpreedly();
                     }
 
                     if($scope.psp == "square"){
+                        console.log("Use Square");
                         $scope.useSquare();
                     }
                 })
@@ -256,9 +257,9 @@ let initializeBookingComponent = function(){
         }
         
         $scope.useSquare = function() {
-            console.log("Use Square");
             // Set the application ID
-            var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g";
+            //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g";
+            var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g";
 
             // Set the location ID
             var locationId = "CBASEPCUENvvoTglXMqmVTIUaUwgAQ";
