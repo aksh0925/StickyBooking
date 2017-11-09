@@ -258,8 +258,8 @@ let initializeBookingComponent = function(){
         
         $scope.useSquare = function() {
             // Set the application ID
-            //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g";
-            var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g";
+            //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g"; //Marc's Sandbox Key
+            var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g"; //OCCASION's Key
 
             // Set the location ID
             var locationId = "CBASEPCUENvvoTglXMqmVTIUaUwgAQ";
