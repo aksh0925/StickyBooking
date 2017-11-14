@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Occsn::StickyBooking::VERSION
   s.authors     = ["Marc DeMory", "Nick Landgrebe"]
   s.email       = ["nick@landgre.be"]
-  s.homepage    = "www.getoccasion.com"
+  s.homepage    = "https://www.getoccasion.com"
   s.summary     = "A Checkout experience"
   s.description = "A StickyBooking checkout experience"
   s.license     = "MIT"
