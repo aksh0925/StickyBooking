@@ -6,7 +6,7 @@ require "sticky_booking/version"
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = "sticky_booking"
-  s.version     = StickyBooking::VERSION
+  s.version     = Occsn::StickyBooking::VERSION
   s.authors     = ["Marc DeMory", "Nick Landgrebe"]
   s.email       = ["nick@landgre.be"]
   s.homepage    = "TODO"
