@@ -1,12 +1,12 @@
 $:.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
-require "sticky_booking/version"
+require "occsn_experiences/sticky_booking/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = "sticky_booking"
-  s.version     = Occsn::StickyBooking::VERSION
+  s.version     = OccsnExperiences::StickyBooking::VERSION
   s.authors     = ["Marc DeMory", "Nick Landgrebe"]
   s.email       = ["nick@landgre.be"]
   s.homepage    = "https://www.getoccasion.com"
