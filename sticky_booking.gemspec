@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = Occsn::StickyBooking::VERSION
   s.authors     = ["Marc DeMory", "Nick Landgrebe"]
   s.email       = ["nick@landgre.be"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of StickyBooking."
-  s.description = "TODO: Description of StickyBooking."
+  s.homepage    = "www.getoccasion.com"
+  s.summary     = "A Checkout experience"
+  s.description = "A StickyBooking checkout experience"
   s.license     = "MIT"
 
   s.files = Dir["{app,lib}/**/*", "MIT-LICENSE", "README.md"]
