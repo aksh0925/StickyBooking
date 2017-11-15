@@ -1,10 +1,6 @@
 var angular = require('angular');
 require('libs/date-helpers');
 
-var ActiveResource = require('active-resource');
-
-ActiveResource.Interfaces.JsonApi.contentType = 'application/json';
-
 angular.module('StickyBooking', [])
   .controller('AppController', function($scope){
 

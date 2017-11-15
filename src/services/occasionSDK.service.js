@@ -2,7 +2,7 @@ var angular = require('angular');
 var Occasion = require('occasion-sdk');
 
 angular.module('StickyBooking')
-    .factory('occasionSDKService', () => {
+    .factory('occasionSDKService', function() {
         console.log("SDK Service Init");
 
         //Private Variables
