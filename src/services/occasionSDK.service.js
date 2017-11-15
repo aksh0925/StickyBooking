@@ -1,3 +1,4 @@
+var ActiveResource = require('active-resource');
 var angular = require('angular');
 var Occasion = require('occasion-sdk');
 
@@ -9,8 +10,15 @@ angular.module('StickyBooking')
         this.occsnKey = window.OCCSN.api_key;
         this.myMerchant;
 
+        let options = { token: this.occsnKey };
+
+        let url = window.OCCSN.host_url;
+        if(url != undefined) {
+            options.baseUrl = ActiveResource.prototype.Links.__constructLink(url, 'api', 'v1');
+        }
+
         //Create Connection to Occasion SDK using Merchant API Key
-        this.occsn = new Occasion.Client({ token: this.occsnKey });
+        this.occsn = new Occasion.Client(options);
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
