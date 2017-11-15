@@ -15,7 +15,7 @@ let initializeSDKService = function(){
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
-            this.occsn.Merchant.first()
+            this.occsn.Merchant.includes('currency').first()
                 .then( (merchant) => {
                     resolve(merchant); 
                 })
