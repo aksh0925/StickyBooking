@@ -33,8 +33,8 @@ module.exports = {
   },
 
   output: {
-    filename: '[name]-bundle.js',
-    path: __dirname + '/lib/assets/javascripts/occsn_experiences/sticky_booking'
+    filename: 'sticky_booking-[name]_bundle.js',
+    path: __dirname + '/lib/assets/javascripts/'
   },
 
   plugins: [
@@ -43,9 +43,6 @@ module.exports = {
 
       // This name 'vendor' ties into the entry definition
       name: 'vendor',
-
-      // We don't want the default vendor.js name
-      filename: 'vendor-bundle.js',
 
       // Passing Infinity just creates the commons chunk, but moves no modules into it.
       // In other words, we only put what's in the vendor entry definition in vendor-bundle.js
