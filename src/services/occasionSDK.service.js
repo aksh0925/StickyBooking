@@ -10,7 +10,7 @@ angular.module('StickyBooking')
         this.myMerchant;
 
         //Create Connection to Occasion SDK using Merchant API Key
-        this.occsn = new Occasion.Client({ baseUrl: 'http://occasion.lvh.me:3000/api/v1/', token: this.occsnKey });
+        this.occsn = new Occasion.Client({ token: this.occsnKey });
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
