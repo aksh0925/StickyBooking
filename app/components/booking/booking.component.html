@@ -169,15 +169,15 @@
                 <table>
                     <tr ng-if="order.attributes().subtotal != order.attributes().total">
                         <td>Subtotal:</td>
-                        <td>{{ order.attributes().subtotal }}</td>
+                        <td>{{ merchant.currency().code }} {{ order.attributes().subtotal }}</td>
                     </tr>
                     <tr ng-if="order.attributes().tax != 0 && order.attributes().tax != null">
                         <td>Tax:</td>
-                        <td>{{ order.attributes().tax }}</td>
+                        <td>{{ merchant.currency().code }} {{ order.attributes().tax }}</td>
                     </tr>
                     <tr  style="border-top:2px solid #666">
                         <td><strong>Total:</strong></td>
-                        <td>{{ order.attributes().total }}</td>
+                        <td>{{ merchant.currency().code }} {{ order.attributes().total }}</td>
                     </tr>
                 </table>
             </div>

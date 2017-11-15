@@ -45,7 +45,6 @@ let initializeBookingComponent = function(){
 
                 //Populate global variables with returns from promises above
                 $scope.merchant = values[0];
-                //console.log('currency:',$scope.merchant.currency().code);
                 $scope.product = values[1];
 
                 $scope.psp = $scope.merchant.pspName;
