@@ -34,7 +34,7 @@ module.exports = {
 
   output: {
     filename: '[name]-bundle.js',
-    path: __dirname + '/app/assets/javascripts/occsn_experiences/sticky_booking'
+    path: __dirname + '/lib/assets/javascripts/occsn_experiences/sticky_booking'
   },
 
   plugins: [
