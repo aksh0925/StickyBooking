@@ -16,6 +16,7 @@ module.exports = {
       // app-bundle.js, then we just wasted a bunch of space.
       'active-resource',
       'angular',
+      'angular-spinner',
       'axios',
       'es6-promise',
       'jquery',
