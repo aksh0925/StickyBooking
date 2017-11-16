@@ -1,5 +1,3 @@
-// Common client-side webpack configuration used by webpack.hot.config and webpack.rails.config.
-
 const webpack = require('webpack');
 const path = require('path');
 
@@ -27,7 +25,6 @@ module.exports = {
       'underscore.string'
     ],
 
-    // This will contain the app entry points defined by webpack.hot.config and webpack.build.config
     app: [
       './src/startup',
     ],
