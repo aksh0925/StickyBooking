@@ -198,14 +198,13 @@
                     <h3>Gift Cards & Coupons</h3>
                     <hr>
 
-                    <div class="form-group">
-                        <label class="control-label" for="gift_card">Gift Card</label>
-                        <input type="text" id="gift_card" name="gift_card" class="form-control" placeholder="Gift Card Number">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label" for="gift_card">Coupon Code</label>
-                        <input type="text" id="coupon_code" name="coupon_code" class="form-control" placeholder="Coupon Code">
+                    <div class="form-group hasButton">
+                        <label class="control-label" for="redeemableInput">Gift Card Number or Coupon Code</label>
+                        <input type="text" id="redeemableInput" name="redeemableInput" class="form-control" placeholder="Gift Card Number or Coupon Code" ng-model="redeemableInput" />
+                        <input type="button" class="btn-primary btn" ng-if="activeRedeemable == null" value="Check" ng-click="checkRedeemable()" />
+                        <input type="button" class="btn-danger btn" ng-if="activeRedeemable != null" value="Remove" ng-click="removeRedeemable()" />
+                        <p class="appliedStatus" ng-if="redeemableStatus != null">{{ redeemableStatus }}</p>
+                        <p class="appliedError" ng-if="redeemableError != null">{{ redeemableError }}</p>
                     </div>
                 </div>
                 <!-- End Redeemables Section -->

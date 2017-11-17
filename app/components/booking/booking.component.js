@@ -22,6 +22,9 @@ let initializeBookingComponent = function(){
             $scope.orderLoaded = false;
             $scope.staticProductID = window.OCCSN.product_id;
             $scope.orderErrors = null;
+            $scope.activeRedeemable = null;
+            $scope.redeemableError = null;
+            $scope.redeemableStatus = null;
             //Test purchase details
             $scope.card = {
                 number: null,
@@ -488,6 +491,76 @@ let initializeBookingComponent = function(){
                         console.log("Errors with final calc price", error);
                     });
             });
+        }
+
+        $scope.checkRedeemable = function(){
+            $scope.redeemableError = null;
+            $scope.activeRedeemable = null;
+            var code = document.getElementById('redeemableInput').value;
+
+            $scope.product.redeemables().findBy({ code: code })
+                .then( (redeemable) => {
+                    console.log("Redeemable", redeemable);
+                    var type = occasionSDKService.redeemableType(redeemable);
+                    $scope.activeRedeemable = redeemable;
+                    console.log("Attr", $scope.activeRedeemable.attributes());
+
+                    //Apply charge or discount
+                    switch(type){
+                        case('card'):
+                            $scope.order.charge($scope.activeRedeemable, $scope.activeRedeemable.value);
+                            $scope.redeemableStatus = 'Gift Card Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().value + ' Applied';
+                            break;
+                        case('coupon'):
+                            $scope.order.assignCoupon($scope.activeRedeemable);
+                            if($scope.activeRedeemable.attributes().discountFixed != null)
+                                $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().discountFixed + ' Off';
+                            if($scope.activeRedeemable.attributes().discountPercentage != null)
+                                $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.activeRedeemable.attributes().discountPercentage + '% Off';
+                            break;
+                    }
+
+                    //Recalc price
+                    $scope.order.calculatePrice()
+                        .then( order => {
+                            console.log("Order after calc after redeem", order);
+                            $scope.$apply();
+                        }).catch( error => {
+                            console.log("Error after calc after redeem", error);
+                        });
+                })
+                .catch( (errors) => {
+                    errors.map( error => {
+                        $scope.redeemableStatus = null;
+                        $scope.redeemableError = error.details;
+                    });
+                    document.getElementById('redeemableInput').value = null;
+                    $scope.$apply();
+                });
+        }
+
+        $scope.removeRedeemable = function(){
+            switch(occasionSDKService.redeemableType($scope.activeRedeemable)){
+                case('card'):
+                    $scope.order.removeCharge($scope.activeRedeemable);
+                    break;
+                case('coupon'):
+                    $scope.order.assignCoupon(null);
+                    break;
+            }
+            $scope.activeRedeemable = null;
+            $scope.redeemableStatus = null;
+            $scope.redeemableError = null;
+            document.getElementById('redeemableInput').value = null;
+            
+            //Recalc price
+            $scope.order.calculatePrice()
+                .then( order => {
+                    console.log("Order after calc after remove redeem", order);
+                    $scope.$apply();
+                }).catch( error => {
+                    console.log("Error after calc after remove redeem", error);
+                });
         }
 
         $scope.submitPaymentForms = function(event){
