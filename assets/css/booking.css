@@ -21,6 +21,10 @@
     max-width: 300px;
 }
 
+.borderTop{
+  border-top: 2px solid #666;
+}
+
 .finishButton{
   display: table !important;
   margin: 0 auto !important;
