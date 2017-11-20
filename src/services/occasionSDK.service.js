@@ -1,17 +1,24 @@
-//Function to be called when dependencies are loaded and the angular application may begin running
-let initializeSDKService = function(){
+var ActiveResource = require('active-resource');
+var angular = require('angular');
+var Occasion = require('occasion-sdk');
 
-    //Occasion SDK Service
-    angular.module('StickyBooking').factory('occasionSDKService', () => {
-
+angular.module('StickyBooking')
+    .factory('occasionSDKService', function() {
         console.log("SDK Service Init");
 
         //Private Variables
         this.occsnKey = window.OCCSN.api_key;
         this.myMerchant;
 
+        let options = { token: this.occsnKey };
+
+        let url = window.OCCSN.host_url;
+        if(url != undefined) {
+            options.baseUrl = ActiveResource.prototype.Links.__constructLink(url, 'api', 'v1');
+        }
+
         //Create Connection to Occasion SDK using Merchant API Key
-        this.occsn = new Occasion.Client({ token: occsnKey });
+        this.occsn = new Occasion.Client(options);
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
@@ -172,5 +179,3 @@ let initializeSDKService = function(){
         }
 
     });
-}
-
