@@ -16,6 +16,10 @@ angular.module('StickyBooking')
             $scope.calendarDataLoaded = false;
             $scope.orderLoaded = false;
             $scope.staticProductID = window.OCCSN.product_id;
+            $scope.orderErrors = null;
+            $scope.activeRedeemable = null;
+            $scope.redeemableError = null;
+            $scope.redeemableStatus = null;
             //Test purchase details
             $scope.card = {
               number: null,
@@ -38,63 +42,75 @@ angular.module('StickyBooking')
             ]).then( (values) => {
               console.log("Promise.All Finished", values);
 
-            //Populate global variables with returns from promises above
-            $scope.merchant = values[0];
-            $scope.product = values[1];
+              //Populate global variables with returns from promises above
+              $scope.merchant = values[0];
+              $scope.product = values[1];
 
-            $scope.psp = $scope.merchant.pspName;
-            console.log("PSP:", $scope.psp);
+              $scope.psp = $scope.merchant.pspName;
+              console.log("PSP:", $scope.psp);
 
-            //Manually refresh DOM
-            $scope.$emit('initialDataLoaded', { product: $scope.product } );
-            $scope.initialDataLoaded = true;
-            $scope.displayLoading = false;
-            $scope.$apply();
+              //Manually refresh DOM
+              $scope.$emit('initialDataLoaded', { product: $scope.product } );
+              $scope.initialDataLoaded = true;
+              $scope.displayLoading = false;
+              $scope.$apply();
 
-            //Eager load calendar data
-            console.log("Calendar data loading");
-            occasionSDKService.getTimeSlotsForProduct($scope.product)
-            .then( (timeSlots) => {
-              $scope.timeSlots = timeSlots;
+              //Eager load calendar data
+              console.log("Calendar data loading");
+              occasionSDKService.getTimeSlotsForProduct($scope.product)
+              .then( (timeSlots) => {
+                $scope.timeSlots = timeSlots;
 
-            occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
-            .then( (timeSlotsByMonth) => {
-              $scope.timeSlots = timeSlotsByMonth;
+                occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
+                .then( (timeSlotsByMonth) => {
+                  $scope.timeSlots = timeSlotsByMonth;
 
-            //Find all possible durations
-            $scope.durations = [];
-            $scope.timeSlots.map( (timeSlot) => {
-              if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
-              $scope.durations.push(timeSlot.attributes().duration);
-            }
-          });
+                  //Find all possible durations
+                  $scope.durations = [];
+                  $scope.timeSlots.map( (timeSlot) => {
+                    if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
+                      $scope.durations.push(timeSlot.attributes().duration);
+                    }
+                  });
 
-            //Manually refresh DOM
-            console.log("Calendar data loaded");
-            $scope.calendarDataLoaded = true;
-            $scope.$apply();
+                  //Manually refresh DOM
+                  console.log("Calendar data loaded");
+                  $scope.calendarDataLoaded = true;
+                  $scope.$apply();
 
-            //Pass data to child components and initiate their processing
-            $scope.$broadcast('timeSlotDataLoaded', {
-              merchant: $scope.merchant,
-              product: $scope.product,
-              timeSlots: $scope.timeSlots,
-              durations: $scope.durations
+                  //Pass data to child components and initiate their processing
+                  $scope.$broadcast('timeSlotDataLoaded', {
+                    merchant: $scope.merchant,
+                    product: $scope.product,
+                    timeSlots: $scope.timeSlots,
+                    durations: $scope.durations
+                  });
+                })
+              .catch( (error) => console.log(error) );
+              });
+
+              //Eager load Order resource
+              console.log("Order data loading");
+              occasionSDKService.createOrderForProduct($scope.product)
+              .then( (order) => {
+                console.log("Order data loaded");
+                $scope.order = order;
+                $scope.orderLoaded = true;
+              });
+
+            }).catch((errors) => {
+              console.log(errors);
+              $scope.displayLoading = false;
+              $scope.$apply();
+
+              if(errors instanceof TypeError){
+                alert("There was an error retrieving the listing you're looking for. Please try again later.");
+              } else {
+                errors.map(error => {
+                  alert(error.details);
+                });
+              }
             });
-          })
-          .catch( (error) => console.log(error) );
-          });
-
-            //Eager load Order resource
-            console.log("Order data loading");
-            occasionSDKService.createOrderForProduct($scope.product)
-            .then( (order) => {
-              console.log("Order data loaded");
-            $scope.order = order;
-            $scope.orderLoaded = true;
-          });
-
-          }).catch( (error) => console.log(error) );
           }
 
           //When a user clicks get started
@@ -168,7 +184,7 @@ angular.module('StickyBooking')
 
             if($scope.orderLoaded){
               $scope.startOrder();
-            }else{
+            } else {
               $scope.displayLoading = true;
               $scope.$watch('orderLoaded', function(newValue, oldValue, scope){
                 if(newValue){
@@ -179,37 +195,74 @@ angular.module('StickyBooking')
             }
           }
 
-          //When Order and Answers must be configured
-          $scope.startOrder = function(){
+        //When the value of a radio selector changes
+        $scope.radioChanged = function(answer, option){
+          $scope.order.answers().target().map((answerAtI) => {
+            if(answerAtI.questionId == answer.questionId){
+              answerAtI.assignOption(option);
+              $scope.questionValueChanged(answer);
+            }
+          });
+        }
 
-            $scope.optionsHolder = {};
+        //When the value of a drop down selector changes
+        $scope.selectChanged = function(answer){
+          $scope.order.answers().target().map((answerAtI) => {
+            if(answerAtI.questionId == answer.questionId){
+              answerAtI.question().options().target().map((option) => {
+                if($scope.optionsHolder[answer.questionId] == option.id){
+                  answerAtI.assignOption(option);
+                  $scope.questionValueChanged(answer);
+                }
+              });
+            }
+          });
+        }
 
-            //Set default values
-            $scope.order.answers().target().map( (answer) => {
+        //When a question value changes
+        $scope.questionValueChanged = function(answer) {
+          if(answer.question().priceCalculating) {
+            $scope.order.calculatePrice()
+            .then((order) => {
+              console.log("Order after calc", $scope.order.attributes());
+              $scope.$apply();
+            })
+            .catch( (error) => {
+              console.log("Error with recalc", error);
+            });
+          }
+        }
 
-              var formControl = answer.question().formControl;
+        //When Order and Answers must be configured
+        $scope.startOrder = function(){
+          $scope.optionsHolder = {};
+
+          //Set default values
+          $scope.order.answers().target().map((answer) => {
+            var formControl = answer.question().formControl;
             var optionCount = 0;
             var firstOption = null;
             var defaultFound = false;
-            answer.question().options().target().map( (option) => {
-
+            answer.question().options().target().map((option) => {
               if(optionCount == 0){
-              firstOption = option;
-            }
-
-            if(formControl == 'drop_down' || formControl == 'option_list'){
-              if(option.default){
-                if(formControl == 'drop_down')
-                  $scope.optionsHolder[answer.question().id] = option.id;
-                if(formControl == 'option_list')
-                  $scope.optionsHolder[answer.question().id] = option.title;
-                defaultFound = true;
-                answer.assignOption(option);
+                firstOption = option;
               }
-            }
 
-            optionCount++;
-          });
+              if(formControl == 'drop_down' || formControl == 'option_list'){
+                if(option.default){
+                  if(formControl == 'drop_down')
+                    $scope.optionsHolder[answer.question().id] = option.id;
+
+                  if(formControl == 'option_list')
+                    $scope.optionsHolder[answer.question().id] = option.title;
+
+                  defaultFound = true;
+                  answer.assignOption(option);
+                }
+              }
+
+              optionCount++;
+            });
 
             if( (formControl == 'drop_down' || formControl == 'option_list') && !defaultFound){
               if(formControl == 'drop_down')
@@ -219,21 +272,21 @@ angular.module('StickyBooking')
               answer.assignOption(firstOption);
             }
 
-            if(formControl == 'checkbox'){
+            if(formControl == 'checkbox') {
               answer.value = false;
             }
           });
 
-            //Scroll into customer info pane and hide the animation spinner
-            $('.pane-customer-information').addClass("step-visible");
-            $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
-            $("#booking-process-status .booking-step-4").addClass("booking-step-active");
-            $scope.scrollToAnchor('customer-info-pane-scroller');
+          //Scroll into customer info pane and hide the animation spinner
+          $('.pane-customer-information').addClass("step-visible");
+          $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
+          $("#booking-process-status .booking-step-4").addClass("booking-step-active");
+          $scope.scrollToAnchor('customer-info-pane-scroller');
 
-            //Calculate starting price
-            $scope.order.calculatePrice()
-            .then( (order) => {
-              console.log("Order after first calc", $scope.order.attributes());
+          //Calculate starting price
+          $scope.order.calculatePrice()
+          .then((order) => {
+            console.log("Order after first calc", $scope.order.attributes());
             $scope.$apply();
 
             if($scope.psp == "spreedly"){
@@ -247,328 +300,363 @@ angular.module('StickyBooking')
             }
           })
           .catch( (error) => {
-              console.log("Error from calc start price", error);
+            console.log("Error from calc start price", error);
           });
-          }
+        };
 
-          $scope.useSquare = function() {
-            // Set the application ID
-            //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g"; //Marc's Sandbox Key
-            var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g"; //OCCASION's Key
+        $scope.useSquare = function() {
+          // Set the application ID
+          //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g"; //Marc's Sandbox Key
+          var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g"; //OCCASION's Key
 
-            // Set the location ID
-            var locationId = "CBASEPCUENvvoTglXMqmVTIUaUwgAQ";
+          // Set the location ID
+          var locationId = "CBASEPCUENvvoTglXMqmVTIUaUwgAQ";
 
-            // Create and initialize a payment form object
-            $scope.paymentForm = new SqPaymentForm({
+          // Create and initialize a payment form object
+          $scope.paymentForm = new SqPaymentForm({
 
-              // Initialize the payment form elements
-              applicationId: applicationId,
-              locationId: locationId,
-              inputClass: 'form-control',
+            // Initialize the payment form elements
+            applicationId: applicationId,
+            locationId: locationId,
+            inputClass: 'form-control',
 
-              applePay: false,
-              masterpass: false,
+            applePay: false,
+            masterpass: false,
 
-              // Customize the CSS for SqPaymentForm iframe elements
-              inputStyles: [{
-                fontSize: '19px'
-              }],
+            // Customize the CSS for SqPaymentForm iframe elements
+            inputStyles: [{
+              fontSize: '19px'
+            }],
 
-              // Initialize Apple Pay placeholder ID
-              applePay: {
-                elementId: 'sq-apple-pay'
-              },
+            // Initialize Apple Pay placeholder ID
+            applePay: {
+              elementId: 'sq-apple-pay'
+            },
 
-              // Initialize Masterpass placeholder ID
-              masterpass: {
-                elementId: 'sq-masterpass'
-              },
+            // Initialize Masterpass placeholder ID
+            masterpass: {
+              elementId: 'sq-masterpass'
+            },
 
-              // Initialize the credit card placeholders
-              cardNumber: {
-                elementId: 'sq-card-number',
-                placeholder: '•••• •••• •••• ••••'
-              },
-              cvv: {
-                elementId: 'sq-cvv',
-                placeholder: 'CVV'
-              },
-              expirationDate: {
-                elementId: 'sq-expiration-date',
-                placeholder: 'MM/YY'
-              },
-              postalCode: {
-                elementId: 'sq-postal-code',
-                placeholder: '#####'
-              },
+            // Initialize the credit card placeholders
+            cardNumber: {
+              elementId: 'sq-card-number',
+              placeholder: '•••• •••• •••• ••••'
+            },
+            cvv: {
+              elementId: 'sq-cvv',
+              placeholder: 'CVV'
+            },
+            expirationDate: {
+              elementId: 'sq-expiration-date',
+              placeholder: 'MM/YY'
+            },
+            postalCode: {
+              elementId: 'sq-postal-code',
+              placeholder: '#####'
+            },
 
-              // SqPaymentForm callback functions
-              callbacks: {
-                methodsSupported: function (methods) {
-                  var applePayBtn = document.getElementById('sq-apple-pay');
-                  var applePayLabel = document.getElementById('sq-apple-pay-label');
-                  var masterpassBtn = document.getElementById('sq-masterpass');
-                  var masterpassLabel = document.getElementById('sq-masterpass-label');
+            // SqPaymentForm callback functions
+            callbacks: {
+              methodsSupported: function (methods) {
+                var applePayBtn = document.getElementById('sq-apple-pay');
+                var applePayLabel = document.getElementById('sq-apple-pay-label');
+                var masterpassBtn = document.getElementById('sq-masterpass');
+                var masterpassLabel = document.getElementById('sq-masterpass-label');
 
-                  applePayBtn.style.display = 'none';
-                  applePayLabel.style.display = 'none';
-                  masterpassBtn.style.display = 'none';
-                  masterpassLabel.style.display = 'none';
-                  // Only show the button if Apple Pay for Web is enabled
-                  // Otherwise, display the wallet not enabled message.
-                  /*if (methods.applePay === true) {
-                      applePayBtn.style.display = 'inline-block';
-                      applePayLabel.style.display = 'none' ;
-                  }
-                  // Only show the button if Masterpass is enabled
-                  // Otherwise, display the wallet not enabled message.
-                  if (methods.masterpass === true) {
-                      masterpassBtn.style.display = 'inline-block';
-                      masterpassLabel.style.display = 'none';
-                  }*/
-                },
-                createPaymentRequest: function () {
-                  var paymentRequestJson ;
-                  return paymentRequestJson ;
-                },
-                cardNonceResponseReceived: function(errors, nonce, cardData) {
-                  if (errors) {
-                    console.log("Encountered errors:");
-                    errors.forEach(function(error) {
-                      console.log('  ' + error.message);
-                    });
-                  }else{
-                    console.log('Nonce received: ', nonce);
-
-                    var creditCard = occasionSDKService.buildCard({ id: nonce});
-
-                    console.log("Credit Card", creditCard);
-
-                    $scope.order.charge( creditCard, $scope.order.outstandingBalance );
-
-                    $scope.order.calculatePrice()
-                    .then( (order) => {
-                      $scope.submitOrder();
-                  })
-                  .catch( (error) => {
-                      console.log("Errors with final calc price", error);
-                  });
-                  }
-                },
-                unsupportedBrowserDetected: function() {},
-                inputEventReceived: function(inputEvent) {
-                  switch (inputEvent.eventType) {
-                    case 'focusClassAdded':
-                      /* HANDLE AS DESIRED */
-                      break;
-                    case 'focusClassRemoved':
-                      /* HANDLE AS DESIRED */
-                      break;
-                    case 'errorClassAdded':
-                      /* HANDLE AS DESIRED */
-                      break;
-                    case 'errorClassRemoved':
-                      /* HANDLE AS DESIRED */
-                      break;
-                    case 'cardBrandChanged':
-                      /* HANDLE AS DESIRED */
-                      break;
-                    case 'postalCodeChanged':
-                      /* HANDLE AS DESIRED */
-                      break;
-                  }
-                },
-                paymentFormLoaded: function() {
-                  console.log("Form loaded");
+                applePayBtn.style.display = 'none';
+                applePayLabel.style.display = 'none';
+                masterpassBtn.style.display = 'none';
+                masterpassLabel.style.display = 'none';
+                // Only show the button if Apple Pay for Web is enabled
+                // Otherwise, display the wallet not enabled message.
+                /*if (methods.applePay === true) {
+                    applePayBtn.style.display = 'inline-block';
+                    applePayLabel.style.display = 'none' ;
                 }
+                // Only show the button if Masterpass is enabled
+                // Otherwise, display the wallet not enabled message.
+                if (methods.masterpass === true) {
+                    masterpassBtn.style.display = 'inline-block';
+                    masterpassLabel.style.display = 'none';
+                }*/
+              },
+              createPaymentRequest: function () {
+                var paymentRequestJson ;
+                return paymentRequestJson ;
+              },
+              cardNonceResponseReceived: function(errors, nonce, cardData) {
+                if (errors) {
+                  //Fill orderErrors array which displays under credit card form
+                  $scope.orderErrors = errors;
+                  $scope.$apply();
+
+                  //Log full errors for console
+                  console.log("Encountered errors:");
+                  errors.forEach(function(error) {
+                    console.log(error);
+                  });
+                } else {
+                  $scope.creditCard = occasionSDKService.buildCard(nonce);
+                  console.log("CARD", $scope.creditCard);
+                  $scope.order.charge( $scope.creditCard, $scope.order.outstandingBalance );
+
+                  $scope.order.calculatePrice()
+                  .then((order) => {
+                    $scope.submitOrder();
+                  })
+                  .catch((error) => {
+                    console.log("Errors with final calc price", error);
+                  });
+                }
+              },
+              unsupportedBrowserDetected: function() {},
+              inputEventReceived: function(inputEvent) {
+                switch (inputEvent.eventType) {
+                  case 'focusClassAdded':
+                    /* HANDLE AS DESIRED */
+                    break;
+                  case 'focusClassRemoved':
+                    /* HANDLE AS DESIRED */
+                    break;
+                  case 'errorClassAdded':
+                    /* HANDLE AS DESIRED */
+                    break;
+                  case 'errorClassRemoved':
+                    /* HANDLE AS DESIRED */
+                    break;
+                  case 'cardBrandChanged':
+                    /* HANDLE AS DESIRED */
+                    break;
+                  case 'postalCodeChanged':
+                    /* HANDLE AS DESIRED */
+                    break;
+                }
+              },
+              paymentFormLoaded: function() {
+                console.log("Form loaded");
               }
-            });
-            $scope.paymentForm.build();
-          }
+            }
+          });
+          $scope.paymentForm.build();
+        };
 
-          $scope.requestCardNonce = function(event) {
-            event.preventDefault();
-            $scope.paymentForm.requestCardNonce();
-          }
+        $scope.useSpreedly = function(){
+          //Init Spreedly card values
+          Spreedly.init("UnQhm0g7l3nOIz2hmAoV3eqm26k", {
+            "numberEl": "spreedly-number",
+            "cvvEl": "spreedly-cvv"
+          });
 
-          $scope.useSpreedly = function(){
-            //Init Spreedly card values
-            Spreedly.init("UnQhm0g7l3nOIz2hmAoV3eqm26k", {
-              "numberEl": "spreedly-number",
-              "cvvEl": "spreedly-cvv"
-            });
+          Spreedly.on("ready", function () {
+            Spreedly.setFieldType("number", "text");
+            Spreedly.setNumberFormat("prettyFormat");
+            Spreedly.setPlaceholder("number", "Card Number");
+            Spreedly.setPlaceholder("cvv", "CVV");
+            Spreedly.setStyle("number", 'display: block; width: 95%; height: 36px; padding: 6px 12px; font-size: 16px; line-height: 1.428571429; color: #7b829a; background-color: #fff; background-image: none; border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
+            Spreedly.setStyle("cvv", 'display: block; width: 60px; height: 36px; padding: 6px 12px; font-size: 16px; line-height: 1.428571429; color: #7b829a; background-color: #fff; background-image: none; border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
+          });
 
-            Spreedly.on("ready", function () {
-              var submitButton = document.getElementById('submit-button');
-              submitButton.disabled = false;
-              Spreedly.setFieldType("number", "text");
-              Spreedly.setNumberFormat("prettyFormat");
-              Spreedly.setPlaceholder("number", "Card Number");
-              Spreedly.setPlaceholder("cvv", "CVV");
-              Spreedly.setStyle("number", 'display: block; width: 95%; height: 36px; padding: 6px 12px; font-size: 16px; line-height: 1.428571429; color: #7b829a; background-color: #fff; background-image: none; border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
-              Spreedly.setStyle("cvv", 'display: block; width: 60px; height: 36px; padding: 6px 12px; font-size: 16px; line-height: 1.428571429; color: #7b829a; background-color: #fff; background-image: none; border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
-            });
+          Spreedly.on('fieldEvent', function(name, type, activeEl, inputProperties) {
+            if(type == 'focus'){
+              Spreedly.setStyle(name,'border-color: #66afe9; outline: 0; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6)');
+            }
+            if(type == 'blur'){
+              Spreedly.setStyle(name, 'border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
+            }
+          });
 
-            Spreedly.on('fieldEvent', function(name, type, activeEl, inputProperties) {
-              if(type == 'focus'){
-                Spreedly.setStyle(name,'border-color: #66afe9; outline: 0; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6)');
-              }
-              if(type == 'blur'){
-                Spreedly.setStyle(name, 'border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
-              }
-            });
+          Spreedly.on('errors', function(errors) {
+            console.log("Spreedly On Errors", errors);
+            $scope.orderErrors = errors;
+          });
 
-            Spreedly.on('errors', function(errors) {
-              for (var i=0; i < errors.length; i++) {
-                var error = errors[i];
-                console.log(error);
-              };
-            });
+          Spreedly.on('paymentMethod', function(token) {
+            $scope.creditCard = occasionSDKService.buildCard(token);
+            $scope.order.charge( $scope.creditCard, $scope.order.outstandingBalance );
 
-            Spreedly.on('paymentMethod', function(token, pmData) {
-              console.log("Card Token", token);
-              console.log("pmData", pmData);
-
-              var creditCard = occasionSDKService.buildCard(token);
-
-              console.log("Credit Card", creditCard);
-
-              console.log("outstanding before charge", $scope.order.outstandingBalance);
-
-              $scope.order.charge( creditCard, $scope.order.outstandingBalance );
-
-              console.log("outstanding after charge but before calc price", $scope.order.outstandingBalance);
-
-              $scope.order.calculatePrice()
-              .then( (order) => {
-                console.log("Order attributes after charge", $scope.order.attributes());
-              console.log("Order outstanding after charge", $scope.order.outstandingBalance)
+            $scope.order.calculatePrice()
+            .then((order) => {
               $scope.submitOrder();
             })
-            .catch( (error) => {
-                console.log("Errors with final calc price", error);
+            .catch((error) => {
+              console.log("Errors with final calc price", error);
             });
-            });
-          }
-
-          $scope.submitPaymentForm = function(){
-            console.log("Submit payment form");
-            var requiredFields = {};
-
-            // Get required, non-sensitive, values from host page
-            requiredFields["full_name"] = document.getElementById("full_name").value;
-            requiredFields["month"] = document.getElementById("month").value;
-            requiredFields["year"] = document.getElementById("year").value;
-
-            Spreedly.tokenizeCreditCard(requiredFields);
-          }
-
-          //When the value of a radio selector changes
-          $scope.radioChanged = function(answer, option){
-            $scope.order.answers().target().map( (answerAtI) => {
-              if(answerAtI.questionId == answer.questionId){
-              answerAtI.assignOption(option);
-              $scope.questionValueChanged(answer);
-            }
           });
-          }
+        };
 
-          //When the value of a drop down selector changes
-          $scope.selectChanged = function(answer){
-            $scope.order.answers().target().map( (answerAtI) => {
-              if(answerAtI.questionId == answer.questionId){
-              answerAtI.question().options().target().map( (option) => {
-                if($scope.optionsHolder[answer.questionId] == option.id){
-                answerAtI.assignOption(option);
-                $scope.questionValueChanged(answer);
+        $scope.checkRedeemable = function(){
+          $scope.redeemableError = null;
+          $scope.activeRedeemable = null;
+          var code = document.getElementById('redeemableInput').value;
+
+          $scope.product.redeemables().findBy({ code: code })
+          .then((redeemable) => {
+              console.log("Redeemable", redeemable);
+              var type = occasionSDKService.redeemableType(redeemable);
+              $scope.activeRedeemable = redeemable;
+              console.log("Attr", $scope.activeRedeemable.attributes());
+
+              //Apply charge or discount
+              switch(type){
+                case('card'):
+                  $scope.order.charge($scope.activeRedeemable, $scope.activeRedeemable.value);
+                  $scope.redeemableStatus = 'Gift Card Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().value + ' Applied';
+                  break;
+                case('coupon'):
+                  $scope.order.assignCoupon($scope.activeRedeemable);
+                  if($scope.activeRedeemable.attributes().discountFixed != null)
+                    $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().discountFixed + ' Off';
+                  if($scope.activeRedeemable.attributes().discountPercentage != null)
+                    $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.activeRedeemable.attributes().discountPercentage + '% Off';
+                  break;
               }
-            });
-            }
-          });
-          }
 
-          //When a question value changes
-          $scope.questionValueChanged = function(answer){
-            if(answer.question().priceCalculating){
+              //Recalc price
               $scope.order.calculatePrice()
-              .then( (order) => {
-                console.log("Order after calc", $scope.order.attributes());
-              $scope.$apply();
-            })
-            .catch( (error) => {
-                console.log("Error with recalc", error);
+              .then((order) => {
+                console.log("Order after calc after redeem", order);
+                $scope.$apply();
+              }).catch((error) => {
+                console.log("Error after calc after redeem", error);
+              });
+          })
+          .catch((errors) => {
+            errors.map((error) => {
+              $scope.redeemableStatus = null;
+              $scope.redeemableError = error.details;
             });
-            }
+
+            document.getElementById('redeemableInput').value = null;
+            $scope.$apply();
+          });
+        };
+
+        $scope.removeRedeemable = function(){
+          switch(occasionSDKService.redeemableType($scope.activeRedeemable)){
+            case('card'):
+              $scope.order.removeCharge($scope.activeRedeemable);
+              break;
+            case('coupon'):
+              $scope.order.assignCoupon(null);
+              break;
           }
 
-          //When users submits order form
-          $scope.submitOrder = function() {
-            console.log("Order Submit", $scope.order);
+          $scope.activeRedeemable = null;
+          $scope.redeemableStatus = null;
+          $scope.redeemableError = null;
+          document.getElementById('redeemableInput').value = null;
 
-            $scope.order.save( () => {
-              if($scope.order.persisted()){
+          //Recalc price
+          $scope.order.calculatePrice()
+          .then((order) => {
+            console.log("Order after calc after remove redeem", order);
+            $scope.$apply();
+          }).catch((error) => {
+            console.log("Error after calc after remove redeem", error);
+          });
+        };
+
+        $scope.submitPaymentForms = function(event) {
+          event.preventDefault();
+          $scope.orderErrors = null;
+          switch($scope.psp){
+            case('cash'):
+              $scope.submitOrder();
+              break;
+            case('square'):
+              $scope.submitSquareForm();
+              break;
+            case('spreedly'):
+              $scope.submitSpreedlyForm();
+              break;
+          }
+        };
+
+        $scope.submitSquareForm = function() {
+          $scope.paymentForm.requestCardNonce();
+        };
+
+        $scope.submitSpreedlyForm = function(){
+          console.log("Submit payment form");
+          var requiredFields = {};
+
+          // Get required, non-sensitive, values from host page
+          requiredFields["full_name"] = document.getElementById("full_name").value;
+          requiredFields["month"] = document.getElementById("month").value;
+          requiredFields["year"] = document.getElementById("year").value;
+
+          Spreedly.tokenizeCreditCard(requiredFields);
+        };
+
+        //When users submits order form
+        $scope.submitOrder = function() {
+          console.log("Order Submit", $scope.order);
+
+          $scope.order.save(() => {
+            if($scope.order.persisted()) {
               console.log("Order save was success");
               alert($scope.product.postTransactionalMessage);
-            }else{
-              console.log("Order save was not success");
-              console.log($scope.order.errors().toArray());
+            } else {
+              console.log("Order save was not a success");
+              console.log("ORDER ERRORS", $scope.order.errors().toArray());
+              $scope.orderErrors = $scope.order.errors().toArray();
+              $scope.order.removeCharge($scope.creditCard);
+              $scope.$apply();
             }
           });
+        };
+
+        //Scroll to specified anchor tag
+        $scope.scrollToAnchor = function(aid){
+          var aTag = $("a[name='"+ aid +"']");
+          $('html, body').animate( { scrollTop: aTag.offset().top }, 'slow');
+        };
+
+        //Check to see if two dates are on the same day
+        $scope.sameDay = function(d1, d2) {
+          return d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
+        };
+
+        //Return a readble time portion of a date
+        $scope.formatToTime = function(dateString){
+          let date = new Date(dateString);
+
+          let hours = date.getHours();
+          let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes().toString() : date.getMinutes().toString;
+          let meridian = hours <= 10 ? 'am' : 'pm';
+          hours = hours <= 12 ? hours : hours - 12;
+
+          return hours.toString() + ':' + minutes + meridian;
+        };
+
+        //Determine which time of day section this timeSlot belongs in
+        $scope.splitByTimeOfDay = function(date, time) {
+          switch(time){
+            case('morning'):
+              return new Date(date).getHours() < 12;
+              break;
+            case('afternoon'):
+              return new Date(date).getHours() >= 12 && new Date(date).getHours() < 18;
+              break;
+            case('evening'):
+              return new Date(date).getHours() >= 18;
+              break;
           }
+        };
 
-          //Scroll to specified anchor tag
-          $scope.scrollToAnchor = function(aid){
-            var aTag = $("a[name='"+ aid +"']");
-            $('html, body').animate( { scrollTop: aTag.offset().top }, 'slow');
-          }
-
-          //Check to see if two dates are on the same day
-          $scope.sameDay = function(d1, d2) {
-            return d1.getFullYear() === d2.getFullYear() &&
-              d1.getMonth() === d2.getMonth() &&
-              d1.getDate() === d2.getDate();
-          }
-
-          //Return a readble time portion of a date
-          $scope.formatToTime = function(dateString){
-            let date = new Date(dateString);
-
-            let hours = date.getHours();
-            let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes().toString() : date.getMinutes().toString;
-            let meridian = hours <= 10 ? 'am' : 'pm';
-            hours = hours <= 12 ? hours : hours - 12;
-
-            return hours.toString() + ':' + minutes + meridian;
-          }
-
-          //Determine which time of day section this timeSlot belongs in
-          $scope.splitByTimeOfDay = function(date, time) {
-            switch(time){
-              case('morning'):
-                return new Date(date).getHours() < 12;
-                break;
-              case('afternoon'):
-                return new Date(date).getHours() >= 12 && new Date(date).getHours() < 18;
-                break;
-              case('evening'):
-                return new Date(date).getHours() >= 18;
-                break;
-            }
-          }
-
-          //Return an object collection as an array
-          $scope.returnAsArray = function(unmapped) {
-            let items = [];
-            if($scope.initialDataLoaded){
-              unmapped
-              .map( (item) => {
-                items.push(item);
+        //Return an object collection as an array
+        $scope.returnAsArray = function(unmapped) {
+          let items = [];
+          if($scope.initialDataLoaded) {
+            unmapped.map((item) => {
+              items.push(item);
             });
-            }
-            return items;
           }
+          return items;
+        };
 
         } //End Controller
-      ,
 }); //End Component

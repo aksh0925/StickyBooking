@@ -22,7 +22,7 @@ angular.module('StickyBooking')
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
-            this.occsn.Merchant.first()
+            this.occsn.Merchant.includes('currency').first()
                 .then( (merchant) => {
                     resolve(merchant); 
                 })
@@ -127,8 +127,15 @@ angular.module('StickyBooking')
             });
         }
 
-        this.queryBuildCard = (token) =>{
+        this.queryBuildCard = (token) => {
             return occsn.CreditCard.build({ id: token });
+        }
+
+        this.queryRedeemableType = (redeemable) => {
+            if( redeemable.isA(occsn.Coupon) )
+                return 'coupon';
+            if( redeemable.isA(occsn.GiftCard) )
+                return 'card';
         }
 
 
@@ -165,6 +172,9 @@ angular.module('StickyBooking')
             },
             buildCard: (token) => {
                 return this.queryBuildCard(token);
+            },
+            redeemableType: (redeemable) => {
+                return this.queryRedeemableType(redeemable);
             }
         }
 
