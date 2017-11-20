@@ -15,7 +15,7 @@ let initializeSDKService = function(){
 
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
-            this.occsn.Merchant.first()
+            this.occsn.Merchant.includes('currency').first()
                 .then( (merchant) => {
                     resolve(merchant); 
                 })
@@ -120,8 +120,15 @@ let initializeSDKService = function(){
             });
         }
 
-        this.queryBuildCard = (token) =>{
+        this.queryBuildCard = (token) => {
             return occsn.CreditCard.build({ id: token });
+        }
+
+        this.queryRedeemableType = (redeemable) => {
+            if( redeemable.isA(occsn.Coupon) )
+                return 'coupon';
+            if( redeemable.isA(occsn.GiftCard) )
+                return 'card';
         }
 
 
@@ -158,6 +165,9 @@ let initializeSDKService = function(){
             },
             buildCard: (token) => {
                 return this.queryBuildCard(token);
+            },
+            redeemableType: (redeemable) => {
+                return this.queryRedeemableType(redeemable);
             }
         }
 

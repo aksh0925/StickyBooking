@@ -21,13 +21,17 @@ let initializeBookingComponent = function(){
             $scope.calendarDataLoaded = false;
             $scope.orderLoaded = false;
             $scope.staticProductID = window.OCCSN.product_id;
-             //Test purchase details
-                $scope.card = {
-                    number: null,
-                    month: null,
-                    year: null,
-                    verification: null
-                }
+            $scope.orderErrors = null;
+            $scope.activeRedeemable = null;
+            $scope.redeemableError = null;
+            $scope.redeemableStatus = null;
+            //Test purchase details
+            $scope.card = {
+                number: null,
+                month: null,
+                year: null,
+                verification: null
+            }
             $scope.loadSDKData();
         }
 
@@ -99,7 +103,19 @@ let initializeBookingComponent = function(){
                         $scope.orderLoaded = true;
                     });
 
-            }).catch( (error) => console.log(error) );
+            }).catch( (errors) => {
+                console.log(errors);
+                $scope.displayLoading = false;
+                $scope.$apply();
+                
+                if(errors instanceof TypeError){
+                    alert("There was an error retrieving the listing you're looking for. Please try again later.");
+                }else{
+                    errors.map(error => {
+                        alert(error.details);
+                    });
+                }
+             });
         }
 
         //When a user clicks get started
@@ -181,6 +197,44 @@ let initializeBookingComponent = function(){
                         $scope.startOrder();
                     }
                 });
+            }
+        }
+
+        //When the value of a radio selector changes
+        $scope.radioChanged = function(answer, option){
+            $scope.order.answers().target().map( (answerAtI) => {
+                if(answerAtI.questionId == answer.questionId){
+                    answerAtI.assignOption(option);
+                    $scope.questionValueChanged(answer);
+                }
+            });
+        }
+
+        //When the value of a drop down selector changes
+        $scope.selectChanged = function(answer){
+            $scope.order.answers().target().map( (answerAtI) => {
+                if(answerAtI.questionId == answer.questionId){
+                    answerAtI.question().options().target().map( (option) => {
+                        if($scope.optionsHolder[answer.questionId] == option.id){
+                            answerAtI.assignOption(option);
+                            $scope.questionValueChanged(answer);
+                        }
+                    });
+                }
+            });
+        }
+
+        //When a question value changes
+        $scope.questionValueChanged = function(answer){
+            if(answer.question().priceCalculating){
+                $scope.order.calculatePrice()
+                    .then( (order) => {
+                        console.log("Order after calc", $scope.order.attributes());
+                        $scope.$apply();
+                    })
+                    .catch( (error) => {
+                        console.log("Error with recalc", error);
+                    });
             }
         }
 
@@ -318,18 +372,19 @@ let initializeBookingComponent = function(){
                     },
                     cardNonceResponseReceived: function(errors, nonce, cardData) {
                         if (errors) {
+                            //Fill orderErrors array which displays under credit card form
+                            $scope.orderErrors = errors;
+                            $scope.$apply();
+
+                            //Log full errors for console
                             console.log("Encountered errors:");
                             errors.forEach(function(error) {
-                                console.log('  ' + error.message);
+                                console.log(error);
                             });
                         }else{
-                            console.log('Nonce received: ', nonce);
-
-                            var creditCard = occasionSDKService.buildCard({ id: nonce});
-
-                            console.log("Credit Card", creditCard);
-
-                            $scope.order.charge( creditCard, $scope.order.outstandingBalance );
+                            $scope.creditCard = occasionSDKService.buildCard(nonce);
+                            console.log("CARD", $scope.creditCard);
+                            $scope.order.charge( $scope.creditCard, $scope.order.outstandingBalance );
 
                             $scope.order.calculatePrice()
                                 .then( (order) => {
@@ -339,15 +394,38 @@ let initializeBookingComponent = function(){
                                     console.log("Errors with final calc price", error);
                                 });
                         }
+                    },
+                    unsupportedBrowserDetected: function() {},
+                    inputEventReceived: function(inputEvent) {
+                        switch (inputEvent.eventType) {
+                            case 'focusClassAdded':
+                                /* HANDLE AS DESIRED */
+                            break;
+                            case 'focusClassRemoved':
+                                /* HANDLE AS DESIRED */
+                            break;
+                            case 'errorClassAdded':
+                                /* HANDLE AS DESIRED */
+                                console.log("Error class added");
+                            break;
+                            case 'errorClassRemoved':
+                                /* HANDLE AS DESIRED */
+                                console.log("Error class removed");
+                            break;
+                            case 'cardBrandChanged':
+                                /* HANDLE AS DESIRED */
+                            break;
+                            case 'postalCodeChanged':
+                                /* HANDLE AS DESIRED */
+                            break;
+                        }
+                    },
+                    paymentFormLoaded: function() {
+                        console.log("Form loaded");
                     }
                 }
             });
             $scope.paymentForm.build();
-        }
-
-        $scope.requestCardNonce = function(event) {
-            event.preventDefault();
-            $scope.paymentForm.requestCardNonce();
         }
 
         $scope.useSpreedly = function(){
@@ -358,8 +436,6 @@ let initializeBookingComponent = function(){
             });
 
             Spreedly.on("ready", function () {
-                var submitButton = document.getElementById('submit-button');
-                submitButton.disabled = false;
                 Spreedly.setFieldType("number", "text");
                 Spreedly.setNumberFormat("prettyFormat");
                 Spreedly.setPlaceholder("number", "Card Number");
@@ -378,30 +454,16 @@ let initializeBookingComponent = function(){
             });
             
             Spreedly.on('errors', function(errors) {
-                for (var i=0; i < errors.length; i++) {
-                    var error = errors[i];
-                    console.log(error);
-                };
+                console.log("Spreedly On Errors", errors);
+                $scope.orderErrors = errors;
             });
 
             Spreedly.on('paymentMethod', function(token, pmData) {
-                console.log("Card Token", token);
-                console.log("pmData", pmData);
-
-                var creditCard = occasionSDKService.buildCard(token);
-
-                console.log("Credit Card", creditCard);
-
-                console.log("outstanding before charge", $scope.order.outstandingBalance);
-
-                $scope.order.charge( creditCard, $scope.order.outstandingBalance );
-
-                console.log("outstanding after charge but before calc price", $scope.order.outstandingBalance);
+                $scope.creditCard = occasionSDKService.buildCard(token);
+                $scope.order.charge( $scope.creditCard, $scope.order.outstandingBalance );
 
                 $scope.order.calculatePrice()
                     .then( (order) => {
-                        console.log("Order attributes after charge", $scope.order.attributes());
-                        console.log("Order outstanding after charge", $scope.order.outstandingBalance)
                         $scope.submitOrder();
                     })
                     .catch( (error) => {
@@ -410,7 +472,97 @@ let initializeBookingComponent = function(){
             });
         }
 
-        $scope.submitPaymentForm = function(){
+        $scope.checkRedeemable = function(){
+            $scope.redeemableError = null;
+            $scope.activeRedeemable = null;
+            var code = document.getElementById('redeemableInput').value;
+
+            $scope.product.redeemables().findBy({ code: code })
+                .then( (redeemable) => {
+                    console.log("Redeemable", redeemable);
+                    var type = occasionSDKService.redeemableType(redeemable);
+                    $scope.activeRedeemable = redeemable;
+                    console.log("Attr", $scope.activeRedeemable.attributes());
+
+                    //Apply charge or discount
+                    switch(type){
+                        case('card'):
+                            $scope.order.charge($scope.activeRedeemable, $scope.activeRedeemable.value);
+                            $scope.redeemableStatus = 'Gift Card Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().value + ' Applied';
+                            break;
+                        case('coupon'):
+                            $scope.order.assignCoupon($scope.activeRedeemable);
+                            if($scope.activeRedeemable.attributes().discountFixed != null)
+                                $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().discountFixed + ' Off';
+                            if($scope.activeRedeemable.attributes().discountPercentage != null)
+                                $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.activeRedeemable.attributes().discountPercentage + '% Off';
+                            break;
+                    }
+
+                    //Recalc price
+                    $scope.order.calculatePrice()
+                        .then( order => {
+                            console.log("Order after calc after redeem", order);
+                            $scope.$apply();
+                        }).catch( error => {
+                            console.log("Error after calc after redeem", error);
+                        });
+                })
+                .catch( (errors) => {
+                    errors.map( error => {
+                        $scope.redeemableStatus = null;
+                        $scope.redeemableError = error.details;
+                    });
+                    document.getElementById('redeemableInput').value = null;
+                    $scope.$apply();
+                });
+        }
+
+        $scope.removeRedeemable = function(){
+            switch(occasionSDKService.redeemableType($scope.activeRedeemable)){
+                case('card'):
+                    $scope.order.removeCharge($scope.activeRedeemable);
+                    break;
+                case('coupon'):
+                    $scope.order.assignCoupon(null);
+                    break;
+            }
+            $scope.activeRedeemable = null;
+            $scope.redeemableStatus = null;
+            $scope.redeemableError = null;
+            document.getElementById('redeemableInput').value = null;
+            
+            //Recalc price
+            $scope.order.calculatePrice()
+                .then( order => {
+                    console.log("Order after calc after remove redeem", order);
+                    $scope.$apply();
+                }).catch( error => {
+                    console.log("Error after calc after remove redeem", error);
+                });
+        }
+
+        $scope.submitPaymentForms = function(event){
+            event.preventDefault();
+            $scope.orderErrors = null;
+            switch($scope.psp){
+                case('cash'):
+                    $scope.submitOrder();
+                    break;
+                case('square'):
+                    $scope.submitSquareForm();
+                    break;
+                case('spreedly'):
+                    $scope.submitSpreedlyForm();
+                    break;
+            }
+        }
+
+        $scope.submitSquareForm = function() {
+            $scope.paymentForm.requestCardNonce();
+        }
+
+        $scope.submitSpreedlyForm = function(){
             console.log("Submit payment form");
             var requiredFields = {};
 
@@ -422,44 +574,6 @@ let initializeBookingComponent = function(){
             Spreedly.tokenizeCreditCard(requiredFields);
         }
 
-        //When the value of a radio selector changes
-        $scope.radioChanged = function(answer, option){
-            $scope.order.answers().target().map( (answerAtI) => {
-                if(answerAtI.questionId == answer.questionId){
-                    answerAtI.assignOption(option);
-                    $scope.questionValueChanged(answer);
-                }
-            });
-        }
-
-        //When the value of a drop down selector changes
-        $scope.selectChanged = function(answer){
-            $scope.order.answers().target().map( (answerAtI) => {
-                if(answerAtI.questionId == answer.questionId){
-                    answerAtI.question().options().target().map( (option) => {
-                        if($scope.optionsHolder[answer.questionId] == option.id){
-                            answerAtI.assignOption(option);
-                            $scope.questionValueChanged(answer);
-                        }
-                    });
-                }
-            });
-        }
-
-        //When a question value changes
-        $scope.questionValueChanged = function(answer){
-            if(answer.question().priceCalculating){
-                $scope.order.calculatePrice()
-                    .then( (order) => {
-                        console.log("Order after calc", $scope.order.attributes());
-                        $scope.$apply();
-                    })
-                    .catch( (error) => {
-                        console.log("Error with recalc", error);
-                    });
-            }
-        }
-
         //When users submits order form
         $scope.submitOrder = function() {
             console.log("Order Submit", $scope.order);
@@ -469,8 +583,11 @@ let initializeBookingComponent = function(){
                     console.log("Order save was success");
                     alert($scope.product.postTransactionalMessage);
                 }else{
-                    console.log("Order save was not success");
-                    console.log($scope.order.errors().toArray());
+                    console.log("Order save was not a success");
+                    console.log("ORDER ERRORS", $scope.order.errors().toArray());
+                    $scope.orderErrors = $scope.order.errors().toArray();
+                    $scope.order.removeCharge($scope.creditCard);
+                    $scope.$apply();
                 }
             });
         }
