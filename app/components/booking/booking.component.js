@@ -315,34 +315,17 @@ let initializeBookingComponent = function(){
             //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g"; //Marc's Sandbox Key
             var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g"; //OCCASION's Key
 
-            // Set the location ID
-            var locationId = "CBASEPCUENvvoTglXMqmVTIUaUwgAQ";
-
             // Create and initialize a payment form object
             $scope.paymentForm = new SqPaymentForm({
 
                 // Initialize the payment form elements
                 applicationId: applicationId,
-                locationId: locationId,
                 inputClass: 'form-control',
-
-                applePay: false,
-                masterpass: false,
 
                 // Customize the CSS for SqPaymentForm iframe elements
                 inputStyles: [{
                     fontSize: '19px'
                 }],
-
-                // Initialize Apple Pay placeholder ID
-                applePay: {
-                    elementId: 'sq-apple-pay'
-                },
-
-                // Initialize Masterpass placeholder ID
-                masterpass: {
-                    elementId: 'sq-masterpass'
-                },
 
                 // Initialize the credit card placeholders
                 cardNumber: {
@@ -386,10 +369,6 @@ let initializeBookingComponent = function(){
                             masterpassBtn.style.display = 'inline-block';
                             masterpassLabel.style.display = 'none';
                         }*/
-                    },
-                    createPaymentRequest: function () {
-                        var paymentRequestJson ;
-                        return paymentRequestJson ;
                     },
                     cardNonceResponseReceived: function(errors, nonce, cardData) {
                         if (errors) {
