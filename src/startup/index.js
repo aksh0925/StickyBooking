@@ -1,7 +1,7 @@
 var angular = require('angular');
 require('libs/date-helpers');
 
-angular.module('StickyBooking', ['angularSpinner'])
+angular.module('StickyBooking', ['angularSpinner', 'ngSanitize'])
   .controller('AppController', function($scope){
 
     //Runs On Init
