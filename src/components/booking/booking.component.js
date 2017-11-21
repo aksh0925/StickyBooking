@@ -1,4 +1,5 @@
 var angular = require('angular');
+var moment = require('moment');
 var templateUrl = require('ngtemplate-loader!./booking.component.html');
 
 //Creating bookingPage component on StickyBooking Module
@@ -602,12 +603,8 @@ angular.module('StickyBooking')
 
           //Return a readble time portion of a date
           $scope.formatToTime = function(dateString){
-              let date = new Date(dateString);
-
-              let hours = date.getHours();
-              let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes().toString() : date.getMinutes().toString;
-              let meridian = hours <= 10 ? 'am' : 'pm';
-              hours = hours <= 12 ? hours : hours - 12;
+              return moment(dateString).format('LT');
+          }
 
               return hours.toString() + ':' + minutes + meridian;
           }
