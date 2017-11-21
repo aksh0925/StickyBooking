@@ -1,4 +1,5 @@
 var angular = require('angular');
+var moment = require('moment');
 var templateUrl = require('ngtemplate-loader!./calendar.component.html');
 
 //Creating bookingCalendar component on the StickyBooking Module
@@ -191,7 +192,9 @@ angular.module('StickyBooking')
             $scope.getNewTimeSlots = function(){
                 if( ($scope.activeCalendarMonth > $scope.highestMonthLoaded && $scope.activeCalendarYear == $scope.highestYearLoaded) || $scope.activeCalendarYear > $scope.highestYearLoaded){
                     $scope.$emit('startLoading');
-                    occasionSDKService.getTimeSlotsByMonth($scope.timeSlots, $scope.activeCalendarMonth, $scope.activeCalendarYear)
+
+                    var desiredMonth = moment([$scope.activeCalendarYear, $scope.activeCalendarMonth, 1]);
+                    occasionSDKService.getTimeSlotsByMonth($scope.product, desiredMonth)
                         .then( (newTimeSlots) => {
                             console.log("Time slots by month", newTimeSlots);
                             $scope.timeSlots = newTimeSlots;

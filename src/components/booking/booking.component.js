@@ -58,36 +58,30 @@ angular.module('StickyBooking')
 
                   //Eager load calendar data
                   console.log("Calendar data loading");
-                  occasionSDKService.getTimeSlotsForProduct($scope.product)
+                  occasionSDKService.getTimeSlotsByMonth($scope.product, moment())
                       .then( (timeSlots) => {
                           $scope.timeSlots = timeSlots;
 
-                          occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
-                              .then( (timeSlotsByMonth) => {
-                                  $scope.timeSlots = timeSlotsByMonth;
+                          //Find all possible durations
+                          $scope.durations = [];
+                          $scope.timeSlots.map( (timeSlot) => {
+                              if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
+                                  $scope.durations.push(timeSlot.attributes().duration);
+                              }
+                          });
 
-                                  //Find all possible durations
-                                  $scope.durations = [];
-                                  $scope.timeSlots.map( (timeSlot) => {
-                                      if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
-                                          $scope.durations.push(timeSlot.attributes().duration);
-                                      }
-                                  });
+                          //Manually refresh DOM
+                          console.log("Calendar data loaded");
+                          $scope.calendarDataLoaded = true;
+                          $scope.$apply();
 
-                                  //Manually refresh DOM
-                                  console.log("Calendar data loaded");
-                                  $scope.calendarDataLoaded = true;
-                                  $scope.$apply();
-
-                                  //Pass data to child components and initiate their processing
-                                  $scope.$broadcast('timeSlotDataLoaded', {
-                                      merchant: $scope.merchant,
-                                      product: $scope.product,
-                                      timeSlots: $scope.timeSlots,
-                                      durations: $scope.durations
-                                  });
-                              })
-                              .catch( (error) => console.log(error) );
+                          //Pass data to child components and initiate their processing
+                          $scope.$broadcast('timeSlotDataLoaded', {
+                              merchant: $scope.merchant,
+                              product: $scope.product,
+                              timeSlots: $scope.timeSlots,
+                              durations: $scope.durations
+                          });
                       });
 
                   //Eager load Order resource

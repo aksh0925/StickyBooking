@@ -1,5 +1,6 @@
 var ActiveResource = require('active-resource');
 var angular = require('angular');
+var moment = require('moment');
 var Occasion = require('occasion-sdk');
 
 angular.module('StickyBooking')
@@ -42,69 +43,21 @@ angular.module('StickyBooking')
         });
 
         //Private Functions
-        this.queryTimeSlotsByMonth = (allTimeSlots, month) => {
+        this.queryTimeSlotsByMonth = (product, month) => {
             return new Promise( (resolve, reject) => {
+                var today = moment();
+                var lowerRange = month.isSame(today, 'month') ? today : month;
+                var upperRange = lowerRange.clone().endOf('month');
 
-                this.queryNextTimeSlotsPage(allTimeSlots)
-                    .then( (newTimeSlots) => {
-
-                        if( new Date(newTimeSlots.__collection[newTimeSlots.__collection.length - 1].startsAt).getMonth() == month ){
-                            newTimeSlots.__collection.unshift( ...allTimeSlots.__collection );
-                            this.queryTimeSlotsByMonth(newTimeSlots, month)
-                                .then( (finalTimeSlots) => {
-                                    resolve(finalTimeSlots);
-                                })
-                                .catch( (error) => reject(error) );
-                        }else{
-                            if( new Date(newTimeSlots.__collection[0].startsAt).getMonth() == month ){
-                                newTimeSlots.__collection.unshift( ...allTimeSlots.__collection );
-                                this.queryTimeSlotsByMonth(newTimeSlots, month)
-                                    .then( (finalTimeSlots) => {
-                                        resolve(finalTimeSlots);
-                                    })
-                                    .catch( (error) => reject(error) );
-                            }else{
-                                resolve(allTimeSlots);
-                            }
-                        }
-
-                    })
-                    .catch( (data) => {
-                        if(data.hasNextPage == false){
-                            resolve(allTimeSlots);
-                        }else{
-                            reject(error);
-                        }
-                    });
-                    
-            });
-        }
-
-        this.queryTimeSlotsForProduct = (product) => {
-            return new Promise( (resolve, reject) => {
-                this.queryMyMerchant
-                    .then( (merchant) => {
-                        merchant.products().find(product.id)
-                        .then( (product) => {
-                            product.timeSlots().where({ status: 'bookable' }).perPage(100).all()
-                            .then( (timeSlots) => resolve(timeSlots) )
-                            .catch( (error) => reject(error) );
-                        })
-                    });
-            });
-        }
-
-        this.queryNextTimeSlotsPage = (timeSlots) => {
-            return new Promise( (resolve, reject) => {
-                if( timeSlots.hasNextPage() ){
-                    timeSlots.nextPage()
-                        .then( (nextTimeSlotsPage) => resolve(nextTimeSlotsPage) )
-                        .catch( (error) => reject({ error: error, hasNextPage: true }) );
-                }else{
-                    reject({
-                        hasNextPage: false
-                    });
-                }
+                return product.timeSlots().where({
+                    startsAt: {
+                        ge: lowerRange.toDate(),
+                        le: upperRange.toDate()
+                    },
+                    status: 'bookable'
+                }).all()
+                    .then( (timeSlots) => resolve(timeSlots) )
+                    .catch( (error) => reject(error) );
             });
         }
 
@@ -158,8 +111,8 @@ angular.module('StickyBooking')
             getProductById: (id) => {
                 return this.queryProductById(id);
             },
-            getTimeSlotsByMonth: (timeSlots, month) => {
-                return this.queryTimeSlotsByMonth(timeSlots, month);
+            getTimeSlotsByMonth: (product, month) => {
+                return this.queryTimeSlotsByMonth(product, month);
             },
             getTimeSlotsForProduct: (product) => {
                 return this.queryTimeSlotsForProduct(product);
