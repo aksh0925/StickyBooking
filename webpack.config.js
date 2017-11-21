@@ -19,6 +19,7 @@ module.exports = {
       'axios',
       'es6-promise',
       'jquery',
+      'moment',
       'qs',
       'occasion-sdk',
       'underscore',

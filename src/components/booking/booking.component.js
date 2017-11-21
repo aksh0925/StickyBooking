@@ -1,4 +1,5 @@
 var angular = require('angular');
+var moment = require('moment');
 var templateUrl = require('ngtemplate-loader!./booking.component.html');
 
 //Creating bookingPage component on StickyBooking Module
@@ -573,17 +574,16 @@ angular.module('StickyBooking')
           $scope.submitOrder = function() {
               console.log("Order Submit", $scope.order);
 
-              $scope.order.save( () => {
-                  if($scope.order.persisted()){
-                      console.log("Order save was success");
-                      alert($scope.product.postTransactionalMessage);
-                  }else{
-                      console.log("Order save was not a success");
-                      console.log("ORDER ERRORS", $scope.order.errors().toArray());
-                      $scope.orderErrors = $scope.order.errors().toArray();
-                      $scope.order.removeCharge($scope.creditCard);
-                      $scope.$apply();
-                  }
+              $scope.order.save(() => {
+                if($scope.order.persisted()) {
+                  console.log("Order save was success");
+                } else {
+                  console.log("Order save was not a success");
+                  console.log("ORDER ERRORS", $scope.order.errors().toArray());
+                  $scope.orderErrors = $scope.order.errors().toArray();
+                  $scope.order.removeCharge($scope.creditCard);
+                }
+                $scope.$apply();
               });
           }
 
@@ -602,14 +602,11 @@ angular.module('StickyBooking')
 
           //Return a readble time portion of a date
           $scope.formatToTime = function(dateString){
-              let date = new Date(dateString);
+              return moment(dateString).format('LT');
+          }
 
-              let hours = date.getHours();
-              let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes().toString() : date.getMinutes().toString;
-              let meridian = hours <= 10 ? 'am' : 'pm';
-              hours = hours <= 12 ? hours : hours - 12;
-
-              return hours.toString() + ':' + minutes + meridian;
+          $scope.formatToFullDatetime = function(dateString) {
+            return moment(dateString).format('dddd MMMM Do, YYYY h:mm A');
           }
 
           //Determine which time of day section this timeSlot belongs in

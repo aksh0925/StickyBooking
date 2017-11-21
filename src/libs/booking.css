@@ -6502,6 +6502,10 @@ label {
           text-shadow: 0 0 0 0; }
           .booking-page-container .booking-sidebar .booking-process .booking-step-complete {
             color: #8e93a8; }
+          .booking-page-container .booking-sidebar .booking-process .booking-step-green {
+            background-color: #5fcbc1 !important;
+            color: #ffffff !important;
+          }
             .booking-page-container .booking-sidebar .booking-process .booking-step-complete:before {
               content: "\f00c";
               font-family: FontAwesome;
@@ -6696,6 +6700,11 @@ padding-bottom: 100px;}
     @media (min-width: 992px) {
       .pane-customer-information .form-submit {
         text-align: right; } }
+
+.pane-order-complete {
+  display: block;
+  padding: 40px 10vw 0 10vw;
+  padding-bottom: 100px;}
 
 .pane-spacer-helper {
   height: 20vh;
