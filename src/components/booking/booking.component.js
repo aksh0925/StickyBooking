@@ -574,17 +574,16 @@ angular.module('StickyBooking')
           $scope.submitOrder = function() {
               console.log("Order Submit", $scope.order);
 
-              $scope.order.save( () => {
-                  if($scope.order.persisted()){
-                      console.log("Order save was success");
-                      alert($scope.product.postTransactionalMessage);
-                  }else{
-                      console.log("Order save was not a success");
-                      console.log("ORDER ERRORS", $scope.order.errors().toArray());
-                      $scope.orderErrors = $scope.order.errors().toArray();
-                      $scope.order.removeCharge($scope.creditCard);
-                      $scope.$apply();
-                  }
+              $scope.order.save(() => {
+                if($scope.order.persisted()) {
+                  console.log("Order save was success");
+                } else {
+                  console.log("Order save was not a success");
+                  console.log("ORDER ERRORS", $scope.order.errors().toArray());
+                  $scope.orderErrors = $scope.order.errors().toArray();
+                  $scope.order.removeCharge($scope.creditCard);
+                }
+                $scope.$apply();
               });
           }
 
@@ -606,7 +605,8 @@ angular.module('StickyBooking')
               return moment(dateString).format('LT');
           }
 
-              return hours.toString() + ':' + minutes + meridian;
+          $scope.formatToFullDatetime = function(dateString) {
+            return moment(dateString).format('dddd MMMM Do, YYYY h:mm A');
           }
 
           //Determine which time of day section this timeSlot belongs in
