@@ -6668,7 +6668,7 @@ padding-bottom: 100px; }
     @media (min-width: 992px) {
       .available-times {
         padding-top: 5vw;
-        padding-bottom: 5vw; } }
+        padding-bottom: 0; } }
     .available-times .unavailable {
       background-color: #e4e6eb;
       color: #a1a6b7; }
