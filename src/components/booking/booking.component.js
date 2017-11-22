@@ -48,7 +48,8 @@ angular.module('StickyBooking')
                   $scope.merchant = values[0];
                   $scope.product = values[1];
 
-                  $scope.psp = $scope.merchant.pspName;
+                  //$scope.psp = $scope.merchant.pspName;
+                  $scope.psp = 'cash';
                   console.log("PSP:", $scope.psp);
 
                   //Manually refresh DOM
@@ -243,7 +244,7 @@ angular.module('StickyBooking')
               
               //Set default values
               $scope.order.answers().target().map( (answer) => {
-                  
+                  console.log("Answer", answer);
                   var formControl = answer.question().formControl;
                   var optionCount = 0;
                   var firstOption = null;
@@ -471,6 +472,8 @@ angular.module('StickyBooking')
           }
 
           $scope.checkRedeemable = function(){
+              $scope.displayLoading = true;
+
               $scope.redeemableError = null;
               $scope.activeRedeemable = null;
               var code = document.getElementById('redeemableInput').value;
@@ -481,6 +484,9 @@ angular.module('StickyBooking')
                       var type = occasionSDKService.redeemableType(redeemable);
                       $scope.activeRedeemable = redeemable;
                       console.log("Attr", $scope.activeRedeemable.attributes());
+
+                      $scope.displayLoading = false;
+                      document.getElementById('redeemableInput').disabled = true;
 
                       //Apply charge or discount
                       switch(type){
@@ -507,6 +513,7 @@ angular.module('StickyBooking')
                           });
                   })
                   .catch( (errors) => {
+                      $scope.displayLoading = false;
                       errors.map( error => {
                           $scope.redeemableStatus = null;
                           $scope.redeemableError = error.details;
@@ -517,6 +524,8 @@ angular.module('StickyBooking')
           }
 
           $scope.removeRedeemable = function(){
+              $scope.displayLoading = true;
+
               switch(occasionSDKService.redeemableType($scope.activeRedeemable)){
                   case('card'):
                       $scope.order.removeCharge($scope.activeRedeemable);
@@ -529,14 +538,17 @@ angular.module('StickyBooking')
               $scope.redeemableStatus = null;
               $scope.redeemableError = null;
               document.getElementById('redeemableInput').value = null;
+              document.getElementById('redeemableInput').disabled = false;
               
               //Recalc price
               $scope.order.calculatePrice()
                   .then( order => {
                       console.log("Order after calc after remove redeem", order);
+                      $scope.displayLoading = false;
                       $scope.$apply();
                   }).catch( error => {
                       console.log("Error after calc after remove redeem", error);
+                      $scope.displayLoading = false;
                   });
           }
 
