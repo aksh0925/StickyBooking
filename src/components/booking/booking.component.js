@@ -60,6 +60,13 @@ angular.module('StickyBooking')
                   console.log("Calendar data loading");
                   occasionSDKService.getTimeSlotsForProduct($scope.product)
                       .then( (timeSlots) => {
+                          if(timeSlots.empty()) {
+                              alert(
+                                'Listing has no timeslots. If you are the merchant who owns this listing, add time slots ' +
+                                'so that there are times that can be booked.'
+                              );
+                          }
+
                           $scope.timeSlots = timeSlots;
 
                           occasionSDKService.getTimeSlotsByMonth( $scope.timeSlots, new Date($scope.timeSlots.__collection[0].startsAt).getMonth() )
