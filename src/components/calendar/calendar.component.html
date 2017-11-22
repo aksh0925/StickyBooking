@@ -2,13 +2,13 @@
     <div ng-repeat="(monthIndex, month) in year.months" ng-if="month.month == activeCalendarMonth">
     <div class="row month-navigator">
         <div class="col-xs-3">
-        <a class="btn btn-defult" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+        <a class="btn btn-default" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
         </div>
         <div class="col-xs-6 text-center">
         <h6>{{ month.monthName }} {{ year.year }}</h6>
         </div>
-        <div class="col-xs-3 text-right">
-        <a class="btn btn-defult" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        <div class="col-xs-3 text-right" ng-if="activeCalendarMonth != maxCalendarMonth || activeCalendarYear != maxCalendarYear">
+        <a class="btn btn-default" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
         </div>
     </div>
 
