@@ -342,7 +342,10 @@
 
                     <!-- Order Submit -->
                     <div class="form-submit">
-                        <input type="submit" class="btn-primary btn animated pulse infinite finishButton" value="{{product.orderButtonText}}" />
+                        <button type="submit" ng-disabled='submitting' class="btn-primary btn animated pulse infinite finishButton">
+                            <span ng-if="!submitting">{{product.orderButtonText}}</span>
+                            <span ng-if="submitting" style="width: 30px; height: 30px;" us-spinner="{ color: '#8e93a8' }"></span>
+                        </button>
                     </div>
                     <!-- End Order Submit -->
 

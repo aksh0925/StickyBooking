@@ -21,6 +21,7 @@ angular.module('StickyBooking')
               $scope.activeRedeemable = null;
               $scope.redeemableError = null;
               $scope.redeemableStatus = null;
+              $scope.submitting = false;
               //Test purchase details
               $scope.card = {
                   number: null,
@@ -575,7 +576,11 @@ angular.module('StickyBooking')
           $scope.submitOrder = function() {
               console.log("Order Submit", $scope.order);
 
+              $scope.submitting = true;
+
               $scope.order.save(() => {
+                $scope.submitting = false;
+
                 if($scope.order.persisted()) {
                   console.log("Order save was success");
                 } else {
