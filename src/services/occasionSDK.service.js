@@ -128,13 +128,13 @@ angular.module('StickyBooking')
         }
 
         this.queryBuildCard = (token) => {
-            return occsn.CreditCard.build({ id: token });
+            return this.occsn.CreditCard.build({ id: token });
         }
 
         this.queryRedeemableType = (redeemable) => {
-            if( redeemable.isA(occsn.Coupon) )
+            if( redeemable.isA(this.occsn.Coupon) )
                 return 'coupon';
-            if( redeemable.isA(occsn.GiftCard) )
+            if( redeemable.isA(this.occsn.GiftCard) )
                 return 'card';
         }
 
