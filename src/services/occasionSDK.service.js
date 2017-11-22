@@ -44,20 +44,41 @@ angular.module('StickyBooking')
 
         //Private Functions
         this.queryTimeSlotsByMonth = (product, month) => {
-            return new Promise( (resolve, reject) => {
-                var today = moment();
-                var lowerRange = month.isSame(today, 'month') ? today : month;
-                var upperRange = lowerRange.clone().endOf('month');
+            var today = moment();
+            var lowerRange = month.isSame(today, 'month') ? today : month;
+            var upperRange = lowerRange.clone().endOf('month');
 
-                return product.timeSlots().where({
+            // make between 1-4 parallel requests (about 7 days per request)
+            var numRequests = Math.min(4, Math.ceil(upperRange.diff(lowerRange, 'days') / 7));
+            if(numRequests < 1) numRequests = 1;
+
+            var i = 0;
+            var requests = [];
+
+            var lower = lowerRange;
+            var upper = lowerRange.clone().add(7, 'days');
+            while(i < numRequests) {
+                if(i + 1 == numRequests) upper = upperRange;
+
+                requests.push(product.timeSlots().where({
                     startsAt: {
-                        ge: lowerRange.toDate(),
-                        le: upperRange.toDate()
+                        ge: lower.toDate(),
+                        le: upper.toDate()
                     },
                     status: 'bookable'
-                }).all()
-                    .then( (timeSlots) => resolve(timeSlots) )
-                    .catch( (error) => reject(error) );
+                }).all());
+
+                lower.add(7, 'days');
+                upper.add(7, 'days');
+                i++;
+            }
+
+            return Promise.all(requests)
+            .then(function(timeSlotsArray) {
+                return ActiveResource.prototype.Collection
+                    .build(timeSlotsArray)
+                    .map(function(ts) { return ts.toArray() })
+                    .flatten();
             });
         }
 
