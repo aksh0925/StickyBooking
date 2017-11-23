@@ -35,7 +35,7 @@
             <h4>{{ formatToFullDatetime(order.timeSlots().target().first().startsAt) }}</h4>
             <p>An order confirmation email with receipt has been sent to {{ order.customer().email }}.</p>
             <br/>
-            <div class="alert priceTable" ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
+            <div class="alert priceTable" ng-if='!product.free' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
                 <div ng-if="psp == 'cash'">
                     <strong>No payment required now. Payment will be collected at the venue.</strong>
                     <br><br>
@@ -217,7 +217,7 @@
 
 
                     <!-- Price Table -->
-                    <div class="alert priceTable" ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
+                    <div class="alert priceTable" ng-if='!product.free' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
                         <div ng-if="psp == 'cash'">
                             <strong>No payment required now. Payment will be collected at the venue.</strong>
                             <br><br>
@@ -246,9 +246,9 @@
                         </table>
                     </div>
                     <!-- End Price Table -->
-                    <br><br>
                     <!-- Redeemables Section -->
-                    <div id="redeemables">
+                    <div id="redeemables" ng-if="product.hasRedeemables && !product.free">
+                        <br><br>
                         <h3>Gift Cards & Coupons</h3>
                         <hr>
 
@@ -263,73 +263,78 @@
                     </div>
                     <!-- End Redeemables Section -->
 
-                    <!-- Spreedly Checkout Form -->
-                    <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">
-                        <h3>Pay with Card</h3>
-                        <hr>
+                    <!-- Checkout Forms -->
+                    <div ng-if='!product.free'>
 
-                        <input type="hidden" name="payment_method_token" id="payment_method_token">
+                        <!-- Spreedly Checkout Form -->
+                        <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">
+                            <h3>Pay with Card</h3>
+                            <hr>
 
-                        <div class="form-group">
-                            <label class="control-label" for="full_name">Name On Card</label>
-                            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
+                            <input type="hidden" name="payment_method_token" id="payment_method_token">
+
+                            <div class="form-group">
+                                <label class="control-label" for="full_name">Name On Card</label>
+                                <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Credit Card Number</label>
+                                <div id="spreedly-number" class="spreedly-input"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
+                                <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
+                                <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">CVV</label>
+                                <div id="spreedly-cvv" class="spreedly-input"></div>
+                            </div>
                         </div>
+                        <!-- End Spreedly Checkout Form -->
 
-                        <div class="form-group">
-                            <label class="control-label">Credit Card Number</label>
-                            <div id="spreedly-number" class="spreedly-input"></div>
-                        </div>
+                        <!-- Square Checkout Form -->
+                        <div id="sq-ccbox" ng-if="psp == 'square'">
+                            <h3>Pay with Card</h3>
+                            <hr>
 
-                        <div class="form-group">
-                            <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
-                            <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
-                            <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
-                        </div>
+                            <div class="form-group">
+                                <label class="control-label">Card Number:</label>
+                                <div id="sq-card-number"></div>
+                            </div>
 
-                        <div class="form-group">
-                            <label class="control-label">CVV</label>
-                            <div id="spreedly-cvv" class="spreedly-input"></div>
+                            <div class="form-group">
+                                <label class="control-label">CVV:</label>
+                                <div id="sq-cvv"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Expiration Date:</label>
+                                <div id="sq-expiration-date"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Postal Code:</label>
+                                <div id="sq-postal-code"></div>
+                            </div>
+
+                            <input type="hidden" id="card-nonce" name="nonce">
                         </div>
+                        <div id="sq-walletbox" ng-if="psp == 'square'">
+                            <div id="sq-apple-pay-label" class="wallet-not-enabled">Apple Pay for Web not enabled</div>
+                            <!-- Placholder for Apple Pay for Web button -->
+                            <button id="sq-apple-pay" class="button-apple-pay"></button>
+
+                            <div id="sq-masterpass-label" class="wallet-not-enabled">Masterpass not enabled</div>
+                            <!-- Placholder for Masterpass button -->
+                            <button id="sq-masterpass" class="button-masterpass"></button>
+                        </div>
+                        <!-- End Square Checkout Form -->
                     </div>
-                    <!-- End Spreedly Checkout Form -->
-
-                    <!-- Square Checkout Form -->
-                    <div id="sq-ccbox" ng-if="psp == 'square'">
-                        <h3>Pay with Card</h3>
-                        <hr>
-
-                        <div class="form-group">
-                            <label class="control-label">Card Number:</label>
-                            <div id="sq-card-number"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">CVV:</label>
-                            <div id="sq-cvv"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">Expiration Date:</label>
-                            <div id="sq-expiration-date"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">Postal Code:</label>
-                            <div id="sq-postal-code"></div>
-                        </div>
-
-                        <input type="hidden" id="card-nonce" name="nonce">
-                    </div>
-                    <div id="sq-walletbox" ng-if="psp == 'square'">
-                        <div id="sq-apple-pay-label" class="wallet-not-enabled">Apple Pay for Web not enabled</div>
-                        <!-- Placholder for Apple Pay for Web button -->
-                        <button id="sq-apple-pay" class="button-apple-pay"></button>
-
-                        <div id="sq-masterpass-label" class="wallet-not-enabled">Masterpass not enabled</div>
-                        <!-- Placholder for Masterpass button -->
-                        <button id="sq-masterpass" class="button-masterpass"></button>
-                    </div>
-                    <!-- End Square Checkout Form -->
+                    <!-- End Checkout Forms -->
 
                     <!-- Errors Section -->
                     <div class="alert alert-danger" ng-if="orderErrors != null && orderErrors.length > 0">
