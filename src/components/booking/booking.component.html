@@ -43,23 +43,23 @@
                 <table>
                     <tr ng-if="order.subtotal != order.total">
                         <td>Subtotal:</td>
-                        <td>{{ merchant.currency().code }} {{ order.subtotal }}</td>
+                        <td>{{ order.subtotal | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-if="order.tax != 0 && order.tax != null">
                         <td>Tax:</td>
-                        <td>{{ merchant.currency().code }} {{ order.tax }}</td>
+                        <td>{{ order.tax | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-if="order.couponAmount != null">
                         <td>Discount:</td>
-                        <td>-{{ merchant.currency().code }} {{ order.couponAmount }}</td>
+                        <td>-{{ order.couponAmount | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-class="{ 'borderTop': order.subtotal != order.total }">
                         <td><strong>Total:</strong></td>
-                        <td>{{ merchant.currency().code }} {{ order.total }}</td>
+                        <td>{{ order.total | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-if="order.outstandingBalance != order.total">
                         <td>Balance due:</td>
-                        <td>{{ merchant.currency().code }} {{ order.outstandingBalance }}</td>
+                        <td>{{ order.outstandingBalance | currency:merchant.currency().code }}</td>
                     </tr>
                 </table>
             </div>
@@ -262,23 +262,23 @@
                         <table>
                             <tr ng-if="order.subtotal != order.total">
                                 <td>Subtotal:</td>
-                                <td>{{ merchant.currency().code }} {{ order.subtotal }}</td>
+                                <td>{{ order.subtotal | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-if="order.tax != 0 && order.tax != null">
                                 <td>Tax:</td>
-                                <td>{{ merchant.currency().code }} {{ order.tax }}</td>
+                                <td>{{ order.tax | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-if="order.couponAmount != null">
                                 <td>Discount:</td>
-                                <td>-{{ merchant.currency().code }} {{ order.couponAmount }}</td>
+                                <td>-{{ order.couponAmount | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-class="{ 'borderTop': order.subtotal != order.total }">
                                 <td><strong>Total:</strong></td>
-                                <td>{{ merchant.currency().code }} {{ order.total }}</td>
+                                <td>{{ order.total | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-if="order.outstandingBalance != order.total">
                                 <td>Balance due:</td>
-                                <td>{{ merchant.currency().code }} {{ order.outstandingBalance }}</td>
+                                <td>{{ order.outstandingBalance | currency:merchant.currency().code }}</td>
                             </tr>
                         </table>
                     </div>
