@@ -157,7 +157,7 @@
                     <div ng-repeat="(index, answer) in order.answers().target().toArray()">
                         <div class="form-group" ng-if="answer.question().formControl != 'separator'">
                             <label ng-if="answer.question().formControl != 'checkbox' && answer.question().formControl != 'text_output' && answer.question().formControl != 'waiver'">
-                                {{ answer.question().attributes().title }}<span ng-if='answer.question().required || answer.question().priceCalculating'>*</span>
+                                {{ answer.question().title }}<span ng-if='answer.question().required'>*</span>
                             </label>
                             <!-- Render different from control based on answer.question.formControl type -->
                             <!-- Text Input -->
