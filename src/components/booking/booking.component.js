@@ -201,7 +201,7 @@ angular.module('StickyBooking')
 
           // Returns the default option from a question's options
           $scope.defaultOptionFor = function(question) {
-              return question.options().target().detect(function(o) { return o.default; })
+              return question.options().target().detect(function(o) { return o.default; });
           };
 
           //When the value of a drop down selector or radio selector changes

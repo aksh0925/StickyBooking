@@ -214,14 +214,22 @@
                             <!-- Spin Button -->
                             <ul class="spinner-input list-inline" ng-if="answer.question().formControl == 'spin_button'">
                                 <li>
-                                    <input class="form-control value-input" ng-model="answer.value" readonly="" type="text" ng-init="answer.value = 1">
+                                    <input class="form-control value-input" readonly=""
+                                           ng-model="answer.value"
+                                           ng-init="answer.value = answer.question().min" />
                                 </li>
                                 <li>
                                     <div class="btn-group btn-group-lg">
-                                        <button class="btn btn-info update-price stepper-minus" ng-click="answer.value = answer.value - 1; answerChanged(answer)"
-                                            ng-disabled="answer.value === 1" type="button" disabled="disabled">-</button>
-                                        <button class="btn btn-info update-price stepper-plus" ng-click="answer.value = answer.value + 1; answerChanged(answer)"
-                                            ng-disabled="answer.value >= answer.question().max" type="button">+</button>
+                                        <button type="button" class="btn btn-info update-price stepper-minus"
+                                                ng-click="answer.value = answer.value - 1; answerChanged(answer)"
+                                                ng-disabled="answer.value == answer.question().min">
+                                            -
+                                        </button>
+                                        <button type="button" class="btn btn-info update-price stepper-plus"
+                                                ng-click="answer.value = answer.value + 1; answerChanged(answer)"
+                                                ng-disabled="answer.value >= answer.question().max">
+                                            +
+                                        </button>
                                     </div>
                                 </li>
                             </ul>
