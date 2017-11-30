@@ -161,10 +161,19 @@
                             </label>
                             <!-- Render different from control based on answer.question.formControl type -->
                             <!-- Text Input -->
-                            <input class="form-control" type="text" ng-model="answer.value" ng-if="answer.question().formControl == 'text_input'" ng-required="answer.question().required" placeholder="{{ answer.question().attributes().title }}"
+                            <input class="form-control"
+                                   ng-if="answer.question().formControl == 'text_input'"
+                                   ng-model="answer.value"
+                                   ng-required="answer.question().required"
+                                   placeholder="{{ answer.question().title }}"
                             />
                             <!-- Text Area -->
-                            <textarea class="form-control" rows="4" ng-model="answer.value" ng-if="answer.question().formControl == 'text_area'" ng-required="answer.question().required" placeholder="Your Response"></textarea>
+                            <textarea class="form-control" rows="4"
+                                      ng-if="answer.question().formControl == 'text_area'"
+                                      ng-model="answer.value"
+                                      ng-required="answer.question().required"
+                                      placeholder="Your Response">
+                            </textarea>
                             <!-- Option List -->
                             <div ng-if="answer.question().formControl == 'option_list'">
                                 <label class="clickable-label"
@@ -228,8 +237,8 @@
                                 </label>
                             </div>
                             <!-- Text Output -->
-                            <p ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</p>
-                            <h3 ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</h3>
+                            <h3 class="question-text-output" ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle">{{ answer.question().title }}</h3>
+                            <p  class="question-text-output" ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle">{{ answer.question().title }}</p>
                         </div>
                         <hr ng-if="answer.question().formControl == 'separator'">
                     </div>
