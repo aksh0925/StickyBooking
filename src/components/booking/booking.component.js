@@ -642,17 +642,5 @@ angular.module('StickyBooking')
               }
           }
 
-          //Return an object collection as an array
-          $scope.returnAsArray = function(unmapped) {
-              let items = [];
-              if($scope.initialDataLoaded){
-                  unmapped
-                      .map( (item) => {
-                          items.push(item);
-                      });
-              }
-              return items;
-          }
-
       } //End Controller
 }); //End Component
