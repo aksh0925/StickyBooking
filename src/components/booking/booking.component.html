@@ -167,19 +167,39 @@
                             <textarea class="form-control" rows="4" ng-model="answer.value" ng-if="answer.question().formControl == 'text_area'" ng-required="answer.question().required" placeholder="Your Response"></textarea>
                             <!-- Option List -->
                             <div ng-if="answer.question().formControl == 'option_list'">
-                                <label ng-repeat="option in answer.question().options().target().toArray()" class="clickable-label">
-                                    <input class="question-radio" type="radio" ng-value="option.title" name="{{answer.question().id}}" ng-model="optionsHolder[answer.question().id]" ng-change="radioChanged(answer, option)" /> {{option.title}}
+                                <label class="clickable-label"
+                                       ng-repeat="option in answer.question().options().target().toArray()"
+                                       ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
+                                    <input class="question-radio" type="radio"
+                                           name="{{answer.question().id}}"
+                                           ng-value="option"
+                                           ng-model="optionsHolder[answer.question().id]"
+                                           ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])" />
+
+                                    {{option.title}}
                                 </label>
                             </div>
                             <!-- Drop Down -->
-                            <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="optionsHolder[answer.question().id]"
-                                ng-change="selectChanged(answer)">
-                                    <option ng-repeat="(optionIndex, option) in answer.question().options().target().toArray()" value="{{option.id}}">{{option.title}}</option>
-                                </select>
+                            <select class="form-control"
+                                    ng-if="answer.question().formControl == 'drop_down'"
+                                    ng-model="optionsHolder[answer.question().id]"
+                                    ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])"
+                                    ng-options="option as option.title for option in answer.question().options().target().toArray()"
+                                    ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
+
+                                <option value="">-- Please select --</option>
+                            </select>
                             <!-- Checkbox -->
                             <div ng-if="answer.question().formControl == 'checkbox'">
                                 <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox" ng-model="answer.value" ng-change="questionValueChanged(answer)" ng-required="answer.question().required"/>{{ answer.question().attributes().title }}<span ng-if='answer.question().mustBeChecked'>*</span>
+                                    <input class="question-checkbox" type="checkbox"
+                                           ng-model="answer.value"
+                                           ng-change="answerChanged(answer)"
+                                           ng-required="answer.question().required"
+                                           ng-init="answer.value = false" />
+
+                                    {{ answer.question().title }}
+                                    <span ng-if='answer.question().required'>*</span>
                                 </label>
                             </div>
                             <!-- Spin Button -->
@@ -189,9 +209,9 @@
                                 </li>
                                 <li>
                                     <div class="btn-group btn-group-lg">
-                                        <button class="btn btn-info update-price stepper-minus" ng-click="answer.value = answer.value - 1; questionValueChanged(answer)"
+                                        <button class="btn btn-info update-price stepper-minus" ng-click="answer.value = answer.value - 1; answerChanged(answer)"
                                             ng-disabled="answer.value === 1" type="button" disabled="disabled">-</button>
-                                        <button class="btn btn-info update-price stepper-plus" ng-click="answer.value = answer.value + 1; questionValueChanged(answer)"
+                                        <button class="btn btn-info update-price stepper-plus" ng-click="answer.value = answer.value + 1; answerChanged(answer)"
                                             ng-disabled="answer.value >= answer.question().max" type="button">+</button>
                                     </div>
                                 </li>

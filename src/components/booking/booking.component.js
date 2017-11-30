@@ -197,34 +197,23 @@ angular.module('StickyBooking')
                       }
                   });
               }
-          }
+          };
 
-          //When the value of a radio selector changes
-          $scope.radioChanged = function(answer, option){
-              $scope.order.answers().target().map( (answerAtI) => {
-                  if(answerAtI.questionId == answer.questionId){
-                      answerAtI.assignOption(option);
-                      $scope.questionValueChanged(answer);
-                  }
-              });
-          }
+          // Returns the default option from a question's options
+          $scope.defaultOptionFor = function(question) {
+              return question.options().target().detect(function(o) { return o.default; })
+          };
 
-          //When the value of a drop down selector changes
-          $scope.selectChanged = function(answer){
-              $scope.order.answers().target().map( (answerAtI) => {
-                  if(answerAtI.questionId == answer.questionId){
-                      answerAtI.question().options().target().map( (option) => {
-                          if($scope.optionsHolder[answer.questionId] == option.id){
-                              answerAtI.assignOption(option);
-                              $scope.questionValueChanged(answer);
-                          }
-                      });
-                  }
-              });
-          }
+          //When the value of a drop down selector or radio selector changes
+          $scope.optionableQuestionChanged = function(answer, option){
+              answer.assignOption(option);
+              $scope.answerChanged(answer);
+          };
 
-          //When a question value changes
-          $scope.questionValueChanged = function(answer){
+          // Update price on answer change if price calculating question
+          //   On init
+          //   When a question value changes
+          $scope.answerChanged = function(answer){
               if(answer.question().priceCalculating){
                   $scope.order.calculatePrice()
                       .then( (order) => {
@@ -235,52 +224,11 @@ angular.module('StickyBooking')
                           console.log("Error with recalc", error);
                       });
               }
-          }
+          };
 
           //When Order and Answers must be configured
           $scope.startOrder = function(){
-
               $scope.optionsHolder = {};
-              
-              //Set default values
-              $scope.order.answers().target().map( (answer) => {
-                  console.log("Answer", answer);
-                  var formControl = answer.question().formControl;
-                  var optionCount = 0;
-                  var firstOption = null;
-                  var defaultFound = false;
-                  answer.question().options().target().map( (option) => {
-
-                      if(optionCount == 0){
-                          firstOption = option;
-                      }
-                      
-                      if(formControl == 'drop_down' || formControl == 'option_list'){
-                          if(option.default){
-                              if(formControl == 'drop_down')
-                                  $scope.optionsHolder[answer.question().id] = option.id;
-                              if(formControl == 'option_list')
-                                  $scope.optionsHolder[answer.question().id] = option.title;
-                              defaultFound = true;
-                              answer.assignOption(option);
-                          }
-                      }
-
-                      optionCount++;
-                  });
-
-                  if( (formControl == 'drop_down' || formControl == 'option_list') && !defaultFound){
-                      if(formControl == 'drop_down')
-                          $scope.optionsHolder[answer.question().id] = firstOption.id;
-                      if(formControl == 'option_list')
-                          $scope.optionsHolder[answer.question().id] = firstOption.title;
-                      answer.assignOption(firstOption);
-                  }
-
-                  if(formControl == 'checkbox'){
-                      answer.value = false;
-                  }
-              });
 
               //Scroll into customer info pane and hide the animation spinner
               $('.pane-customer-information').addClass("step-visible");
