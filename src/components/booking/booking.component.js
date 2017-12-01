@@ -6,7 +6,7 @@ var templateUrl = require('ngtemplate-loader!./booking.component.html');
 angular.module('StickyBooking')
     .component('bookingPage', {
         templateUrl: templateUrl,
-        controller: function BookingController($scope, $http, occasionSDKService) {
+        controller: function BookingController($scope, $http, $filter, occasionSDKService) {
 
           //Runs On Init
           this.$onInit = function(){
@@ -197,6 +197,15 @@ angular.module('StickyBooking')
                       }
                   });
               }
+          };
+
+          // Formats the title for options of dropdowns/option lists to include price if the option has a price
+          $scope.titleForOption = function(option) {
+              var title = option.title;
+
+              if(option.price) title += ' (' + $filter('currency')(option.price, $scope.merchant.currency().code) + ')';
+
+              return title;
           };
 
           // Returns the default option from a question's options

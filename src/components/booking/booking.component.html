@@ -185,7 +185,7 @@
                                            ng-model="optionsHolder[answer.question().id]"
                                            ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])" />
 
-                                    {{option.title}}
+                                    {{ titleForOption(option) }}
                                 </label>
                             </div>
                             <!-- Drop Down -->
@@ -193,7 +193,7 @@
                                     ng-if="answer.question().formControl == 'drop_down'"
                                     ng-model="optionsHolder[answer.question().id]"
                                     ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])"
-                                    ng-options="option as option.title for option in answer.question().options().target().toArray()"
+                                    ng-options="option as titleForOption(option) for option in answer.question().options().target().toArray()"
                                     ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
 
                                 <option value="">-- Please select --</option>
