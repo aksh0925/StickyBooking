@@ -156,7 +156,7 @@
                     <!-- Dynamic Questions, Set by Merchant -->
                     <div ng-repeat="(index, answer) in order.answers().target().toArray()">
                         <div class="form-group" ng-if="answer.question().formControl != 'separator'">
-                            <label ng-if="answer.question().formControl != 'checkbox' && answer.question().formControl != 'text_output' && answer.question().formControl != 'waiver'">
+                            <label ng-if="answer.question().formControl == 'text_input' || answer.question().formControl == 'text_area' || answer.question().formControl == 'option_list' || answer.question().formControl == 'drop_down'">
                                 {{ answer.question().title }}<span ng-if='answer.question().required'>*</span>
                             </label>
                             <!-- Render different from control based on answer.question.formControl type -->
@@ -199,27 +199,33 @@
                                 <option value="">-- Please select --</option>
                             </select>
                             <!-- Spin Button -->
-                            <ul class="spinner-input list-inline" ng-if="answer.question().formControl == 'spin_button'">
-                                <li>
-                                    <input class="form-control value-input" readonly=""
-                                           ng-model="answer.value"
-                                           ng-init="answer.value = answer.question().min" />
-                                </li>
-                                <li>
-                                    <div class="btn-group btn-group-lg">
-                                        <button type="button" class="btn btn-info update-price stepper-minus"
-                                                ng-click="answer.value = answer.value - 1; answerChanged(answer)"
-                                                ng-disabled="answer.value == answer.question().min">
-                                            -
-                                        </button>
-                                        <button type="button" class="btn btn-info update-price stepper-plus"
-                                                ng-click="answer.value = answer.value + 1; answerChanged(answer)"
-                                                ng-disabled="answer.value >= answer.question().max">
-                                            +
-                                        </button>
-                                    </div>
-                                </li>
-                            </ul>
+                            <div ng-if="answer.question().formControl == 'spin_button'">
+                                <label>
+                                    <span>{{ titleForSpinButton(answer) }}</span>
+                                    <span ng-if='answer.question().required'>*</span>
+                                </label>
+                                <ul class="spinner-input list-inline">
+                                    <li>
+                                        <input class="form-control value-input" readonly=""
+                                               ng-model="answer.value"
+                                               ng-init="answer.value = answer.question().min" />
+                                    </li>
+                                    <li>
+                                        <div class="btn-group btn-group-lg">
+                                            <button type="button" class="btn btn-info update-price stepper-minus"
+                                                    ng-click="answer.value = answer.value - 1; answerChanged(answer)"
+                                                    ng-disabled="answer.value == answer.question().min">
+                                                -
+                                            </button>
+                                            <button type="button" class="btn btn-info update-price stepper-plus"
+                                                    ng-click="answer.value = answer.value + 1; answerChanged(answer)"
+                                                    ng-disabled="answer.value >= answer.question().max">
+                                                +
+                                            </button>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                             <!-- Checkbox && Waiver -->
                             <div ng-if="answer.question().formControl == 'checkbox' || answer.question().formControl == 'waiver'">
                                 <div class="well well-sm waiver" ng-if="answer.question().formControl == 'waiver'">

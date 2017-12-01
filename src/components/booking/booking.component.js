@@ -201,7 +201,7 @@ angular.module('StickyBooking')
 					};
 
 					// Returns a number formatted like "($NN.NN)"
-					var numToCurrencyIndicator = function(n) {
+					var numToCurrency = function(n) {
 					    return $filter('currency')(n, $scope.merchant.currency().code);
           };
 
@@ -222,7 +222,7 @@ angular.module('StickyBooking')
 									        case 'price':
 									            switch(checkbox.operation) {
 									                case 'add':
-									                    return checkbox.title + ' (' + numToCurrencyIndicator(checkbox.price) + ')';
+									                    return checkbox.title + ' (' + numToCurrency(checkbox.price) + ')';
                                   case 'multiply':
                                       return checkbox.title + ' (' + checkbox.percentage + '% extra)';
                               }
@@ -230,7 +230,7 @@ angular.module('StickyBooking')
                           case 'discount':
                               switch(checkbox.operation) {
                                   case 'subtract':
-                                      return checkbox.title + ' (' + numToCurrencyIndicator(checkbox.price) + ' off)';
+                                      return checkbox.title + ' (' + numToCurrency(checkbox.price) + ' off)';
                                   case 'divide':
                                       return checkbox.title + ' (' + checkbox.percentage + '% off)';
                               }
@@ -248,10 +248,26 @@ angular.module('StickyBooking')
 					$scope.titleForOption = function(option) {
 							var title = option.title;
 
-							if(option.price) title += ' (' + numToCurrencyIndicator(option.price) + ')';
+							if(option.price) title += ' (' + numToCurrency(option.price) + ')';
 
 							return title;
 					};
+
+          // Formats the title for spin buttons that change based on the value of the spin button
+          $scope.titleForSpinButton = function(answer) {
+              var title = answer.question().title;
+
+              if(answer.question().price) {
+                  title += ' ' + answer.value + ' x ' + numToCurrency(answer.question().price) + ' = ';
+                  title += numToCurrency(parseFloat(answer.question().price) * answer.value);
+              }
+
+              if(answer.question().max) {
+                  title += ' (Max of ' + answer.question().max + ')';
+              }
+
+              return title;
+          };
 
 					// Returns the default option from a question's options
 					$scope.defaultOptionFor = function(question) {
