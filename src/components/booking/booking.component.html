@@ -198,19 +198,6 @@
 
                                 <option value="">-- Please select --</option>
                             </select>
-                            <!-- Checkbox -->
-                            <div ng-if="answer.question().formControl == 'checkbox'">
-                                <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox"
-                                           ng-model="answer.value"
-                                           ng-change="answerChanged(answer)"
-                                           ng-required="answer.question().required"
-                                           ng-init="answer.value = false" />
-
-                                    {{ answer.question().title }}
-                                    <span ng-if='answer.question().required'>*</span>
-                                </label>
-                            </div>
                             <!-- Spin Button -->
                             <ul class="spinner-input list-inline" ng-if="answer.question().formControl == 'spin_button'">
                                 <li>
@@ -233,15 +220,22 @@
                                     </div>
                                 </li>
                             </ul>
-                            <!-- Waiver -->
-                            <div ng-if="answer.question().formControl == 'waiver'">
-                                <div class="well well-sm waiver">
+                            <!-- Checkbox && Waiver -->
+                            <div ng-if="answer.question().formControl == 'checkbox' || answer.question().formControl == 'waiver'">
+                                <div class="well well-sm waiver" ng-if="answer.question().formControl == 'waiver'">
                                     <ng-bind-html ng-bind-html="answer.question().waiverText">
                                     </ng-bind-html>
                                 </div>
 
                                 <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox" ng-model="answer.value" required="required" />{{ answer.question().attributes().title }}*
+                                    <input class="question-checkbox" type="checkbox"
+                                           ng-model="answer.value"
+                                           ng-change="answerChanged(answer)"
+                                           ng-required="answer.question().required || answer.question().formControl == 'waiver'"
+                                           ng-init="answer.value = false" />
+
+                                    <span>{{ titleForCheckbox(answer.question()) }}</span>
+                                    <span ng-if="answer.question().required || answer.question().formControl == 'waiver'">*</span>
                                 </label>
                             </div>
                             <!-- Text Output -->
