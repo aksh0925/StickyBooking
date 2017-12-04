@@ -176,9 +176,11 @@
                             </textarea>
                             <!-- Option List -->
                             <div ng-if="answer.question().formControl == 'option_list'">
+                                <span class="invisible"
+                                      ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question()); optionableQuestionChanged(answer, optionsHolder[answer.question().id])">
+                                </span>
                                 <label class="clickable-label"
-                                       ng-repeat="option in answer.question().options().target().toArray()"
-                                       ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
+                                       ng-repeat="option in answer.question().options().target().toArray()">
                                     <input class="question-radio" type="radio"
                                            name="{{answer.question().id}}"
                                            ng-value="option"
@@ -194,7 +196,7 @@
                                     ng-model="optionsHolder[answer.question().id]"
                                     ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])"
                                     ng-options="option as titleForOption(option) for option in answer.question().options().target().toArray()"
-                                    ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
+                                    ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question()); optionableQuestionChanged(answer, optionsHolder[answer.question().id])">
 
                                 <option value="">-- Please select --</option>
                             </select>
