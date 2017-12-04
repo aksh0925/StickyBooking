@@ -6,7 +6,7 @@ var templateUrl = require('ngtemplate-loader!./booking.component.html');
 angular.module('StickyBooking')
     .component('bookingPage', {
         templateUrl: templateUrl,
-        controller: function BookingController($scope, $http, occasionSDKService) {
+        controller: function BookingController($scope, $http, $filter, occasionSDKService) {
 
           //Runs On Init
           this.$onInit = function(){
@@ -29,6 +29,7 @@ angular.module('StickyBooking')
                   year: null,
                   verification: null
               }
+
               $scope.loadSDKData();
           }
 
@@ -106,7 +107,7 @@ angular.module('StickyBooking')
                   console.log(errors);
                   $scope.displayLoading = false;
                   $scope.$apply();
-                  
+
                   if(errors instanceof TypeError){
                       alert("There was an error retrieving the listing you're looking for. Please try again later.");
                   }else{
@@ -197,34 +198,92 @@ angular.module('StickyBooking')
                       }
                   });
               }
-          }
+          };
 
-          //When the value of a radio selector changes
-          $scope.radioChanged = function(answer, option){
-              $scope.order.answers().target().map( (answerAtI) => {
-                  if(answerAtI.questionId == answer.questionId){
-                      answerAtI.assignOption(option);
-                      $scope.questionValueChanged(answer);
-                  }
-              });
-          }
+          // Returns a number formatted like "($NN.NN)"
+          var numToCurrency = function(n) {
+              return $filter('currency')(n, $scope.merchant.currency().code);
+          };
 
-          //When the value of a drop down selector changes
-          $scope.selectChanged = function(answer){
-              $scope.order.answers().target().map( (answerAtI) => {
-                  if(answerAtI.questionId == answer.questionId){
-                      answerAtI.question().options().target().map( (option) => {
-                          if($scope.optionsHolder[answer.questionId] == option.id){
-                              answerAtI.assignOption(option);
-                              $scope.questionValueChanged(answer);
-                          }
-                      });
-                  }
-              });
-          }
+          // Formats the title for checkbox questions, which have following permutations:
+          // formControl == 'checkbox'
+          //   category == 'info': TITLE
+          //   category == 'price'
+          //     operation == 'add': TITLE ($99.99)
+          //     operation == 'multiply': TITLE (99.99% extra)
+          //   category == 'price'
+          //     operation == 'subtract': TITLE ($99.99 off)
+          //     operation == 'divide': TITLE (99.99% off)
+          // formControl == 'waiver': TITLE
+          $scope.titleForCheckbox = function(checkbox) {
+              switch(checkbox.formControl) {
+                  case 'checkbox':
+                      switch(checkbox.category) {
+                          case 'price':
+                              switch(checkbox.operation) {
+                                  case 'add':
+                                      return checkbox.title + ' (' + numToCurrency(checkbox.price) + ')';
+                                  case 'multiply':
+                                      return checkbox.title + ' (' + checkbox.percentage + '% extra)';
+                              }
+                              break;
+                          case 'discount':
+                              switch(checkbox.operation) {
+                                  case 'subtract':
+                                      return checkbox.title + ' (' + numToCurrency(checkbox.price) + ' off)';
+                                  case 'divide':
+                                      return checkbox.title + ' (' + checkbox.percentage + '% off)';
+                              }
+                              break;
+                          default:
+                              return checkbox.title;
+                      }
+                      break;
+                  case 'waiver':
+                      return checkbox.title;
+              }
+          };
 
-          //When a question value changes
-          $scope.questionValueChanged = function(answer){
+          // Formats the title for options of dropdowns/option lists to include price if the option has a price
+          $scope.titleForOption = function(option) {
+              var title = option.title;
+
+              if(option.price) title += ' (' + numToCurrency(option.price) + ')';
+
+              return title;
+          };
+
+          // Formats the title for spin buttons that change based on the value of the spin button
+          $scope.titleForSpinButton = function(answer) {
+              var title = answer.question().title;
+
+              if(answer.question().price) {
+                  title += ' ' + answer.value + ' x ' + numToCurrency(answer.question().price) + ' = ';
+                  title += numToCurrency(parseFloat(answer.question().price) * answer.value);
+              }
+
+              if(answer.question().max) {
+                  title += ' (Max of ' + answer.question().max + ')';
+              }
+
+              return title;
+          };
+
+          // Returns the default option from a question's options
+          $scope.defaultOptionFor = function(question) {
+              return question.options().target().detect(function(o) { return o.default; });
+          };
+
+          //When the value of a drop down selector or radio selector changes
+          $scope.optionableQuestionChanged = function(answer, option){
+              answer.assignOption(option);
+              $scope.answerChanged(answer);
+          };
+
+          // Update price on answer change if price calculating question
+          //   On init
+          //   When a question value changes
+          $scope.answerChanged = function(answer){
               if(answer.question().priceCalculating){
                   $scope.order.calculatePrice()
                       .then( (order) => {
@@ -235,52 +294,11 @@ angular.module('StickyBooking')
                           console.log("Error with recalc", error);
                       });
               }
-          }
+          };
 
           //When Order and Answers must be configured
           $scope.startOrder = function(){
-
               $scope.optionsHolder = {};
-              
-              //Set default values
-              $scope.order.answers().target().map( (answer) => {
-                  console.log("Answer", answer);
-                  var formControl = answer.question().formControl;
-                  var optionCount = 0;
-                  var firstOption = null;
-                  var defaultFound = false;
-                  answer.question().options().target().map( (option) => {
-
-                      if(optionCount == 0){
-                          firstOption = option;
-                      }
-                      
-                      if(formControl == 'drop_down' || formControl == 'option_list'){
-                          if(option.default){
-                              if(formControl == 'drop_down')
-                                  $scope.optionsHolder[answer.question().id] = option.id;
-                              if(formControl == 'option_list')
-                                  $scope.optionsHolder[answer.question().id] = option.title;
-                              defaultFound = true;
-                              answer.assignOption(option);
-                          }
-                      }
-
-                      optionCount++;
-                  });
-
-                  if( (formControl == 'drop_down' || formControl == 'option_list') && !defaultFound){
-                      if(formControl == 'drop_down')
-                          $scope.optionsHolder[answer.question().id] = firstOption.id;
-                      if(formControl == 'option_list')
-                          $scope.optionsHolder[answer.question().id] = firstOption.title;
-                      answer.assignOption(firstOption);
-                  }
-
-                  if(formControl == 'checkbox'){
-                      answer.value = false;
-                  }
-              });
 
               //Scroll into customer info pane and hide the animation spinner
               $('.pane-customer-information').addClass("step-visible");
@@ -308,7 +326,7 @@ angular.module('StickyBooking')
                       console.log("Error from calc start price", error);
                   });
           }
-          
+
           $scope.useSquare = function() {
               // Set the application ID
               //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g"; //Marc's Sandbox Key
@@ -451,7 +469,7 @@ angular.module('StickyBooking')
                       Spreedly.setStyle(name, 'border: 1px solid #ccc; -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;');
                   }
               });
-              
+
               Spreedly.on('errors', function(errors) {
                   console.log("Spreedly On Errors", errors);
                   $scope.orderErrors = errors;
@@ -539,7 +557,7 @@ angular.module('StickyBooking')
               $scope.redeemableError = null;
               document.getElementById('redeemableInput').value = null;
               document.getElementById('redeemableInput').disabled = false;
-              
+
               //Recalc price
               $scope.order.calculatePrice()
                   .then( order => {
@@ -640,18 +658,6 @@ angular.module('StickyBooking')
                       return new Date(date).getHours() >= 18;
                       break;
               }
-          }
-
-          //Return an object collection as an array
-          $scope.returnAsArray = function(unmapped) {
-              let items = [];
-              if($scope.initialDataLoaded){
-                  unmapped
-                      .map( (item) => {
-                          items.push(item);
-                      });
-              }
-              return items;
           }
 
       } //End Controller

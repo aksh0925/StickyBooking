@@ -43,23 +43,23 @@
                 <table>
                     <tr ng-if="order.subtotal != order.total">
                         <td>Subtotal:</td>
-                        <td>{{ merchant.currency().code }} {{ order.subtotal }}</td>
+                        <td>{{ order.subtotal | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-if="order.tax != 0 && order.tax != null">
                         <td>Tax:</td>
-                        <td>{{ merchant.currency().code }} {{ order.tax }}</td>
+                        <td>{{ order.tax | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-if="order.couponAmount != null">
                         <td>Discount:</td>
-                        <td>-{{ merchant.currency().code }} {{ order.couponAmount }}</td>
+                        <td>-{{ order.couponAmount | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-class="{ 'borderTop': order.subtotal != order.total }">
                         <td><strong>Total:</strong></td>
-                        <td>{{ merchant.currency().code }} {{ order.total }}</td>
+                        <td>{{ order.total | currency:merchant.currency().code }}</td>
                     </tr>
                     <tr ng-if="order.outstandingBalance != order.total">
                         <td>Balance due:</td>
-                        <td>{{ merchant.currency().code }} {{ order.outstandingBalance }}</td>
+                        <td>{{ order.outstandingBalance | currency:merchant.currency().code }}</td>
                     </tr>
                 </table>
             </div>
@@ -154,62 +154,99 @@
                     <!-- End of Static Questions -->
 
                     <!-- Dynamic Questions, Set by Merchant -->
-                    <div ng-repeat="(index, answer) in returnAsArray(order.answers().target())">
+                    <div ng-repeat="(index, answer) in order.answers().target().toArray()">
                         <div class="form-group" ng-if="answer.question().formControl != 'separator'">
-                            <label ng-if="answer.question().formControl != 'checkbox' && answer.question().formControl != 'text_output' && answer.question().formControl != 'waiver'">
-                                {{ answer.question().attributes().title }}<span ng-if='answer.question().required || answer.question().priceCalculating'>*</span>
+                            <label ng-if="answer.question().formControl == 'text_input' || answer.question().formControl == 'text_area' || answer.question().formControl == 'option_list' || answer.question().formControl == 'drop_down'">
+                                {{ answer.question().title }}<span ng-if='answer.question().required'>*</span>
                             </label>
                             <!-- Render different from control based on answer.question.formControl type -->
                             <!-- Text Input -->
-                            <input class="form-control" type="text" ng-model="answer.value" ng-if="answer.question().formControl == 'text_input'" ng-required="answer.question().required" placeholder="{{ answer.question().attributes().title }}"
+                            <input class="form-control"
+                                   ng-if="answer.question().formControl == 'text_input'"
+                                   ng-model="answer.value"
+                                   ng-required="answer.question().required"
+                                   placeholder="{{ answer.question().title }}"
                             />
                             <!-- Text Area -->
-                            <textarea class="form-control" rows="4" ng-model="answer.value" ng-if="answer.question().formControl == 'text_area'" ng-required="answer.question().required" placeholder="Your Response"></textarea>
+                            <textarea class="form-control" rows="4"
+                                      ng-if="answer.question().formControl == 'text_area'"
+                                      ng-model="answer.value"
+                                      ng-required="answer.question().required"
+                                      placeholder="Your Response">
+                            </textarea>
                             <!-- Option List -->
                             <div ng-if="answer.question().formControl == 'option_list'">
-                                <label ng-repeat="option in returnAsArray(answer.question().options().target())" class="clickable-label">
-                                    <input class="question-radio" type="radio" ng-value="option.title" name="{{answer.question().id}}" ng-model="optionsHolder[answer.question().id]" ng-change="radioChanged(answer, option)" /> {{option.title}}
+                                <label class="clickable-label"
+                                       ng-repeat="option in answer.question().options().target().toArray()"
+                                       ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
+                                    <input class="question-radio" type="radio"
+                                           name="{{answer.question().id}}"
+                                           ng-value="option"
+                                           ng-model="optionsHolder[answer.question().id]"
+                                           ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])" />
+
+                                    {{ titleForOption(option) }}
                                 </label>
                             </div>
                             <!-- Drop Down -->
-                            <select class="form-control" ng-if="answer.question().formControl == 'drop_down'" ng-model="optionsHolder[answer.question().id]"
-                                ng-change="selectChanged(answer)">
-                                    <option ng-repeat="(optionIndex, option) in returnAsArray(answer.question().options().target())" value="{{option.id}}">{{option.title}}</option>
-                                </select>
-                            <!-- Checkbox -->
-                            <div ng-if="answer.question().formControl == 'checkbox'">
-                                <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox" ng-model="answer.value" ng-change="questionValueChanged(answer)" ng-required="answer.question().required"/>{{ answer.question().attributes().title }}<span ng-if='answer.question().mustBeChecked'>*</span>
-                                </label>
-                            </div>
+                            <select class="form-control"
+                                    ng-if="answer.question().formControl == 'drop_down'"
+                                    ng-model="optionsHolder[answer.question().id]"
+                                    ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])"
+                                    ng-options="option as titleForOption(option) for option in answer.question().options().target().toArray()"
+                                    ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question())">
+
+                                <option value="">-- Please select --</option>
+                            </select>
                             <!-- Spin Button -->
-                            <ul class="spinner-input list-inline" ng-if="answer.question().formControl == 'spin_button'">
-                                <li>
-                                    <input class="form-control value-input" ng-model="answer.value" readonly="" type="text" ng-init="answer.value = 1">
-                                </li>
-                                <li>
-                                    <div class="btn-group btn-group-lg">
-                                        <button class="btn btn-info update-price stepper-minus" ng-click="answer.value = answer.value - 1; questionValueChanged(answer)"
-                                            ng-disabled="answer.value === 1" type="button" disabled="disabled">-</button>
-                                        <button class="btn btn-info update-price stepper-plus" ng-click="answer.value = answer.value + 1; questionValueChanged(answer)"
-                                            ng-disabled="answer.value >= answer.question().max" type="button">+</button>
-                                    </div>
-                                </li>
-                            </ul>
-                            <!-- Waiver -->
-                            <div ng-if="answer.question().formControl == 'waiver'">
-                                <div class="well well-sm waiver">
+                            <div ng-if="answer.question().formControl == 'spin_button'">
+                                <label>
+                                    <span>{{ titleForSpinButton(answer) }}</span>
+                                    <span ng-if='answer.question().required'>*</span>
+                                </label>
+                                <ul class="spinner-input list-inline">
+                                    <li>
+                                        <input class="form-control value-input" readonly=""
+                                               ng-model="answer.value"
+                                               ng-init="answer.value = answer.question().min" />
+                                    </li>
+                                    <li>
+                                        <div class="btn-group btn-group-lg">
+                                            <button type="button" class="btn btn-info update-price stepper-minus"
+                                                    ng-click="answer.value = answer.value - 1; answerChanged(answer)"
+                                                    ng-disabled="answer.value == answer.question().min">
+                                                -
+                                            </button>
+                                            <button type="button" class="btn btn-info update-price stepper-plus"
+                                                    ng-click="answer.value = answer.value + 1; answerChanged(answer)"
+                                                    ng-disabled="answer.value >= answer.question().max">
+                                                +
+                                            </button>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Checkbox && Waiver -->
+                            <div ng-if="answer.question().formControl == 'checkbox' || answer.question().formControl == 'waiver'">
+                                <div class="well well-sm waiver" ng-if="answer.question().formControl == 'waiver'">
                                     <ng-bind-html ng-bind-html="answer.question().waiverText">
                                     </ng-bind-html>
                                 </div>
 
                                 <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox" ng-model="answer.value" required="required" />{{ answer.question().attributes().title }}*
+                                    <input class="question-checkbox" type="checkbox"
+                                           ng-model="answer.value"
+                                           ng-change="answerChanged(answer)"
+                                           ng-required="answer.question().required || answer.question().formControl == 'waiver'"
+                                           ng-init="answer.value = false" />
+
+                                    <span>{{ titleForCheckbox(answer.question()) }}</span>
+                                    <span ng-if="answer.question().required || answer.question().formControl == 'waiver'">*</span>
                                 </label>
                             </div>
                             <!-- Text Output -->
-                            <p ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</p>
-                            <h3 ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle" class="question-text-output">{{ answer.question().title }}</h3>
+                            <h3 class="question-text-output" ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle">{{ answer.question().title }}</h3>
+                            <p  class="question-text-output" ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle">{{ answer.question().title }}</p>
                         </div>
                         <hr ng-if="answer.question().formControl == 'separator'">
                     </div>
@@ -225,23 +262,23 @@
                         <table>
                             <tr ng-if="order.subtotal != order.total">
                                 <td>Subtotal:</td>
-                                <td>{{ merchant.currency().code }} {{ order.subtotal }}</td>
+                                <td>{{ order.subtotal | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-if="order.tax != 0 && order.tax != null">
                                 <td>Tax:</td>
-                                <td>{{ merchant.currency().code }} {{ order.tax }}</td>
+                                <td>{{ order.tax | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-if="order.couponAmount != null">
                                 <td>Discount:</td>
-                                <td>-{{ merchant.currency().code }} {{ order.couponAmount }}</td>
+                                <td>-{{ order.couponAmount | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-class="{ 'borderTop': order.subtotal != order.total }">
                                 <td><strong>Total:</strong></td>
-                                <td>{{ merchant.currency().code }} {{ order.total }}</td>
+                                <td>{{ order.total | currency:merchant.currency().code }}</td>
                             </tr>
                             <tr ng-if="order.outstandingBalance != order.total">
                                 <td>Balance due:</td>
-                                <td>{{ merchant.currency().code }} {{ order.outstandingBalance }}</td>
+                                <td>{{ order.outstandingBalance | currency:merchant.currency().code }}</td>
                             </tr>
                         </table>
                     </div>
