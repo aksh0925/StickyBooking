@@ -49,8 +49,7 @@ angular.module('StickyBooking')
                   $scope.merchant = values[0];
                   $scope.product = values[1];
 
-                  //$scope.psp = $scope.merchant.pspName;
-                  $scope.psp = 'cash';
+                  $scope.psp = $scope.merchant.pspName;
                   console.log("PSP:", $scope.psp);
 
                   //Manually refresh DOM
