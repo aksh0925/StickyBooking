@@ -211,7 +211,7 @@ angular.module('StickyBooking')
             $scope.getDisplayClasses = function(passDay){
                 let day = passDay.thisDay;
                 let dayOfWeek = day.dayOfWeek;
-                let classString = 'unavailable-day';
+                let classString = '';
 
                 //Set class depending on if there is a session that day
                 $scope.timeSlots.map( (timeSlot) => {
