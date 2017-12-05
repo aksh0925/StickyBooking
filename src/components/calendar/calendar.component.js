@@ -197,7 +197,7 @@ angular.module('StickyBooking')
                     occasionSDKService.getTimeSlotsByMonth($scope.product, desiredMonth)
                         .then( (newTimeSlots) => {
                             console.log("Time slots by month", newTimeSlots);
-                            $scope.timeSlots = newTimeSlots;
+                            $scope.timeSlots.push(...newTimeSlots.toArray());
                             $scope.highestMonthLoaded = $scope.activeCalendarMonth;
                             $scope.highestYearLoaded = $scope.activeCalendarYear;
                             $scope.$emit('timeSlotsUpdated', { timeSlots: $scope.timeSlots});
