@@ -18,6 +18,8 @@
         <div ng-if="!order.persisted()">
             <div class="booking-page-welcome-message animated slideInLeft" ng-if="initialDataLoaded">
                 <p>Welcome to the online booking tool. This platform will allow you to schedule, book, &amp; pay for your session.</p>
+                <ng-bind-html ng-if="product.description" ng-bind-html="product.description">
+                </ng-bind-html>
             </div>
             <ol class="booking-process animated slideInLeft" id="booking-process-status" ng-if="initialDataLoaded">
                 <li class="booking-step-1 booking-step">Get Started</li>
