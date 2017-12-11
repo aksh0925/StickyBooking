@@ -258,7 +258,7 @@
 
 
                     <!-- Price Table -->
-                    <div class="alert priceTable" ng-if='!product.free' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
+                    <div class="alert priceTable" ng-if='requiresPaymentForms()' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
                         <div ng-if="psp == 'cash'">
                             <strong>No payment required now. Payment will be collected at the venue.</strong>
                             <br><br>
@@ -288,7 +288,7 @@
                     </div>
                     <!-- End Price Table -->
                     <!-- Redeemables Section -->
-                    <div id="redeemables" ng-if="product.hasRedeemables && !product.free">
+                    <div id="redeemables" ng-if="product.hasRedeemables && requiresPaymentForms()">
                         <br><br>
                         <h3>Gift Cards & Coupons</h3>
                         <hr>
@@ -305,7 +305,7 @@
                     <!-- End Redeemables Section -->
 
                     <!-- Checkout Forms -->
-                    <div ng-if='!product.free'>
+                    <div ng-if='requiresPaymentForms()'>
 
                         <!-- Spreedly Checkout Form -->
                         <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">

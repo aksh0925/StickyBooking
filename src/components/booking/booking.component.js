@@ -295,6 +295,12 @@ angular.module('StickyBooking')
               }
           };
 
+          // Indicates whether or not the payment, price, and redeemable sections are necessary
+          // @note This is false if the product is free or the order's outstanding balance is not zero
+          $scope.requiresPaymentForms = function() {
+              return !$scope.product.free && parseFloat($scope.order.outstandingBalance) > 0;
+          };
+
           //When Order and Answers must be configured
           $scope.startOrder = function(){
               $scope.optionsHolder = {};
@@ -324,7 +330,7 @@ angular.module('StickyBooking')
                   .catch( (error) => {
                       console.log("Error from calc start price", error);
                   });
-          }
+          };
 
           $scope.useSquare = function() {
               // Set the application ID
@@ -442,7 +448,7 @@ angular.module('StickyBooking')
                   }
               });
               $scope.paymentForm.build();
-          }
+          };
 
           $scope.useSpreedly = function(){
               //Init Spreedly card values
@@ -486,7 +492,7 @@ angular.module('StickyBooking')
                           console.log("Errors with final calc price", error);
                       });
               });
-          }
+          };
 
           $scope.checkRedeemable = function(){
               $scope.displayLoading = true;
@@ -538,7 +544,7 @@ angular.module('StickyBooking')
                       document.getElementById('redeemableInput').value = null;
                       $scope.$apply();
                   });
-          }
+          };
 
           $scope.removeRedeemable = function(){
               $scope.displayLoading = true;
@@ -567,7 +573,7 @@ angular.module('StickyBooking')
                       console.log("Error after calc after remove redeem", error);
                       $scope.displayLoading = false;
                   });
-          }
+          };
 
           $scope.submitPaymentForms = function(event){
               event.preventDefault();
@@ -587,7 +593,7 @@ angular.module('StickyBooking')
 
           $scope.submitSquareForm = function() {
               $scope.paymentForm.requestCardNonce();
-          }
+          };
 
           $scope.submitSpreedlyForm = function(){
               console.log("Submit payment form");
@@ -599,7 +605,7 @@ angular.module('StickyBooking')
               requiredFields["year"] = document.getElementById("year").value;
 
               Spreedly.tokenizeCreditCard(requiredFields);
-          }
+          };
 
           //When users submits order form
           $scope.submitOrder = function() {
@@ -620,7 +626,7 @@ angular.module('StickyBooking')
                 }
                 $scope.$apply();
               });
-          }
+          };
 
           //Scroll to specified anchor tag
           $scope.scrollToAnchor = function(aid){
