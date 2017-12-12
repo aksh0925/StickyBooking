@@ -6843,3 +6843,7 @@ label {
   vertical-align: top;
   font-weight: bold;
 }
+
+.calendar-dates .empty-date .date {
+  display: none;
+}
