@@ -20,6 +20,7 @@ module.exports = {
       'es6-promise',
       'jquery',
       'moment',
+      'moment-range',
       'qs',
       'occasion-sdk',
       'underscore',
