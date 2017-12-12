@@ -1,17 +1,15 @@
-<div ng-repeat="(yearIndex, year) in allDates" ng-if="year.year == activeCalendarYear">
-    <div ng-repeat="(monthIndex, month) in year.months" ng-if="month.month == activeCalendarMonth">
+<div ng-if='getTimeSlotsForMonth(activeCalendarMonth)'>
     <div class="row month-navigator">
         <div class="col-xs-3">
-        <a class="btn btn-default" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+            <a class="btn btn-default" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
         </div>
         <div class="col-xs-6 text-center">
-        <h6>{{ month.monthName }} {{ year.year }}</h6>
+            <h6>{{ activeCalendarMonth.format('MMMM YYYY') }}</h6>
         </div>
-        <div class="col-xs-3 text-right" ng-if="activeCalendarMonth != maxCalendarMonth || activeCalendarYear != maxCalendarYear">
-        <a class="btn btn-default" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        <div class="col-xs-3 text-right">
+            <a class="btn btn-default" ng-click="moveMonthAhead()"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
         </div>
     </div>
-
     <table class="calendar-table">
         <thead>
         <tr>
@@ -25,24 +23,12 @@
         </tr>
         </thead>
         <tr></tr>
-        <tr class="calendar-dates" ng-repeat="(weekIndex, week) in month.weeks">
-        
-        <!-- Empty space at the begining of the month -->
-        <!-- If it is the first week of the month, and the first day of the month is not on a Sunday, print as many empty blocks as there are missing days at the start of the week -->
-        <td ng-if="weekIndex == 0 && week[0].thisDay.dayOfWeek != 0" ng-repeat="times in returnRange( (week[0].thisDay.dayOfWeek + 1) - week[0].thisDay.date )" class="empty-date"></td>  
-        
-        <!-- If the starting calendar date is not the first day of the week or month -->
-        <td ng-if="monthIndex == 0 && weekIndex == 0 && week[0].thisDay.date != 1" ng-repeat="(timeIndex, time) in returnRange(week[0].thisDay.date - 1)" class="unavailable-day">Un{{ timeIndex + 1 }}</td>
-
-        <!-- All days within the month -->
-        <!-- Classes that distinguish availability are added by the getDisplayClasses function-->
-        <td ng-repeat="(dayIndex, day) in week" class="{{ getDisplayClasses(day) }}" ng-click="onDateSelection($event, day)">{{ day.thisDay.date }}</td>
-        
-        <!-- Empty space at the end of the month -->
-        <!-- If it is the last week of the month, and the last day of the month is not on a Saturday, print as many empty blocks as there are missing days at the end of the week -->
-        <td ng-if="weekIndex == (month.weeks.length - 1)"  ng-repeat="times in returnRange( 6 - (week[week.length - 1].thisDay.dayOfWeek) )" class="empty-date"></td>  
-        
+        <tr class="calendar-dates" ng-repeat="(weekIndex, week) in getCalendarWeeksForMonth(activeCalendarMonth)">
+            <td ng-repeat="day in week" class="{{ getDisplayClassForDay(day) }}" ng-click="onDateSelection(day)">
+                <span class="date">
+                    {{ day.date() }}
+                </span>
+            </td>
         </tr>
     </table>
-    </div>
 </div>

@@ -70,8 +70,6 @@
                 <div class="booking-page-hero-content animated slideInRight" ng-if="initialDataLoaded">
                     <h6 class="get-started-title">Get Started</h6>
                     <h1 class="page-title">{{ product.title }}</h1>
-                    <!--<h6 class="session-length" ng-if="durations.length == 1">Session Length: {{ durations[0] }} minutes</h6>
-                    <h6 class="session-length" ng-if="durations.length > 1">Session Lengths: {{ document.write(durations.join(", ")) }} minutes</h6>-->
                     <button class="get-started animated tada infinite" ng-click="getStarted()">{{ product.orderButtonText }}</button>
                 </div>
             </div>
@@ -84,12 +82,6 @@
                         <h6>Availability</h6>
                         <h3>Select a date on the calendar below to view availability:</h3>
                     </div>
-                    <!--<div class="col-md-6">
-                        <div class="session-duration text-right">
-                            <h4 class="duration-count">{{ durations[0] }} minutes</h4>
-                            <h6>Session Duration</h6>
-                        </div>
-                    </div>-->
                 </div>
                 <hr />
 
@@ -101,23 +93,41 @@
             <div class="available-times clearfix" style="display:none;">
                 <div class="col-md-12">
                     <h6>Available Time Slots</h6>
-                    <h3>Select a time slot on {{ friendlyDate }} to continue booking:</h3>
+                    <h3>Select a time slot on {{ formatToDate(selectedDate) }} to continue booking:</h3>
                     <hr />
                 </div>
                 <div class="col-md-4 time-slot-buttons">
                     <h6>Morning</h6>
-                    <button class="btn btn-primary time-slot" ng-repeat="(slotIndex, slotValue) in availableSlots" ng-if="splitByTimeOfDay(slotValue.startsAt, 'morning')"
-                        ng-click="onTimeSlotSelection($event, slotValue)">{{ formatToTime(slotValue.startsAt) }}</button>
+                    <button class="btn btn-primary time-slot"
+                            ng-repeat="timeSlot in availableSlots.toArray()"
+                            ng-if="splitByTimeOfDay(timeSlot, 'morning')"
+                            ng-click="onTimeSlotSelection($event, timeSlot)"
+                            ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
+
+                        {{ formatToTime(timeSlot.startsAt) }}
+                    </button>
                 </div>
                 <div class="col-md-4 time-slot-buttons">
                     <h6>Afternoon</h6>
-                    <button class="btn btn-primary time-slot" ng-repeat="(slotIndex, slotValue) in availableSlots" ng-if="splitByTimeOfDay(slotValue.startsAt, 'afternoon')"
-                        ng-click="onTimeSlotSelection($event, slotValue)">{{ formatToTime(slotValue.startsAt) }}</button>
+                    <button class="btn btn-primary time-slot"
+                            ng-repeat="timeSlot in availableSlots.toArray()"
+                            ng-if="splitByTimeOfDay(timeSlot, 'afternoon')"
+                            ng-click="onTimeSlotSelection($event, timeSlot)"
+                            ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
+
+                        {{ formatToTime(timeSlot.startsAt) }}
+                    </button>
                 </div>
                 <div class="col-md-4 time-slot-buttons">
                     <h6>Evening</h6>
-                    <button class="btn btn-primary time-slot" ng-repeat="(slotIndex, slotValue) in availableSlots" ng-if="splitByTimeOfDay(slotValue.startsAt, 'evening')"
-                        ng-click="onTimeSlotSelection($event, slotValue)">{{ formatToTime(slotValue.startsAt) }}</button>
+                    <button class="btn btn-primary time-slot"
+                            ng-repeat="timeSlot in availableSlots.toArray()"
+                            ng-if="splitByTimeOfDay(timeSlot, 'evening')"
+                            ng-click="onTimeSlotSelection($event, timeSlot)"
+                            ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
+
+                        {{ formatToTime(timeSlot.startsAt) }}
+                    </button>
                 </div>
             </div>
 

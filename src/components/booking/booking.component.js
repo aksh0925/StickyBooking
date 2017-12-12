@@ -1,5 +1,6 @@
 var angular = require('angular');
 var moment = require('moment');
+var _ = require('underscore');
 var templateUrl = require('ngtemplate-loader!./booking.component.html');
 
 //Creating bookingPage component on StickyBooking Module
@@ -71,14 +72,6 @@ angular.module('StickyBooking')
 
                           $scope.timeSlots = timeSlots;
 
-                          //Find all possible durations
-                          $scope.durations = [];
-                          $scope.timeSlots.map( (timeSlot) => {
-                              if($scope.durations.indexOf(timeSlot.attributes().duration) == -1){
-                                  $scope.durations.push(timeSlot.attributes().duration);
-                              }
-                          });
-
                           //Manually refresh DOM
                           console.log("Calendar data loaded");
                           $scope.calendarDataLoaded = true;
@@ -88,8 +81,7 @@ angular.module('StickyBooking')
                           $scope.$broadcast('timeSlotDataLoaded', {
                               merchant: $scope.merchant,
                               product: $scope.product,
-                              timeSlots: $scope.timeSlots,
-                              durations: $scope.durations
+                              timeSlots: $scope.timeSlots
                           });
                       });
 
@@ -142,27 +134,8 @@ angular.module('StickyBooking')
 
           //When date is selected from calendar
           $scope.$on('dateSelectedEvent', function(event, data){
-              $scope.friendlyDate = data.friendlyDate;
               $scope.selectedDate = data.selectedDate;
-              $scope.selectedDateElement = data.selectedDateElement;
-
-              $scope.availableSlots = [];
-              $scope.timeSlots.map( (timeSlot) => {
-                  if( $scope.sameDay( new Date(timeSlot.startsAt), new Date($scope.selectedDate.stringDate) )){
-                      $scope.availableSlots.push(timeSlot);
-                  }
-              });
-              $scope.availableSlots.sort(function(a,b){
-                  return new Date(b.startsAt) - new Date(a.startsAt);
-              });
-              $scope.availableSlots.reverse();
-          });
-
-          //When new time slots are loaded
-          $scope.$on('timeSlotsUpdated', function(event, data){
-              $scope.timeSlots = data.timeSlots;
-              $scope.displayLoading = false;
-              $scope.$apply();
+              $scope.availableSlots = data.availableTimeSlots;
           });
 
           //When loading animation is started from sub component
@@ -176,27 +149,30 @@ angular.module('StickyBooking')
           });
 
           //When time slot is selected
-          $scope.onTimeSlotSelection = function(event, passTime){
+          $scope.onTimeSlotSelection = function(event, timeSlot){
               event.preventDefault();
-              let time = passTime;
-              $scope.selectedTimeSlot = time;
-              $scope.selectedTimeSlotElement = event.currentTarget;
-              $(".time-slot-buttons button").removeClass("time-slot-active");
-              $scope.selectedTimeSlotElement.className += " time-slot-active";
+              $scope.selectedTimeSlot = timeSlot;
 
-              $scope.order.timeSlots().target().push($scope.selectedTimeSlot);
+              $scope.order.timeSlots().assign([$scope.selectedTimeSlot]);
 
               if($scope.orderLoaded){
                   $scope.startOrder();
               }else{
                   $scope.displayLoading = true;
-                  $scope.$watch('orderLoaded', function(newValue, oldValue, scope){
+                  $scope.$watch('orderLoaded', function(newValue){
                       if(newValue){
                           $scope.displayLoading = false;
                           $scope.startOrder();
                       }
                   });
               }
+          };
+
+          $scope.isActiveTimeSlot = function(timeSlot) {
+              let activeTimeSlot = $scope.order.timeSlots().target().first();
+              if(_.isUndefined(activeTimeSlot)) return false;
+
+              return activeTimeSlot.startsAt.isSame(timeSlot.startsAt);
           };
 
           // Returns a number formatted like "($NN.NN)"
@@ -632,38 +608,34 @@ angular.module('StickyBooking')
           $scope.scrollToAnchor = function(aid){
               var aTag = $("a[name='"+ aid +"']");
               $('html, body').animate( { scrollTop: aTag.offset().top }, 'slow');
-          }
+          };
 
-          //Check to see if two dates are on the same day
-          $scope.sameDay = function(d1, d2) {
-              return d1.getFullYear() === d2.getFullYear() &&
-                      d1.getMonth() === d2.getMonth() &&
-                      d1.getDate() === d2.getDate();
-          }
-
-          //Return a readble time portion of a date
+          //Return a readable time portion of a date
           $scope.formatToTime = function(dateString){
               return moment(dateString).format('LT');
-          }
+          };
 
+          //Return a readable date portion of a date
+          $scope.formatToDate = function(dateString){
+            return moment(dateString).format('MMMM DD, YYYY');
+          };
+
+          //Return a readable full datetime
           $scope.formatToFullDatetime = function(dateString) {
             return moment(dateString).format('dddd MMMM Do, YYYY h:mm A');
-          }
+          };
 
           //Determine which time of day section this timeSlot belongs in
-          $scope.splitByTimeOfDay = function(date, time) {
+          $scope.splitByTimeOfDay = function(timeSlot, time) {
               switch(time){
                   case('morning'):
-                      return new Date(date).getHours() < 12;
-                      break;
+                      return timeSlot.startsAt.hour() < 12;
                   case('afternoon'):
-                      return new Date(date).getHours() >= 12 && new Date(date).getHours() < 18;
-                      break;
+                      return timeSlot.startsAt.hour() >= 12 && timeSlot.startsAt.hour() < 18;
                   case('evening'):
-                      return new Date(date).getHours() >= 18;
-                      break;
+                      return timeSlot.startsAt.hour() >= 18;
               }
-          }
+          };
 
       } //End Controller
 }); //End Component
