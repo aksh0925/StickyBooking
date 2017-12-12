@@ -21,6 +21,10 @@ angular.module('StickyBooking')
         //Create Connection to Occasion SDK using Merchant API Key
         this.occsn = new Occasion.Client(options);
 
+        this.occsn.TimeSlot.afterRequest(function() {
+            this.startsAt = moment(this.startsAt);
+        });
+
         //Private Promises
         this.queryMyMerchant = new Promise( (resolve, reject) => {
             this.occsn.Merchant.includes('currency').first()

@@ -54,6 +54,7 @@ module.exports = {
     extensions: ['.css', '.js'],
     alias: {
       libs: path.join(process.cwd(), 'src', 'libs'),
+      'active-resource': path.join(process.cwd(), 'node_modules', 'active-resource', 'build', 'active-resource.min.js')
     },
   },
 
