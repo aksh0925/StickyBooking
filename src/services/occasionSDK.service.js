@@ -59,7 +59,7 @@ angular.module('StickyBooking')
             var i = 0;
             var requests = [];
 
-            var lower = lowerRange;
+            var lower = lowerRange.clone();
             var upper = lowerRange.clone().add(7, 'days');
             while(i < numRequests) {
                 if(i + 1 == numRequests) upper = upperRange;

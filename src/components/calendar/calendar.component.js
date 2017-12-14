@@ -36,6 +36,8 @@ angular.module('StickyBooking')
 
             };
 
+            // Constructs rows of weeks starting on Sunday and ending on Saturday, for display as a calendar
+            // Each cell of the calendar is a Moment.js date corresponding to that day
             $scope.getCalendarWeeksForMonth = function(month) {
                 if(!$scope.calendarWeeks[month.format('MM-YYYY')]) {
                   let startDate = moment(month).startOf('month').startOf('week');
@@ -62,9 +64,18 @@ angular.module('StickyBooking')
             };
 
             //Moves the activeCalendar month forward to display the next month
-            $scope.moveMonthAhead = function(){
-                $scope.activeCalendarMonth.add(1, 'month');
-                $scope.getNewTimeSlots();
+            $scope.moveMonthAhead = function() {
+                var nextMonth = moment($scope.activeCalendarMonth).add(1, 'month');
+
+                if(!_.has($scope.timeSlotsByMonth, nextMonth.format('MM-YYYY'))) {
+                    $scope.getNewTimeSlots(nextMonth)
+                        .then(() => {
+                            $scope.activeCalendarMonth = nextMonth;
+                            $scope.$apply();
+                        });
+                } else {
+                    $scope.activeCalendarMonth = nextMonth;
+                }
             };
 
             //Moves the activeCalendar month back to display the previous month
@@ -73,18 +84,16 @@ angular.module('StickyBooking')
             };
 
             //Gets new month of time slots on month change
-            $scope.getNewTimeSlots = function(){
-                if(!_.has($scope.timeSlotsByMonth, $scope.activeCalendarMonth.format('MM-YYYY'))){
-                    $scope.$emit('startLoading');
+            $scope.getNewTimeSlots = function(month){
+                $scope.$emit('startLoading');
 
-                    occasionSDKService.getTimeSlotsByMonth($scope.product, $scope.activeCalendarMonth)
-                        .then((newTimeSlots) => {
-                            console.log("Time slots by month", newTimeSlots);
-                            $scope.setTimeSlotsForMonth($scope.activeCalendarMonth, newTimeSlots);
-                            $scope.$apply();
-                        })
-                        .catch( (error) => console.log("Error", error) );
-                }
+                return occasionSDKService.getTimeSlotsByMonth($scope.product, month)
+                    .then((newTimeSlots) => {
+                        console.log("Time slots by month", newTimeSlots);
+                        $scope.setTimeSlotsForMonth(month, newTimeSlots);
+                        $scope.$emit('stopLoading');
+                    })
+                    .catch( (error) => console.log("Error", error) );
             };
 
             //Evaluates what classes should be applied to the date to distinguish availability
