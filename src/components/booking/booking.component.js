@@ -1,5 +1,6 @@
 var angular = require('angular');
 var moment = require('moment');
+require('moment-timezone');
 var _ = require('underscore');
 var templateUrl = require('ngtemplate-loader!./booking.component.html');
 
@@ -52,6 +53,8 @@ angular.module('StickyBooking')
 
                   $scope.psp = $scope.merchant.pspName;
                   console.log("PSP:", $scope.psp);
+
+                  moment.tz.setDefault($scope.merchant.timeZone);
 
                   //Manually refresh DOM
                   $scope.$emit('initialDataLoaded', { product: $scope.product } );
