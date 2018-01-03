@@ -428,7 +428,7 @@ angular.module('StickyBooking')
 
           $scope.useSpreedly = function(){
               //Init Spreedly card values
-              Spreedly.init("UnQhm0g7l3nOIz2hmAoV3eqm26k", {
+              Spreedly.init(window.OCCSN.spreedly_key, {
                   "numberEl": "spreedly-number",
                   "cvvEl": "spreedly-cvv"
               });
