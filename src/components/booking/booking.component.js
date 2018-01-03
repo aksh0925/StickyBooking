@@ -291,7 +291,6 @@ angular.module('StickyBooking')
               $scope.order.calculatePrice()
                   .then( (order) => {
                       console.log("Order after first calc", $scope.order.attributes());
-                      $scope.$apply();
 
                       if($scope.psp == "spreedly"){
                           console.log("Use Spreedly");
@@ -302,6 +301,8 @@ angular.module('StickyBooking')
                           console.log("Use Square");
                           $scope.useSquare();
                       }
+
+                      $scope.$apply();
                   })
                   .catch( (error) => {
                       console.log("Error from calc start price", error);

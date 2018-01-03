@@ -313,7 +313,7 @@
                     <!-- End Redeemables Section -->
 
                     <!-- Checkout Forms -->
-                    <div ng-if='requiresPaymentForms()'>
+                    <div ng-show='requiresPaymentForms()'>
 
                         <!-- Spreedly Checkout Form -->
                         <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">
