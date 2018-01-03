@@ -458,6 +458,7 @@ angular.module('StickyBooking')
               Spreedly.on('errors', function(errors) {
                   console.log("Spreedly On Errors", errors);
                   $scope.orderErrors = errors;
+                  $scope.$apply();
               });
 
               Spreedly.on('paymentMethod', function(token, pmData) {
