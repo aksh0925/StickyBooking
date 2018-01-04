@@ -13,10 +13,14 @@ angular.module('StickyBooking')
         templateUrl: templateUrl,
         controller: function($scope, occasionSDKService){
             $scope.setTimeSlotsForMonth = function(month, timeSlots) {
+                if(_.isUndefined(month)) return;
+
                 $scope.timeSlotsByMonth[month.format('MM-YYYY')] = timeSlots;
             };
 
             $scope.getTimeSlotsForMonth = function(month) {
+                if(_.isUndefined(month)) return;
+
                 return $scope.timeSlotsByMonth[month.format('MM-YYYY')];
             };
 
@@ -25,12 +29,12 @@ angular.module('StickyBooking')
                 $scope.calendarWeeks = {};
                 $scope.timeSlotsByMonth = {};
 
-                //Set starting month and year for the calendar to display
-                $scope.activeCalendarMonth = moment().startOf('month');
-
                 $scope.$on('timeSlotDataLoaded', function(event, data){
                     $scope.merchant = data.merchant;
                     $scope.product = data.product;
+
+                    // Set starting month and year for the calendar to display
+                    $scope.activeCalendarMonth = moment().startOf('month');
                     $scope.setTimeSlotsForMonth($scope.activeCalendarMonth, data.timeSlots);
                 });
 

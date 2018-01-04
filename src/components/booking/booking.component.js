@@ -56,6 +56,13 @@ angular.module('StickyBooking')
 
                   moment.tz.setDefault($scope.merchant.timeZone);
 
+                  if(_.isNull($scope.product.firstTimeSlotStartsAt)) {
+                      alert(
+                        'Listing has no timeslots. If you are the merchant who owns this listing, add time slots ' +
+                        'so that there are times that can be booked.'
+                      );
+                  }
+
                   //Manually refresh DOM
                   $scope.$emit('initialDataLoaded', { product: $scope.product } );
                   $scope.initialDataLoaded = true;
@@ -66,13 +73,6 @@ angular.module('StickyBooking')
                   console.log("Calendar data loading");
                   occasionSDKService.getTimeSlotsByMonth($scope.product, moment())
                       .then( (timeSlots) => {
-                          if(timeSlots.empty()) {
-                              alert(
-                                'Listing has no timeslots. If you are the merchant who owns this listing, add time slots ' +
-                                'so that there are times that can be booked.'
-                              );
-                          }
-
                           $scope.timeSlots = timeSlots;
 
                           //Manually refresh DOM

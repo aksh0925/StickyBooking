@@ -21,6 +21,10 @@ angular.module('StickyBooking')
         //Create Connection to Occasion SDK using Merchant API Key
         this.occsn = new Occasion.Client(options);
 
+        this.occsn.Product.afterRequest(function() {
+            if(this.firstTimeSlotStartsAt != null) this.firstTimeSlotStartsAt = moment(this.firstTimeSlotStartsAt);
+        });
+
         this.occsn.TimeSlot.afterRequest(function() {
             this.startsAt = moment(this.startsAt);
         });
