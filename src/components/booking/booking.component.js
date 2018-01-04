@@ -559,18 +559,23 @@ angular.module('StickyBooking')
           $scope.submitPaymentForms = function(event){
               event.preventDefault();
               $scope.orderErrors = null;
-              switch($scope.psp){
+
+              if($scope.product.free) {
+                $scope.submitOrder();
+              } else {
+                switch($scope.psp){
                   case('cash'):
-                      $scope.submitOrder();
-                      break;
+                    $scope.submitOrder();
+                    break;
                   case('square'):
-                      $scope.submitSquareForm();
-                      break;
+                    $scope.submitSquareForm();
+                    break;
                   case('spreedly'):
-                      $scope.submitSpreedlyForm();
-                      break;
+                    $scope.submitSpreedlyForm();
+                    break;
+                }
               }
-          }
+          };
 
           $scope.submitSquareForm = function() {
               $scope.paymentForm.requestCardNonce();
