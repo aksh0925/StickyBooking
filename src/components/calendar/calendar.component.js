@@ -92,6 +92,10 @@ angular.module('StickyBooking')
                 $scope.activeCalendarMonth.subtract(1, 'month');
             };
 
+            $scope.canMoveMonthBack = function() {
+                return $scope.activeCalendarMonth.isAfter(moment(), 'month');
+            };
+
             //Gets new month of time slots on month change
             $scope.getNewTimeSlots = function(month){
                 $scope.$emit('startLoading');

@@ -1,7 +1,12 @@
 <div ng-if='getTimeSlotsForMonth(activeCalendarMonth)'>
     <div class="row month-navigator">
         <div class="col-xs-3">
-            <a class="btn btn-default" ng-click="moveMonthBack()"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+            <a class="btn btn-default"
+               ng-if="canMoveMonthBack()"
+               ng-click="moveMonthBack()">
+
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </a>
         </div>
         <div class="col-xs-6 text-center">
             <h6>{{ activeCalendarMonth.format('MMMM YYYY') }}</h6>
