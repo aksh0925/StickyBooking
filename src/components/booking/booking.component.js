@@ -24,38 +24,33 @@ angular.module('StickyBooking')
               $scope.redeemableError = null;
               $scope.redeemableStatus = null;
               $scope.submitting = false;
-              //Test purchase details
-              $scope.card = {
-                  number: null,
-                  month: null,
-                  year: null,
-                  verification: null
-              }
 
-              $scope.loadSDKData();
-          }
+              $scope.loadInitialData();
+          };
 
-          //Make initial calls for data and subsequent eager loaded calls
-          $scope.loadSDKData = function(){
+          // Make initial calls for data and subsequent eager loaded calls
+          $scope.loadInitialData = function(){
               $scope.merchant = null;
               $scope.product = null;
 
-              //Initiate several promises at once, wait for all of them to respond before continuing
+              // Initiate several promises at once, wait for all of them to respond before continuing
               Promise.all([
                   occasionSDKService.getMyMerchant(),
                   occasionSDKService.getProductById($scope.staticProductID)
-              ]).then( (values) => {
-                  console.log("Promise.All Finished", values);
-
-                  //Populate global variables with returns from promises above
+              ]).then((values) => {
+                  // Populate global variables with returns from promises above
                   $scope.merchant = values[0];
                   $scope.product = values[1];
 
+                  // Set PSP (payment service provider) to merchant's
+                  // @example 'cash', 'spreedly', 'square'
                   $scope.psp = $scope.merchant.pspName;
-                  console.log("PSP:", $scope.psp);
+                  console.log("PSP: ", $scope.psp);
 
+                  // Set moment.js time zone to merchant's
                   moment.tz.setDefault($scope.merchant.timeZone);
 
+                  // Flash an alert to the merchant to add time slots if the product does not a first time slot
                   if(_.isNull($scope.product.firstTimeSlotStartsAt)) {
                       alert(
                         'Listing has no timeslots. If you are the merchant who owns this listing, add time slots ' +
@@ -63,30 +58,11 @@ angular.module('StickyBooking')
                       );
                   }
 
-                  //Manually refresh DOM
+                  $scope.$broadcast('initialDataLoaded', { product: $scope.product } );
                   $scope.$emit('initialDataLoaded', { product: $scope.product } );
                   $scope.initialDataLoaded = true;
                   $scope.displayLoading = false;
                   $scope.$apply();
-
-                  //Eager load calendar data
-                  console.log("Calendar data loading");
-                  occasionSDKService.getTimeSlotsByMonth($scope.product, moment())
-                      .then( (timeSlots) => {
-                          $scope.timeSlots = timeSlots;
-
-                          //Manually refresh DOM
-                          console.log("Calendar data loaded");
-                          $scope.calendarDataLoaded = true;
-                          $scope.$apply();
-
-                          //Pass data to child components and initiate their processing
-                          $scope.$broadcast('timeSlotDataLoaded', {
-                              merchant: $scope.merchant,
-                              product: $scope.product,
-                              timeSlots: $scope.timeSlots
-                          });
-                      });
 
                   //Eager load Order resource
                   console.log("Order data loading");
@@ -110,30 +86,27 @@ angular.module('StickyBooking')
                       });
                   }
               });
-          }
+          };
+
+          $scope.$on('calendarDataLoaded', function(event, data){
+            $scope.calendarDataLoaded = data.calendarDataLoaded;
+          });
 
           //When a user clicks get started
           $scope.getStarted = function(){
-              if($scope.calendarDataLoaded){
+            $scope.displayLoading = true;
+
+            $scope.$watch('calendarDataLoaded', function(calendarDataLoaded) {
+                if(calendarDataLoaded) {
+                  $scope.displayLoading = false;
                   //Scroll Calendar into view
                   $(".pane-calendar").fadeIn();
                   $scope.scrollToAnchor('step-1-scroller');
                   $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
                   $("#booking-process-status .booking-step-2").addClass("booking-step-active");
-              }else{
-                  $scope.displayLoading = true;
-                  $scope.$watch('calendarDataLoaded', function(newValue, oldValue, scope){
-                      if(newValue == true){
-                          $scope.displayLoading = false;
-                          //Scroll Calendar into view
-                          $(".pane-calendar").fadeIn();
-                          $scope.scrollToAnchor('step-1-scroller');
-                          $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
-                          $("#booking-process-status .booking-step-2").addClass("booking-step-active");
-                      }
-                  });
-              }
-          }
+                }
+            });
+          };
 
           //When date is selected from calendar
           $scope.$on('dateSelectedEvent', function(event, data){

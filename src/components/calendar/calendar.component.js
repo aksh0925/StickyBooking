@@ -25,19 +25,24 @@ angular.module('StickyBooking')
             };
 
             this.$onInit = function(){
-                console.log("Calendar Component Init");
                 $scope.calendarWeeks = {};
                 $scope.timeSlotsByMonth = {};
 
-                $scope.$on('timeSlotDataLoaded', function(event, data){
-                    $scope.merchant = data.merchant;
+                $scope.$on('initialDataLoaded', function(event, data) {
                     $scope.product = data.product;
 
                     // Set starting month and year for the calendar to display
                     $scope.activeCalendarMonth = moment().startOf('month');
-                    $scope.setTimeSlotsForMonth($scope.activeCalendarMonth, data.timeSlots);
-                });
 
+                    // Get all time slots for the month, starting at the current moment (i.e. day)
+                    occasionSDKService.getTimeSlotsByMonth($scope.product, moment())
+                    .then((timeSlots) => {
+                      $scope.setTimeSlotsForMonth($scope.activeCalendarMonth, timeSlots);
+                      $scope.$apply();
+
+                      $scope.$emit('calendarDataLoaded', { calendarDataLoaded: true });
+                    });
+                });
             };
 
             // Constructs rows of weeks starting on Sunday and ending on Saturday, for display as a calendar
