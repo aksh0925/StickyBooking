@@ -15,16 +15,31 @@
                 <li class="booking-step booking-step-green booking-step-complete">Order Complete</li>
             </ol>
         </div>
-        <div ng-if="!order.persisted()">
-            <div class="booking-page-welcome-message animated slideInLeft" ng-if="initialDataLoaded">
-                <ng-bind-html ng-bind-html="product.description"></ng-bind-html>
+        <div ng-if="!order.persisted() && initialDataLoaded">
+            <div ng-if="product.status == 'active'">
+                <div class="booking-page-welcome-message animated slideInLeft">
+                    <ng-bind-html ng-bind-html="product.description"></ng-bind-html>
+                </div>
+                <ol class="booking-process animated slideInLeft" id="booking-process-status">
+                    <li class="booking-step-1 booking-step">Get Started</li>
+                    <li class="booking-step-2 booking-step">Select a Date</li>
+                    <li class="booking-step-3 booking-step">Select a Time</li>
+                    <li class="booking-step-4 booking-step">Your Information</li>
+                </ol>
             </div>
-            <ol class="booking-process animated slideInLeft" id="booking-process-status" ng-if="initialDataLoaded">
-                <li class="booking-step-1 booking-step">Get Started</li>
-                <li class="booking-step-2 booking-step">Select a Date</li>
-                <li class="booking-step-3 booking-step">Select a Time</li>
-                <li class="booking-step-4 booking-step">Your Information</li>
-            </ol>
+            <div ng-if="product.status != 'active'">
+                <div class="booking-page-welcome-message animated slideInLeft">
+                    <p ng-if="product.status == 'expired'">
+                        The last time slot of this product has expired, so no bookings are
+                        currently accepted. Please contact the merchant if you think this is in error.
+                    </p>
+                    <p ng-if="product.status == 'inactive'">
+                        This listing is no longer available for sale. Please contact the
+                        merchant if you think this is may be an error.
+                    </p>
+                    <p ng-if="product.status == 'sold_out'">This listing has sold out.</p>
+                </div>
+            </div>
         </div>
     </div>
   
@@ -70,7 +85,14 @@
                 <div class="booking-page-hero-content animated slideInRight" ng-if="initialDataLoaded">
                     <h6 class="get-started-title">Get Started</h6>
                     <h1 class="page-title">{{ product.title }}</h1>
-                    <button class="get-started animated tada infinite" ng-click="getStarted()">{{ product.orderButtonText }}</button>
+
+                    <button class="get-started tada infinite"
+                            ng-click="getStarted()"
+                            ng-class="{ animated: product.status == 'active' }"
+                            ng-disabled="product.status != 'active'">
+
+                        {{ product.orderButtonText }}
+                    </button>
                 </div>
             </div>
 

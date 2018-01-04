@@ -6597,6 +6597,15 @@ label {
         border: 1px solid white;
         color: #2E313C;
         background-color: #fff; }
+    .booking-page-container .booking-content .booking-page-hero .get-started[disabled] {
+      cursor: not-allowed;
+      color: #aaaaaa;
+    }
+    .booking-page-container .booking-content .booking-page-hero .get-started[disabled]:hover {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      color: #aaaaaa;
+    }
 
 .pane-calendar {
   margin-left: auto;
