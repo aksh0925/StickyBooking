@@ -64,8 +64,7 @@ angular.module('StickyBooking')
                   $scope.displayLoading = false;
                   $scope.$apply();
 
-                  //Eager load Order resource
-                  console.log("Order data loading");
+                  // New order for product
                   occasionSDKService.createOrderForProduct($scope.product)
                       .then( (order) => {
                           console.log("Order data loaded");
