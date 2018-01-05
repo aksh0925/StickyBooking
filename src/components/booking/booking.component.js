@@ -246,10 +246,14 @@ angular.module('StickyBooking')
               }
           };
 
-          // Indicates whether or not the payment, price, and redeemable sections are necessary
-          // @note This is false if the product is free or the order's outstanding balance is not zero
-          $scope.requiresPaymentForms = function() {
-              return !$scope.product.free && parseFloat($scope.order.outstandingBalance) > 0;
+          // Indicates whether or not the order has a subtotal, meaning the price and redeemable sections are necessary
+          $scope.hasSubtotal = function() {
+            return !$scope.product.free && parseFloat($scope.order.subtotal) > 0;
+          };
+
+          // Indicates whether or not the order requires payment, meaning the payment section is necessary
+          $scope.requiresPayment = function() {
+              return $scope.hasSubtotal() && parseFloat($scope.order.outstandingBalance) > 0;
           };
 
           //When Order and Answers must be configured
@@ -528,11 +532,11 @@ angular.module('StickyBooking')
                   });
           };
 
-          $scope.submitPaymentForms = function(event){
-              event.preventDefault();
+          $scope.submitPaymentForms = function() {
+              $scope.submitting = true
               $scope.orderErrors = null;
 
-              if($scope.product.free) {
+              if(!$scope.requiresPayment()) {
                 $scope.submitOrder();
               } else {
                 switch($scope.psp){
@@ -568,8 +572,6 @@ angular.module('StickyBooking')
           //When users submits order form
           $scope.submitOrder = function() {
               console.log("Order Submit", $scope.order);
-
-              $scope.submitting = true;
 
               $scope.order.save(() => {
                 $scope.submitting = false;

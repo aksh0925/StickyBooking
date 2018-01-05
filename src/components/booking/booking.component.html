@@ -161,7 +161,7 @@
                 <hr />
 
                 <!-- Question Form -->
-                <form id="questionForm" ng-submit="submitPaymentForms($event)">
+                <form id="questionForm" ng-submit="submitPaymentForms()">
                     <!-- Static Questions, Always Required -->
                     <div class="form-group">
                         <label class="control-label" for="order_customer_email">First Name*</label>
@@ -288,7 +288,7 @@
 
 
                     <!-- Price Table -->
-                    <div class="alert priceTable" ng-if='requiresPaymentForms()' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
+                    <div class="alert priceTable" ng-if='hasSubtotal()' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
                         <div ng-if="psp == 'cash'">
                             <strong>No payment required now. Payment will be collected at the venue.</strong>
                             <br><br>
@@ -318,7 +318,7 @@
                     </div>
                     <!-- End Price Table -->
                     <!-- Redeemables Section -->
-                    <div id="redeemables" ng-if="product.hasRedeemables && requiresPaymentForms()">
+                    <div id="redeemables" ng-if="product.hasRedeemables && hasSubtotal()">
                         <br><br>
                         <h3>Gift Cards & Coupons</h3>
                         <hr>
@@ -335,7 +335,7 @@
                     <!-- End Redeemables Section -->
 
                     <!-- Checkout Forms -->
-                    <div ng-show='requiresPaymentForms()'>
+                    <div ng-show='requiresPayment()'>
 
                         <!-- Spreedly Checkout Form -->
                         <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">
