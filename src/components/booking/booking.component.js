@@ -45,7 +45,6 @@ angular.module('StickyBooking')
                   // Set PSP (payment service provider) to merchant's
                   // @example 'cash', 'spreedly', 'square'
                   $scope.psp = $scope.merchant.pspName;
-                  console.log("PSP: ", $scope.psp);
 
                   // Set moment.js time zone to merchant's
                   moment.tz.setDefault($scope.merchant.timeZone);
@@ -348,6 +347,7 @@ angular.module('StickyBooking')
                           if (errors) {
                               //Fill orderErrors array which displays under credit card form
                               $scope.orderErrors = errors;
+                              $scope.submitting = false;
                               $scope.$apply();
 
                               //Log full errors for console
@@ -430,6 +430,7 @@ angular.module('StickyBooking')
               Spreedly.on('errors', function(errors) {
                   console.log("Spreedly On Errors", errors);
                   $scope.orderErrors = errors;
+                  $scope.submitting = false;
                   $scope.$apply();
               });
 
@@ -533,7 +534,7 @@ angular.module('StickyBooking')
           };
 
           $scope.submitPaymentForms = function() {
-              $scope.submitting = true
+              $scope.submitting = true;
               $scope.orderErrors = null;
 
               if(!$scope.requiresPayment()) {
