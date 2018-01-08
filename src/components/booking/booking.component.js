@@ -459,7 +459,7 @@ angular.module('StickyBooking')
               var code = document.getElementById('redeemableInput').value;
 
               $scope.product.redeemables().findBy({ code: code })
-                  .then( (redeemable) => {
+                  .then((redeemable) => {
                       console.log("Redeemable", redeemable);
                       var type = occasionSDKService.redeemableType(redeemable);
                       $scope.activeRedeemable = redeemable;
@@ -468,16 +468,20 @@ angular.module('StickyBooking')
                       $scope.displayLoading = false;
                       document.getElementById('redeemableInput').disabled = true;
 
-                      //Apply charge or discount
-                      switch(type){
+                      // Apply charge or discount
+                      switch(type) {
                           case('card'):
-                              $scope.order.charge($scope.activeRedeemable, $scope.activeRedeemable.value);
-                              $scope.redeemableStatus = 'Gift Card Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().value + ' Applied';
+                              var value = parseFloat($scope.activeRedeemable.value);
+                              var balance = parseFloat($scope.order.outstandingBalance);
+                              if(value > balance) value = balance;
+
+                              $scope.order.charge($scope.activeRedeemable, value);
+                              $scope.redeemableStatus = 'Gift Card Applied! - ' + $scope.merchant.currency().code + value + ' Applied';
                               break;
                           case('coupon'):
                               $scope.order.assignCoupon($scope.activeRedeemable);
                               if($scope.activeRedeemable.attributes().discountFixed != null)
-                                  $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.attributes().discountFixed + ' Off';
+                                  $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.merchant.currency().code + $scope.activeRedeemable.discountFixed + ' Off';
                               if($scope.activeRedeemable.attributes().discountPercentage != null)
                                   $scope.redeemableStatus = 'Coupon Applied! - ' + $scope.activeRedeemable.attributes().discountPercentage + '% Off';
                               break;
