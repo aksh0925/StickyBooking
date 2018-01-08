@@ -289,15 +289,11 @@ angular.module('StickyBooking')
           };
 
           $scope.useSquare = function() {
-              // Set the application ID
-              //var applicationId = "sandbox-sq0idp-uLNY74KK3HbAKyORsoR3_g"; //Marc's Sandbox Key
-              var applicationId = "sq0idp-kKdgouNdlT2lj08V0tSJ3g"; //OCCASION's Key
-
               // Create and initialize a payment form object
               $scope.paymentForm = new SqPaymentForm({
 
                   // Initialize the payment form elements
-                  applicationId: applicationId,
+                  applicationId: window.OCCSN.square_key,
                   inputClass: 'form-control',
 
                   // Customize the CSS for SqPaymentForm iframe elements
