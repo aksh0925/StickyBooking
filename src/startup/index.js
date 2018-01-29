@@ -1,3 +1,4 @@
+require('babel-polyfill');
 var angular = require('angular');
 
 angular.module('StickyBooking', ['angularSpinner', 'ngAnimate', 'ngSanitize'])
