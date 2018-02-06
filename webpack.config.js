@@ -29,7 +29,7 @@ module.exports = {
       'underscore.string'
     ],
 
-    app: [
+    client: [
       './src/startup',
     ],
   },
