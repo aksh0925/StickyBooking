@@ -50,6 +50,10 @@ module.exports = {
       // In other words, we only put what's in the vendor entry definition in vendor-bundle.js
       minChunks: Infinity,
     }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+      minChunks: Infinity
+    })
   ],
 
   resolve: {
