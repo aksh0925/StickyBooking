@@ -186,74 +186,74 @@
                     <!-- End of Static Questions -->
 
                     <!-- Dynamic Questions, Set by Merchant -->
-                    <div ng-repeat="(index, answer) in order.answers().target().toArray()">
-                        <div class="form-group" ng-if="answer.question().formControl != 'separator'">
-                            <label ng-if="answer.question().formControl == 'text_input' || answer.question().formControl == 'text_area' || answer.question().formControl == 'option_list' || answer.question().formControl == 'drop_down'">
-                                {{ answer.question().title }}<span ng-if='answer.question().required'>*</span>
+                    <div ng-repeat="(index, question) in product.questions().toArray()" ng-init="answer = answerForQuestion(question)">
+                        <div class="form-group" ng-if="question.formControl != 'separator'">
+                            <label ng-if="question.formControl == 'text_input' || question.formControl == 'text_area' || question.formControl == 'option_list' || question.formControl == 'drop_down'">
+                                {{ question.title }}<span ng-if='question.required'>*</span>
                             </label>
                             <!-- Render different from control based on answer.question.formControl type -->
                             <!-- Text Input -->
                             <input class="form-control"
-                                   ng-if="answer.question().formControl == 'text_input'"
+                                   ng-if="question.formControl == 'text_input'"
                                    ng-model="answer.value"
-                                   ng-required="answer.question().required"
-                                   placeholder="{{ answer.question().title }}"
+                                   ng-required="question.required"
+                                   placeholder="{{ question.title }}"
                             />
                             <!-- Text Area -->
                             <textarea class="form-control" rows="4"
-                                      ng-if="answer.question().formControl == 'text_area'"
+                                      ng-if="question.formControl == 'text_area'"
                                       ng-model="answer.value"
-                                      ng-required="answer.question().required"
+                                      ng-required="question.required"
                                       placeholder="Your Response">
                             </textarea>
                             <!-- Option List -->
-                            <div ng-if="answer.question().formControl == 'option_list'">
+                            <div ng-if="question.formControl == 'option_list'">
                                 <span class="invisible"
-                                      ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question()); optionableQuestionChanged(answer, optionsHolder[answer.question().id])">
+                                      ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
                                 </span>
                                 <label class="clickable-label"
-                                       ng-repeat="option in answer.question().options().target().toArray()">
+                                       ng-repeat="option in question.options().target().toArray()">
                                     <input class="question-radio" type="radio"
-                                           name="{{answer.question().id}}"
+                                           name="{{question.id}}"
                                            ng-value="option"
-                                           ng-model="optionsHolder[answer.question().id]"
-                                           ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])" />
+                                           ng-model="optionsHolder[question.id]"
+                                           ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])" />
 
                                     {{ titleForOption(option) }}
                                 </label>
                             </div>
                             <!-- Drop Down -->
                             <select class="form-control"
-                                    ng-if="answer.question().formControl == 'drop_down'"
-                                    ng-model="optionsHolder[answer.question().id]"
-                                    ng-change="optionableQuestionChanged(answer, optionsHolder[answer.question().id])"
-                                    ng-options="option as titleForOption(option) for option in answer.question().options().target().toArray()"
-                                    ng-init="optionsHolder[answer.question().id] = defaultOptionFor(answer.question()); optionableQuestionChanged(answer, optionsHolder[answer.question().id])">
+                                    ng-if="question.formControl == 'drop_down'"
+                                    ng-model="optionsHolder[question.id]"
+                                    ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])"
+                                    ng-options="option as titleForOption(option) for option in question.options().target().toArray()"
+                                    ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
 
                                 <option value="">-- Please select --</option>
                             </select>
                             <!-- Spin Button -->
-                            <div ng-if="answer.question().formControl == 'spin_button'">
+                            <div ng-if="question.formControl == 'spin_button'">
                                 <label>
                                     <span>{{ titleForSpinButton(answer) }}</span>
-                                    <span ng-if='answer.question().required'>*</span>
+                                    <span ng-if='question.required'>*</span>
                                 </label>
                                 <ul class="spinner-input list-inline">
                                     <li>
                                         <input class="form-control value-input" readonly=""
                                                ng-model="answer.value"
-                                               ng-init="answer.value = answer.question().min" />
+                                               ng-init="answer.value = question.min" />
                                     </li>
                                     <li>
                                         <div class="btn-group btn-group-lg">
                                             <button type="button" class="btn btn-info update-price stepper-minus"
                                                     ng-click="answer.value = answer.value - 1; answerChanged(answer)"
-                                                    ng-disabled="answer.value == answer.question().min">
+                                                    ng-disabled="answer.value == question.min">
                                                 -
                                             </button>
                                             <button type="button" class="btn btn-info update-price stepper-plus"
                                                     ng-click="answer.value = answer.value + 1; answerChanged(answer)"
-                                                    ng-disabled="answer.value >= answer.question().max">
+                                                    ng-disabled="answer.value >= question.max">
                                                 +
                                             </button>
                                         </div>
@@ -261,9 +261,9 @@
                                 </ul>
                             </div>
                             <!-- Checkbox && Waiver -->
-                            <div ng-if="answer.question().formControl == 'checkbox' || answer.question().formControl == 'waiver'">
-                                <div class="well well-sm waiver" ng-if="answer.question().formControl == 'waiver'">
-                                    <ng-bind-html ng-bind-html="answer.question().waiverText">
+                            <div ng-if="question.formControl == 'checkbox' || question.formControl == 'waiver'">
+                                <div class="well well-sm waiver" ng-if="question.formControl == 'waiver'">
+                                    <ng-bind-html ng-bind-html="question.waiverText">
                                     </ng-bind-html>
                                 </div>
 
@@ -271,18 +271,18 @@
                                     <input class="question-checkbox" type="checkbox"
                                            ng-model="answer.value"
                                            ng-change="answerChanged(answer)"
-                                           ng-required="answer.question().required || answer.question().formControl == 'waiver'"
+                                           ng-required="question.required || question.formControl == 'waiver'"
                                            ng-init="answer.value = false" />
 
-                                    <span>{{ titleForCheckbox(answer.question()) }}</span>
-                                    <span ng-if="answer.question().required || answer.question().formControl == 'waiver'">*</span>
+                                    <span>{{ titleForCheckbox(question) }}</span>
+                                    <span ng-if="question.required || question.formControl == 'waiver'">*</span>
                                 </label>
                             </div>
                             <!-- Text Output -->
-                            <h3 class="question-text-output" ng-if="answer.question().formControl == 'text_output' && answer.question().displayAsTitle">{{ answer.question().title }}</h3>
-                            <p  class="question-text-output" ng-if="answer.question().formControl == 'text_output' && !answer.question().displayAsTitle">{{ answer.question().title }}</p>
+                            <h3 class="question-text-output" ng-if="question.formControl == 'text_output' && question.displayAsTitle">{{ question.title }}</h3>
+                            <p  class="question-text-output" ng-if="question.formControl == 'text_output' && !question.displayAsTitle">{{ question.title }}</p>
                         </div>
-                        <hr ng-if="answer.question().formControl == 'separator'">
+                        <hr ng-if="question.formControl == 'separator'">
                     </div>
                     <!-- End of Dynamic Questions -->
 

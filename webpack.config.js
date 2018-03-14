@@ -60,7 +60,8 @@ module.exports = {
     extensions: ['.css', '.js'],
     alias: {
       libs: path.join(process.cwd(), 'src', 'libs'),
-      'active-resource': path.join(process.cwd(), 'node_modules', 'active-resource', 'build', 'active-resource.min.js')
+      'active-resource': path.join(process.cwd(), 'node_modules', 'active-resource', 'build', 'active-resource.min.js'),
+      'occasion-sdk': path.join(process.cwd(), 'node_modules', 'occasion-sdk', 'build', 'occasion-sdk.min.js')
     },
   },
 
