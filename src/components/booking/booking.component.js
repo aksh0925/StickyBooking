@@ -154,6 +154,11 @@ angular.module('StickyBooking')
               return $filter('currency')(n, $scope.merchant.currency().code);
           };
 
+          // Returns the answer on the order for any of the questions the product asks
+          $scope.answerForQuestion = function(question) {
+            return $scope.order.answers().target().detect((a) => { return a.question() == question });
+          };
+
           // Formats the title for checkbox questions, which have following permutations:
           // formControl == 'checkbox'
           //   category == 'info': TITLE
