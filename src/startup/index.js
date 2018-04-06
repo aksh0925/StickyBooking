@@ -1,5 +1,18 @@
 require('babel-polyfill');
 var angular = require('angular');
+require('angular-animate');
+require('angular-sanitize');
+require('angular-spinner');
+
+require('jquery');
+require('chosen-js');
+
+require('moment-range');
+
+require('animate.css/animate.css');
+require('bootstrap/dist/css/bootstrap.css');
+
+require('../styles/index.css');
 
 angular.module('StickyBooking', ['angularSpinner', 'ngAnimate', 'ngSanitize'])
   .controller('AppController', function($scope) {

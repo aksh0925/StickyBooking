@@ -1,0 +1,466 @@
+@media (min-width: 992px) {
+    .booking-ui-body-padding {
+        padding-left: 500px; } }
+
+.session-title {
+    margin-top: 0; }
+
+.session-duration h6, .session-duration label,
+.session-duration .duration-count {
+    color: #4FC213; }
+
+.session-duration .duration-count {
+    margin-top: 0; }
+
+.time-slot-buttons {
+    margin-bottom: 40px; }
+.time-slot-buttons .time-slot {
+    display: block;
+    width: 100%;
+    border-radius: 0;
+    margin-bottom: 5px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    background-color: #e4e6eb;
+    color: #5a6076; }
+.time-slot-buttons .time-slot:hover {
+    background-color: #3C9FF3;
+    color: #fff; }
+.time-slot-buttons .disabled {
+    background-color: white !important;
+    opacity: 1;
+    color: #abafbe !important; }
+.time-slot-buttons .disabled:hover {
+    background-color: white !important;
+    opacity: 1;
+    color: #abafbe !important; }
+
+.time-slot-active {
+    background-color: #3C9FF3 !important;
+    color: #fff !important; }
+
+.step-1 {
+    display: none; }
+
+.step-2 {
+    display: none; }
+
+.step-3 {
+    display: none; }
+
+.selected-date-header {
+    background-color: #2E313C;
+    border: 0; }
+.selected-date-header .date-time-small-title {
+    color: #3C9FF3; }
+.selected-date-header .date-time-title {
+    color: #fff; }
+.selected-date-header .date-time-title a {
+    font-size: 11px;
+    color: #dbedfd; }
+
+label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #8e93a8; }
+
+.tab-content {
+    border-left: 1px solid #e4e6eb;
+    border-bottom: 1px solid #e4e6eb;
+    border-right: 1px solid #e4e6eb; }
+
+.booking-page-container .booking-sidebar {
+    z-index: 100;
+    width: 100%;
+    height: auto;
+    padding: 40px;
+    text-align: center;
+    background-color: #f3f3f6; }
+@media (min-width: 992px) {
+    .booking-page-container .booking-sidebar {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        height: 100%;
+        max-width: 500px;
+        width: 500px;
+        text-align: left; } }
+.booking-page-container .booking-sidebar .booking-page-photographer-name {
+    margin-bottom: 40px;
+    margin-top: 0;
+    min-height: 30px; }
+.booking-page-container .booking-sidebar .booking-process {
+    display: none; }
+@media (min-width: 992px) {
+    .booking-page-container .booking-sidebar .booking-process {
+        margin-top: 40px;
+        list-style: none;
+        padding: 0;
+        display: block; }
+    .booking-page-container .booking-sidebar .booking-process .booking-step {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.2rem;
+        padding: 20px;
+        margin: 0;
+        color: #8e93a8;
+        background-color: #e4e6eb;
+        text-shadow: 0 0 0 0; }
+    .booking-page-container .booking-sidebar .booking-process .booking-step-complete {
+        color: #8e93a8; }
+    .booking-page-container .booking-sidebar .booking-process .booking-step-green {
+        background-color: #5fcbc1 !important;
+        color: #ffffff !important;
+    }
+    .booking-page-container .booking-sidebar .booking-process .booking-step-complete:before {
+        content: "\f00c";
+        font-family: FontAwesome;
+        font-size: 12px;
+        margin-right: 10px; }
+    .booking-page-container .booking-sidebar .booking-process .booking-step-active {
+        color: #fff;
+        background-color: #8e93a8; } }
+
+.booking-page-container .booking-content {
+    width: 100%;
+    height: auto;
+    background-color: #fff;
+    z-index: 1;
+    overflow-x: hidden;
+}
+@media (min-width: 992px) {
+    .booking-page-container .booking-content {
+        min-height: 100vh;
+        padding-left: 0;
+        padding-right: 0px;
+        padding-top: 0px;
+        padding-bottom: 0; } }
+.booking-page-container .booking-content .booking-page-hero {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: #2e313c;
+    padding: 10vw;
+    min-height: 120vmin;
+    position: relative;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; }
+@media (min-width: 992px) {
+    .booking-page-container .booking-content .booking-page-hero {
+        min-height: 100vh; } }
+.booking-page-container .booking-content .booking-page-hero:after {
+    display: block;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(46, 49, 60, 0.8); }
+.booking-page-container .booking-content .booking-page-hero .booking-page-hero-content {
+    position: relative;
+    z-index: 100; }
+.booking-page-container .booking-content .booking-page-hero .get-started-title {
+    color: #fff; }
+.booking-page-container .booking-content .booking-page-hero .page-title {
+    color: #fff;
+    position: relative;
+    z-index: 10;
+    font-size: 10vw;
+    line-height: 10vw;
+    margin-bottom: 40px; }
+@media (min-width: 992px) {
+    .booking-page-container .booking-content .booking-page-hero .page-title {
+        font-size: 4vw;
+        line-height: 4vw; } }
+.booking-page-container .booking-content .booking-page-hero .session-length {
+    color: #fff;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 50px; }
+@media (min-width: 992px) {
+    .booking-page-container .booking-content .booking-page-hero .session-length {
+        margin-bottom: 3vw; } }
+.booking-page-container .booking-content .booking-page-hero .get-started {
+    background-color: transparent;
+    display: inline-block;
+    padding: 15px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    color: #fff;
+    position: relative;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    max-width: 140px;
+    margin-left: auto;
+    margin-right: auto;
+    animation-duration: 2s; }
+.booking-page-container .booking-content .booking-page-hero .get-started:hover {
+    border: 1px solid white;
+    color: #2E313C;
+    background-color: #fff; }
+.booking-page-container .booking-content .booking-page-hero .get-started[disabled] {
+    cursor: not-allowed;
+    color: #aaaaaa;
+}
+.booking-page-container .booking-content .booking-page-hero .get-started[disabled]:hover {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    color: #aaaaaa;
+}
+
+.pane-calendar {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px;
+    padding-bottom: 100px; }
+@media (min-width: 992px) {
+    .pane-calendar, .available-times {
+        padding: 90px 10vw 0px 10vw;
+        min-height: 100vh; } }
+.pane-calendar .month-navigator {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto; }
+.pane-calendar .calendar-table {
+    width: 100%;
+    text-align: center;
+    border: 1px solid #c8cad4;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin-left: auto;
+    margin-right: auto; }
+.pane-calendar .calendar-table thead {
+    border-bottom: 0;
+    background-color: #4f5467; }
+.pane-calendar .calendar-table thead td {
+    font-weight: 700;
+    font-size: 12px;
+    padding: 30px 15px !important;
+    text-align: center !important;
+    color: #fff;
+    width: calc(100%/7);
+    border: 0 !important; }
+.pane-calendar .calendar-table tr {
+    border-bottom: 1px solid #f3f3f6; }
+.pane-calendar .calendar-table tr td {
+    padding-top: 10px;
+    padding-bottom: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-bottom: 1px solid #c8cad4;
+    border-right: 1px solid #c8cad4;
+    text-align: left; }
+.pane-calendar .calendar-table tr .empty-date {
+    background-color: #f3f3f6;
+    border-bottom: 1px solid #c8cad4;
+    cursor: not-allowed !important; }
+.pane-calendar .calendar-table tr .selected-date {
+    background-color: #3C9FF3 !important;
+    color: #fff !important;
+    font-weight: 700; }
+@media (min-width: 992px) {
+    .pane-calendar .calendar-table .calendar-dates td {
+        padding: 20px 20px 3vw 20px; } }
+.pane-calendar .calendar-table .calendar-dates td:hover {
+    cursor: pointer; }
+.pane-calendar .calendar-table .calendar-dates .available-time-slot {
+    position: relative;
+    border: 1px solid #c8cad4 !important;
+    color: #5a6076; }
+.pane-calendar .calendar-table .unavailable-day {
+    background-color: #f3f3f6;
+    cursor: not-allowed !important; }
+.available-times {
+    display: none;
+    padding-top: 40px;
+    margin-bottom: 40px;
+    padding-bottom: 100px;}
+@media (min-width: 992px) {
+    .available-times {
+        padding-top: 5vw;
+        padding-bottom: 0; } }
+.available-times .unavailable {
+    background-color: #e4e6eb;
+    color: #a1a6b7; }
+.available-times .unavailable:hover {
+    cursor: not-allowed; }
+
+.pane-customer-information {
+    display: block;
+    padding: 40px 10vw 0 10vw;
+    display: none;
+    padding-bottom: 100px;}
+@media (min-width: 992px) {
+    .pane-customer-information {
+        min-height: 100vh; } }
+.pane-customer-information input, .pane-customer-information textarea {
+    border: 1px solid #c8cad4;
+    padding: 30px 20px;
+    border-radius: 0;
+    font-size: 19px;
+    line-height: 30px;
+    display: block; }
+.pane-customer-information text-area {
+    min-height: 200px; }
+.pane-customer-information .form-submit {
+    margin-top: 40px;
+    background-color: #f3f3f6;
+    padding: 40px;
+    text-align: center; }
+@media (min-width: 992px) {
+    .pane-customer-information .form-submit {
+        text-align: right; } }
+
+.pane-order-complete {
+    display: block;
+    padding: 40px 10vw 0 10vw;
+    padding-bottom: 100px;}
+
+.pane-spacer-helper {
+    height: 20vh;
+    display: block; }
+
+.step-visible {
+    display: block !important; }
+
+.booking-confirm {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 10vw; }
+.booking-confirm .booking-confirmation-code {
+    background-color: #F3F6F9;
+    padding: 20px 40px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 200px;
+    display: block;
+    text-align: center;
+    margin-bottom: 40px; }
+.booking-confirm .booking-confirmation-code h6, .booking-confirm .booking-confirmation-code label {
+    width: 120px;
+    line-height: 18px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0; }
+.booking-confirm .booking-confirmation-code h3 {
+    margin-top: 10px;
+    font-weight: 100; }
+
+
+
+
+
+/*Square CSS */
+/* Define how SqPaymentForm iframes should look */
+#sq-ccbox .form-control {
+    /*border: 1px solid rgb(223, 223, 223);
+    outline-offset: -2px;
+    margin-bottom: 5px;
+    display: inline-block;*/
+}
+
+/* Define how SqPaymentForm iframes should look when they have focus */
+#sq-ccbox .form-control--focus {
+    outline: 5px auto rgb(59, 153, 252);
+}
+
+/* Define how SqPaymentForm iframes should look when they contain invalid values */
+#sq-ccbox .form-control--error {
+    outline: 5px auto rgb(255, 97, 97);
+}
+
+/* Customize the "Pay with Credit Card" button */
+.button-credit-card {
+    min-width: 200px;
+    min-height: 20px;
+    padding: 0;
+    margin: 5px;
+    line-height: 20px;
+    box-shadow: 2px 2px 1px rgb(200, 200, 200);
+    background: rgb(255, 255, 255);
+    border-radius: 5px;
+    border: 1px solid rgb(200, 200, 200);
+    font-weight: bold;
+    cursor:pointer;
+}
+
+
+/* Customize the "{{Wallet}} not enabled" message */
+.wallet-not-enabled {
+    min-width: 200px;
+    min-height: 40px;
+    max-height: 64px;
+    padding: 0;
+    margin: 10px;
+    line-height: 40px;
+    background: #eee;
+    border-radius: 5px;
+    font-weight: lighter;
+    font-style: italic;
+    font-family: inherit;
+    display: block;
+}
+
+/* Customize the Apple Pay on the Web button */
+.button-apple-pay {
+    min-width: 200px;
+    min-height: 40px;
+    max-height: 64px;
+    padding: 0;
+    margin: 10px;
+    background-image: -webkit-named-image(apple-pay-logo-white);
+    background-color: black;
+    background-size: 100% 60%;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    border-radius: 5px;
+    cursor:pointer;
+    display: none;
+}
+
+/* Customize the Masterpass button */
+.button-masterpass {
+    min-width: 200px;
+    min-height: 40px;
+    max-height: 40px;
+    padding: 0;
+    margin: 10px;
+    background-image: url(https://static.masterpass.com/dyn/img/btn/global/mp_chk_btn_147x034px.svg);
+    background-color: black;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    border-radius: 5px;
+    border-color: rgb(255, 255, 255);
+    cursor:pointer;
+    display: none;
+}
+
+#sq-walletbox {
+    margin:5px;
+    padding:10px;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+#sq-ccbox {
+    margin:5px;
+    padding:10px;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+.calendar-dates .empty-date .date {
+    display: none;
+}

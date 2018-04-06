@@ -1,8 +1,11 @@
 var angular = require('angular');
+var $ = require('jquery');
+
 var moment = require('moment');
 require('moment-timezone');
 var _ = require('underscore');
-var templateUrl = require('ngtemplate-loader!./booking.component.html');
+
+var templateUrl = require('./booking.component.nghtml');
 
 //Creating bookingPage component on StickyBooking Module
 angular.module('StickyBooking')

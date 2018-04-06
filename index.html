@@ -3,29 +3,27 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Loading...</title>
 
-    <script type="application/javascript" src="lib/assets/javascripts/sticky_booking-manifest_bundle.js" ></script>
-    <script type="application/javascript" src="lib/assets/javascripts/sticky_booking-vendor_bundle.js" ></script>
-    <script type="application/javascript" src="lib/assets/javascripts/sticky_booking-client_bundle.js"></script>
-    <link rel="stylesheet" href="lib/assets/stylesheets/sticky_booking-vendor_bundle.css" />
-    <link rel="stylesheet" href="lib/assets/stylesheets/sticky_booking-client_bundle.css" />
-  </head>
-  <body class="booking-ui-body-padding body-scroll-lock">
+    <title><%= htmlWebpackPlugin.options.title %></title>
 
-    <booking-page></booking-page>
+    <% if (htmlWebpackPlugin.options.description) { %>
+    <meta name="description" content="<%= htmlWebpackPlugin.options.description %>"/>
+    <% } %>
 
     <!-- Set Static API Key and Product ID -->
     <script>
       window.OCCSN = {
-        api_key: '59a8517bcbfa3fd9458b46d4ee59f8fd717fb80d',
-        product_id: 'zkrml3szaw3zjlzy4fbvgw',
+        api_key: 'f52cda5a0ab8455a8edd40ae7fb372de',
+        product_id: 'f8aqqjq6o9x9unuyxfks0q',
         host_url: 'http://occasion.lvh.me:3000/',
         spreedly_key: 'CYJy65Wq5dmc2dGFVQOp6eci1Ka',
         square_key: 'sandbox-sq0idp-kKdgouNdlT2lj08V0tSJ3g'
       };
     </script>
+  </head>
+  <body class="booking-ui-body-padding body-scroll-lock">
+
+    <booking-page></booking-page>
 
     <!-- Font-Awesome -->
     <script src="https://use.fontawesome.com/c385cd600f.js"></script>

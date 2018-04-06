@@ -1,5 +1,5 @@
 # StickyBooking
-<p>The StickyBooking Checkout Experience enables users to quickly and easily book an appointment at the date and time of their choosing. This simple app utilizes jQuery, Angular.js, and Animate.css</p>
+<p>The StickyBooking Checkout Experience enables users to quickly and easily book an appointment at the date and time of their choosing. This simple app uses Angular 1, and Animate.css</p>
 
 <h2>Getting Started</h2>
 <p>Below are the steps you will need to follow to get started with The StickyBooking Checkout Experience.</p>
@@ -14,4 +14,19 @@
 </pre>
 
 <h2>Running the App</h2>
-<p>This packaging of the application does not require a back-end. All features are handled on the client-side, so you may simply navigate to the root directory and open index.html in your browser of choice.</p>
+
+To launch the app, run the following command:
+
+```shell
+poi
+```
+
+Then navigate to localhost:4000
+
+<h2>Building the App For Release</h2>
+
+To build the app for release to Occasion, run the following command:
+
+```shell
+poi build
+```

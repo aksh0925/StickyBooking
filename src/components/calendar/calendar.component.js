@@ -1,8 +1,11 @@
 var angular = require('angular');
+var $ = require('jquery');
+
 var moment = require('moment');
 var { extendMoment } = require('moment-range');
 var _ = require('underscore');
-var templateUrl = require('ngtemplate-loader!./calendar.component.html');
+
+var templateUrl = require('./calendar.component.nghtml');
 
 // add moment-range
 moment = extendMoment(moment);
