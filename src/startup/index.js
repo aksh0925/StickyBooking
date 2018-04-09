@@ -12,7 +12,7 @@ require('moment-range');
 require('animate.css/animate.css');
 require('bootstrap/dist/css/bootstrap.css');
 
-require('../styles/index.css');
+require('../styles/index.scss');
 
 angular.module('StickyBooking', ['angularSpinner', 'ngAnimate', 'ngSanitize'])
   .controller('AppController', function($scope) {

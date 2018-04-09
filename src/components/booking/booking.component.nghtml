@@ -4,8 +4,7 @@
         <span us-spinner="{ color: '#fff' }"></span>
     </div>
 
-    <div class="booking-sidebar">
-        <h3 class="booking-page-photographer-name animated slideInLeft" ng-if="initialDataLoaded">{{ merchant.name }}</h3>
+    <div class="booking-sidebar booking-sidebar-hidden">
         <div ng-if="order.persisted()">
             <div class="booking-page-welcome-message animated slideInUp">
                 <p>Hello {{ order.customer().firstName }}, thanks for your purchase!</p>
@@ -17,28 +16,17 @@
         </div>
         <div ng-if="!order.persisted() && initialDataLoaded">
             <div ng-if="product.status == 'active'">
-                <div class="booking-page-welcome-message animated slideInLeft">
-                    <ng-bind-html ng-bind-html="product.description"></ng-bind-html>
-                </div>
-                <ol class="booking-process animated slideInLeft" id="booking-process-status">
-                    <li class="booking-step-1 booking-step">Get Started</li>
-                    <li class="booking-step-2 booking-step">Select a Date</li>
-                    <li class="booking-step-3 booking-step">Select a Time</li>
-                    <li class="booking-step-4 booking-step">Your Information</li>
+                <ol class="booking-process" id="booking-process-status">
+                    <li class="booking-step-1 booking-step">
+                      <a href>Select a Date</a>
+                    </li>
+                    <li class="booking-step-2 booking-step">
+                      <a href>Select a Time</a>
+                    </li>
+                    <li class="booking-step-3 booking-step">
+                      <a href>Your Information</a>
+                    </li>
                 </ol>
-            </div>
-            <div ng-if="product.status != 'active'">
-                <div class="booking-page-welcome-message animated slideInLeft">
-                    <p ng-if="product.status == 'expired'">
-                        The last time slot of this product has expired, so no bookings are
-                        currently accepted. Please contact the merchant if you think this is in error.
-                    </p>
-                    <p ng-if="product.status == 'inactive'">
-                        This listing is no longer available for sale. Please contact the
-                        merchant if you think this is may be an error.
-                    </p>
-                    <p ng-if="product.status == 'sold_out'">This listing has sold out.</p>
-                </div>
             </div>
         </div>
     </div>
@@ -80,353 +68,380 @@
             </div>
         </div>
         <div ng-if="!order.persisted()">
+            <div class="booking-page-intro">
+              <h2 class="booking-page-photographer-name">{{ merchant.name }}</h2>
+              <div ng-if="product.status == 'active'">
+                  <div class="booking-page-welcome-message">
+                    <ng-bind-html ng-bind-html="product.description"></ng-bind-html>
+                  </div>
+              </div>
+              <div ng-if="product.status != 'active'">
+                  <div class="booking-page-welcome-message animated slideInLeft">
+                      <p ng-if="product.status == 'expired'">
+                          The last time slot of this product has expired, so no bookings are
+                          currently accepted. Please contact the merchant if you think this is in error.
+                      </p>
+                      <p ng-if="product.status == 'inactive'">
+                          This listing is no longer available for sale. Please contact the
+                          merchant if you think this is may be an error.
+                      </p>
+                      <p ng-if="product.status == 'sold_out'">This listing has sold out.</p>
+                  </div>
+              </div>
+            </div>
             <!--Get Started section -->
             <div class="booking-page-hero" style="background-image: url('{{ product.image.url }}');">
                 <div class="booking-page-hero-content animated slideInRight" ng-if="initialDataLoaded">
                     <h6 class="get-started-title">Get Started</h6>
                     <h1 class="page-title">{{ product.title }}</h1>
+                    <h6 class="session-length">Session Length: 1 hour</h6>
 
                     <button class="get-started tada infinite"
                             ng-click="getStarted()"
                             ng-class="{ animated: product.status == 'active' }"
                             ng-disabled="product.status != 'active'">
 
-                        {{ product.orderButtonText }}
+                        <svg viewBox="686 482 141 141" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <path d="M826.958984,552.5 C826.958984,513.586577 795.413423,482.041016 756.5,482.041016 C717.586577,482.041016 686.041016,513.586577 686.041016,552.5 C686.041016,591.413423 717.586577,622.958984 756.5,622.958984 C795.413423,622.958984 826.958984,591.413423 826.958984,552.5 Z M693.041016,552.5 C693.041016,517.452571 721.452571,489.041016 756.5,489.041016 C791.547429,489.041016 819.958984,517.452571 819.958984,552.5 C819.958984,587.547429 791.547429,615.958984 756.5,615.958984 C721.452571,615.958984 693.041016,587.547429 693.041016,552.5 Z M761.386839,585.043454 L789.042157,557.388135 C791.742872,554.688285 791.742872,550.310967 789.042157,547.611116 C786.346196,544.910834 781.964124,544.910834 779.268163,547.611116 L763.413455,563.463663 L763.413455,524.844307 C763.413455,521.025713 760.319517,517.930478 756.499626,517.930478 C752.680167,517.930478 749.585796,521.025713 749.585796,524.844307 L749.585796,563.463663 L733.731521,547.611116 C731.035127,544.910834 726.653488,544.910834 723.957094,547.611116 C722.604576,548.961041 721.930478,550.730118 721.930478,552.499626 C721.930478,554.269134 722.604576,556.03821 723.957094,557.388135 L751.612412,585.043454 C754.308806,587.743736 758.690878,587.743736 761.386839,585.043454 Z"
+                              stroke="none" fill="#FFFFFF" fill-rule="evenodd"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
 
-            <!-- Calendar pane -->
-            <a name="step-1-scroller"></a>
-            <div class="pane-calendar" id="step-2" style="display:none;">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Availability</h6>
-                        <h3>Select a date on the calendar below to view availability:</h3>
+            <div class="panes">
+                <!-- Calendar pane -->
+                <a name="step-1-scroller"></a>
+                <div class="pane pane-calendar pane-active" id="step-2" style="display:none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Availability</h6>
+                            <h3>Select a date on the calendar below to view availability:</h3>
+                        </div>
                     </div>
-                </div>
-                <hr />
-
-                <booking-calendar></booking-calendar>
-            </div>
-
-            <!-- available times-->
-            <a name="time-slot-scroll"></a>
-            <div class="available-times clearfix" style="display:none;">
-                <div class="col-md-12">
-                    <h6>Available Time Slots</h6>
-                    <h3>Select a time slot on {{ formatToDate(selectedDate) }} to continue booking:</h3>
                     <hr />
+
+                    <booking-calendar></booking-calendar>
                 </div>
-                <div class="col-md-4 time-slot-buttons">
-                    <h6>Morning</h6>
-                    <button class="btn btn-primary time-slot"
-                            ng-repeat="timeSlot in availableSlots.toArray()"
-                            ng-if="splitByTimeOfDay(timeSlot, 'morning')"
-                            ng-click="onTimeSlotSelection($event, timeSlot)"
-                            ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
 
-                        {{ formatToTime(timeSlot.startsAt) }}
-                    </button>
-                </div>
-                <div class="col-md-4 time-slot-buttons">
-                    <h6>Afternoon</h6>
-                    <button class="btn btn-primary time-slot"
-                            ng-repeat="timeSlot in availableSlots.toArray()"
-                            ng-if="splitByTimeOfDay(timeSlot, 'afternoon')"
-                            ng-click="onTimeSlotSelection($event, timeSlot)"
-                            ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
-
-                        {{ formatToTime(timeSlot.startsAt) }}
-                    </button>
-                </div>
-                <div class="col-md-4 time-slot-buttons">
-                    <h6>Evening</h6>
-                    <button class="btn btn-primary time-slot"
-                            ng-repeat="timeSlot in availableSlots.toArray()"
-                            ng-if="splitByTimeOfDay(timeSlot, 'evening')"
-                            ng-click="onTimeSlotSelection($event, timeSlot)"
-                            ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
-
-                        {{ formatToTime(timeSlot.startsAt) }}
-                    </button>
-                </div>
-            </div>
-
-            <!--Customer information pane -->
-            <a name="customer-info-pane-scroller"></a>
-            <div class="pane-customer-information" style="display:none;" ng-if="orderLoaded">
-                <h6>Your Info</h6>
-                <h3>We need to collect some information from you to confirm booking:</h3>
-                <hr />
-
-                <!-- Question Form -->
-                <form id="questionForm" ng-submit="submitPaymentForms()">
-                    <!-- Static Questions, Always Required -->
-                    <div class="form-group">
-                        <label class="control-label" for="order_customer_email">First Name*</label>
-                        <input id="lastName" placeholder="First Name" required="required" type="text" ng-model="order.customer().firstName" name="firstName"
-                            class="form-control" autofocus><span class="message"></span>
+                <!-- available times-->
+                <a name="time-slot-scroll"></a>
+                <div class="pane pane-available-times clearfix" style="display:none;">
+                    <div class="col-md-12">
+                        <h6>Available Time Slots</h6>
+                        <h3>Select a time slot on {{ formatToDate(selectedDate) }} to continue booking:</h3>
+                        <hr />
                     </div>
-                    <div class="form-group">
-                        <label class="control-label" for="order_customer_email">Last Name*</label>
-                        <input id="firstName" placeholder="Last Name" required="required" type="text" ng-model="order.customer().lastName" name="lastName"
-                            class="form-control"><span class="message"></span>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label" for="order_customer_email">E-mail Address*</label>
-                        <input id="email" placeholder="E-mail" required="required" type="email" ng-model="order.customer().email" name="email" class="form-control">
-                        <span class="message"></span>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label" for="order_customer_email">Zip Code*</label>
-                        <input id="zip" placeholder="Zip Code" required="required" type="text" ng-model="order.customer().zip" name="zip" class="form-control">
-                        <span class="message"></span>
-                    </div>
-                    <!-- End of Static Questions -->
+                    <div class="col-md-4 time-slot-buttons">
+                        <h6>Morning</h6>
+                        <button class="btn btn-primary time-slot"
+                                ng-repeat="timeSlot in availableSlots.toArray()"
+                                ng-if="splitByTimeOfDay(timeSlot, 'morning')"
+                                ng-click="onTimeSlotSelection($event, timeSlot)"
+                                ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
 
-                    <!-- Dynamic Questions, Set by Merchant -->
-                    <div ng-repeat="(index, question) in product.questions().toArray()" ng-init="answer = answerForQuestion(question)">
-                        <div class="form-group" ng-if="question.formControl != 'separator'">
-                            <label ng-if="question.formControl == 'text_input' || question.formControl == 'text_area' || question.formControl == 'option_list' || question.formControl == 'drop_down'">
-                                {{ question.title }}<span ng-if='question.required'>*</span>
-                            </label>
-                            <!-- Render different from control based on answer.question.formControl type -->
-                            <!-- Text Input -->
-                            <input class="form-control"
-                                   ng-if="question.formControl == 'text_input'"
-                                   ng-model="answer.value"
-                                   ng-required="question.required"
-                                   placeholder="{{ question.title }}"
-                            />
-                            <!-- Text Area -->
-                            <textarea class="form-control" rows="4"
-                                      ng-if="question.formControl == 'text_area'"
-                                      ng-model="answer.value"
-                                      ng-required="question.required"
-                                      placeholder="Your Response">
-                            </textarea>
-                            <!-- Option List -->
-                            <div ng-if="question.formControl == 'option_list'">
-                                <span class="invisible"
-                                      ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
-                                </span>
-                                <label class="clickable-label"
-                                       ng-repeat="option in question.options().target().toArray()">
-                                    <input class="question-radio" type="radio"
-                                           name="{{question.id}}"
-                                           ng-value="option"
-                                           ng-model="optionsHolder[question.id]"
-                                           ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])" />
-
-                                    {{ titleForOption(option) }}
-                                </label>
-                            </div>
-                            <!-- Drop Down -->
-                            <select class="form-control"
-                                    ng-if="question.formControl == 'drop_down'"
-                                    ng-model="optionsHolder[question.id]"
-                                    ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])"
-                                    ng-options="option as titleForOption(option) for option in question.options().target().toArray()"
-                                    ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
-
-                                <option value="">-- Please select --</option>
-                            </select>
-                            <!-- Spin Button -->
-                            <div ng-if="question.formControl == 'spin_button'">
-                                <label>
-                                    <span>{{ titleForSpinButton(answer) }}</span>
-                                    <span ng-if='question.required'>*</span>
-                                </label>
-                                <ul class="spinner-input list-inline">
-                                    <li>
-                                        <input class="form-control value-input" readonly=""
-                                               ng-model="answer.value"
-                                               ng-init="answer.value = question.min" />
-                                    </li>
-                                    <li>
-                                        <div class="btn-group btn-group-lg">
-                                            <button type="button" class="btn btn-info update-price stepper-minus"
-                                                    ng-click="answer.value = answer.value - 1; answerChanged(answer)"
-                                                    ng-disabled="answer.value == question.min">
-                                                -
-                                            </button>
-                                            <button type="button" class="btn btn-info update-price stepper-plus"
-                                                    ng-click="answer.value = answer.value + 1; answerChanged(answer)"
-                                                    ng-disabled="answer.value >= question.max">
-                                                +
-                                            </button>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!-- Checkbox && Waiver -->
-                            <div ng-if="question.formControl == 'checkbox' || question.formControl == 'waiver'">
-                                <div class="well well-sm waiver" ng-if="question.formControl == 'waiver'">
-                                    <ng-bind-html ng-bind-html="question.waiverText">
-                                    </ng-bind-html>
-                                </div>
-
-                                <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox"
-                                           ng-model="answer.value"
-                                           ng-change="answerChanged(answer)"
-                                           ng-required="question.required || question.formControl == 'waiver'"
-                                           ng-init="answer.value = false" />
-
-                                    <span>{{ titleForCheckbox(question) }}</span>
-                                    <span ng-if="question.required || question.formControl == 'waiver'">*</span>
-                                </label>
-                            </div>
-                            <!-- Text Output -->
-                            <h3 class="question-text-output" ng-if="question.formControl == 'text_output' && question.displayAsTitle">{{ question.title }}</h3>
-                            <p  class="question-text-output" ng-if="question.formControl == 'text_output' && !question.displayAsTitle">{{ question.title }}</p>
-                        </div>
-                        <hr ng-if="question.formControl == 'separator'">
-                    </div>
-                    <!-- End of Dynamic Questions -->
-
-
-                    <!-- Price Table -->
-                    <div class="alert priceTable" ng-if='hasSubtotal()' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
-                        <div ng-if="psp == 'cash'">
-                            <strong>No payment required now. Payment will be collected at the venue.</strong>
-                            <br><br>
-                        </div>
-                        <table>
-                            <tr ng-if="order.subtotal != order.total">
-                                <td>Subtotal:</td>
-                                <td>{{ order.subtotal | currency:merchant.currency().code }}</td>
-                            </tr>
-                            <tr ng-if="order.tax != 0 && order.tax != null">
-                                <td>Tax:</td>
-                                <td>{{ order.tax | currency:merchant.currency().code }}</td>
-                            </tr>
-                            <tr ng-if="order.couponAmount != null">
-                                <td>Discount:</td>
-                                <td>-{{ order.couponAmount | currency:merchant.currency().code }}</td>
-                            </tr>
-                            <tr ng-class="{ 'borderTop': order.subtotal != order.total }">
-                                <td><strong>Total:</strong></td>
-                                <td>{{ order.total | currency:merchant.currency().code }}</td>
-                            </tr>
-                            <tr ng-if="order.outstandingBalance != order.total">
-                                <td>Balance due:</td>
-                                <td>{{ order.outstandingBalance | currency:merchant.currency().code }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <!-- End Price Table -->
-                    <!-- Redeemables Section -->
-                    <div id="redeemables" ng-if="product.hasRedeemables && hasSubtotal()">
-                        <br><br>
-                        <h3>Gift Cards & Coupons</h3>
-                        <hr>
-
-                        <div class="form-group hasButton">
-                            <label class="control-label" for="redeemableInput">Gift Card Number or Coupon Code</label>
-                            <input type="text" id="redeemableInput" name="redeemableInput" class="form-control" placeholder="Gift Card Number or Coupon Code" ng-model="redeemableInput" />
-                            <input type="button" class="btn-primary btn" ng-if="activeRedeemable == null" value="Check" ng-click="checkRedeemable()" />
-                            <input type="button" class="btn-danger btn" ng-if="activeRedeemable != null" value="Remove" ng-click="removeRedeemable()" />
-                            <p class="appliedStatus" ng-if="redeemableStatus != null">{{ redeemableStatus }}</p>
-                            <p class="appliedError" ng-if="redeemableError != null">{{ redeemableError }}</p>
-                        </div>
-                    </div>
-                    <!-- End Redeemables Section -->
-
-                    <!-- Checkout Forms -->
-                    <div ng-show='requiresPayment()'>
-
-                        <!-- Spreedly Checkout Form -->
-                        <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">
-                            <h3>Pay with Card</h3>
-                            <hr>
-
-                            <input type="hidden" name="payment_method_token" id="payment_method_token">
-
-                            <div class="form-group">
-                                <label class="control-label" for="full_name">Name On Card</label>
-                                <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label">Credit Card Number</label>
-                                <div id="spreedly-number" class="spreedly-input"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
-                                <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
-                                <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label">CVV</label>
-                                <div id="spreedly-cvv" class="spreedly-input"></div>
-                            </div>
-                        </div>
-                        <!-- End Spreedly Checkout Form -->
-
-                        <!-- Square Checkout Form -->
-                        <div id="sq-ccbox" ng-if="psp == 'square'">
-                            <h3>Pay with Card</h3>
-                            <hr>
-
-                            <div class="form-group">
-                                <label class="control-label">Card Number:</label>
-                                <div id="sq-card-number"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label">CVV:</label>
-                                <div id="sq-cvv"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label">Expiration Date:</label>
-                                <div id="sq-expiration-date"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label">Postal Code:</label>
-                                <div id="sq-postal-code"></div>
-                            </div>
-
-                            <input type="hidden" id="card-nonce" name="nonce">
-                        </div>
-                        <div id="sq-walletbox" ng-if="psp == 'square'">
-                            <div id="sq-apple-pay-label" class="wallet-not-enabled">Apple Pay for Web not enabled</div>
-                            <!-- Placholder for Apple Pay for Web button -->
-                            <button id="sq-apple-pay" class="button-apple-pay"></button>
-
-                            <div id="sq-masterpass-label" class="wallet-not-enabled">Masterpass not enabled</div>
-                            <!-- Placholder for Masterpass button -->
-                            <button id="sq-masterpass" class="button-masterpass"></button>
-                        </div>
-                        <!-- End Square Checkout Form -->
-                    </div>
-                    <!-- End Checkout Forms -->
-
-                    <!-- Errors Section -->
-                    <div class="alert alert-danger" ng-if="orderErrors != null && orderErrors.length > 0">
-                        <h4>There were issues with your order:</h4>
-                        <ul>
-                            <li ng-repeat="(errorIndex, errorValue) in orderErrors">{{ errorValue.message }}</li>
-                        </ul>
-                    </div>
-                    <!-- End Errors Section -->
-
-                    <!-- Order Submit -->
-                    <div class="form-submit">
-                        <button type="submit" ng-disabled='submitting' class="btn-primary btn animated pulse infinite finishButton">
-                            <span ng-if="!submitting">{{product.orderButtonText}}</span>
-                            <span ng-if="submitting" style="width: 30px; height: 30px;" us-spinner="{ color: '#8e93a8' }"></span>
+                            {{ formatToTime(timeSlot.startsAt) }}
                         </button>
                     </div>
-                    <!-- End Order Submit -->
+                    <div class="col-md-4 time-slot-buttons">
+                        <h6>Afternoon</h6>
+                        <button class="btn btn-primary time-slot"
+                                ng-repeat="timeSlot in availableSlots.toArray()"
+                                ng-if="splitByTimeOfDay(timeSlot, 'afternoon')"
+                                ng-click="onTimeSlotSelection($event, timeSlot)"
+                                ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
 
-                </form>
-                <!-- End Question Form -->
+                            {{ formatToTime(timeSlot.startsAt) }}
+                        </button>
+                    </div>
+                    <div class="col-md-4 time-slot-buttons">
+                        <h6>Evening</h6>
+                        <button class="btn btn-primary time-slot"
+                                ng-repeat="timeSlot in availableSlots.toArray()"
+                                ng-if="splitByTimeOfDay(timeSlot, 'evening')"
+                                ng-click="onTimeSlotSelection($event, timeSlot)"
+                                ng-class='{ "time-slot-active": isActiveTimeSlot(timeSlot) }'>
+
+                            {{ formatToTime(timeSlot.startsAt) }}
+                        </button>
+                    </div>
+                </div>
+
+                <!--Customer information pane -->
+                <a name="customer-info-pane-scroller"></a>
+                <div class="pane pane-customer-information" style="display:none;" ng-if="orderLoaded">
+                    <h6>Your Info</h6>
+                    <h3>We need to collect some information from you to confirm booking:</h3>
+                    <hr />
+
+                    <!-- Question Form -->
+                    <form id="questionForm" ng-submit="submitPaymentForms()">
+                        <!-- Static Questions, Always Required -->
+                        <div class="form-group">
+                            <label class="control-label" for="order_customer_email">First Name*</label>
+                            <input id="lastName" placeholder="First Name" required="required" type="text" ng-model="order.customer().firstName" name="firstName"
+                                class="form-control" autofocus><span class="message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="order_customer_email">Last Name*</label>
+                            <input id="firstName" placeholder="Last Name" required="required" type="text" ng-model="order.customer().lastName" name="lastName"
+                                class="form-control"><span class="message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="order_customer_email">E-mail Address*</label>
+                            <input id="email" placeholder="E-mail" required="required" type="email" ng-model="order.customer().email" name="email" class="form-control">
+                            <span class="message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="order_customer_email">Zip Code*</label>
+                            <input id="zip" placeholder="Zip Code" required="required" type="text" ng-model="order.customer().zip" name="zip" class="form-control">
+                            <span class="message"></span>
+                        </div>
+                        <!-- End of Static Questions -->
+
+                        <!-- Dynamic Questions, Set by Merchant -->
+                        <div ng-repeat="(index, question) in product.questions().toArray()" ng-init="answer = answerForQuestion(question)">
+                            <div class="form-group" ng-if="question.formControl != 'separator'">
+                                <label ng-if="question.formControl == 'text_input' || question.formControl == 'text_area' || question.formControl == 'option_list' || question.formControl == 'drop_down'">
+                                    {{ question.title }}<span ng-if='question.required'>*</span>
+                                </label>
+                                <!-- Render different from control based on answer.question.formControl type -->
+                                <!-- Text Input -->
+                                <input class="form-control"
+                                       ng-if="question.formControl == 'text_input'"
+                                       ng-model="answer.value"
+                                       ng-required="question.required"
+                                       placeholder="{{ question.title }}"
+                                />
+                                <!-- Text Area -->
+                                <textarea class="form-control" rows="4"
+                                          ng-if="question.formControl == 'text_area'"
+                                          ng-model="answer.value"
+                                          ng-required="question.required"
+                                          placeholder="Your Response">
+                                </textarea>
+                                <!-- Option List -->
+                                <div ng-if="question.formControl == 'option_list'">
+                                    <span class="invisible"
+                                          ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
+                                    </span>
+                                    <label class="clickable-label"
+                                           ng-repeat="option in question.options().target().toArray()">
+                                        <input class="question-radio" type="radio"
+                                               name="{{question.id}}"
+                                               ng-value="option"
+                                               ng-model="optionsHolder[question.id]"
+                                               ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])" />
+
+                                        {{ titleForOption(option) }}
+                                    </label>
+                                </div>
+                                <!-- Drop Down -->
+                                <select class="form-control"
+                                        ng-if="question.formControl == 'drop_down'"
+                                        ng-model="optionsHolder[question.id]"
+                                        ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])"
+                                        ng-options="option as titleForOption(option) for option in question.options().target().toArray()"
+                                        ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
+
+                                    <option value="">-- Please select --</option>
+                                </select>
+                                <!-- Spin Button -->
+                                <div ng-if="question.formControl == 'spin_button'">
+                                    <label>
+                                        <span>{{ titleForSpinButton(answer) }}</span>
+                                        <span ng-if='question.required'>*</span>
+                                    </label>
+                                    <ul class="spinner-input list-inline">
+                                        <li>
+                                            <input class="form-control value-input" readonly=""
+                                                   ng-model="answer.value"
+                                                   ng-init="answer.value = question.min" />
+                                        </li>
+                                        <li>
+                                            <div class="btn-group btn-group-lg">
+                                                <button type="button" class="btn btn-info update-price stepper-minus"
+                                                        ng-click="answer.value = answer.value - 1; answerChanged(answer)"
+                                                        ng-disabled="answer.value == question.min">
+                                                    -
+                                                </button>
+                                                <button type="button" class="btn btn-info update-price stepper-plus"
+                                                        ng-click="answer.value = answer.value + 1; answerChanged(answer)"
+                                                        ng-disabled="answer.value >= question.max">
+                                                    +
+                                                </button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Checkbox && Waiver -->
+                                <div ng-if="question.formControl == 'checkbox' || question.formControl == 'waiver'">
+                                    <div class="well well-sm waiver" ng-if="question.formControl == 'waiver'">
+                                        <ng-bind-html ng-bind-html="question.waiverText">
+                                        </ng-bind-html>
+                                    </div>
+
+                                    <label class="clickable-label">
+                                        <input class="question-checkbox" type="checkbox"
+                                               ng-model="answer.value"
+                                               ng-change="answerChanged(answer)"
+                                               ng-required="question.required || question.formControl == 'waiver'"
+                                               ng-init="answer.value = false" />
+
+                                        <span>{{ titleForCheckbox(question) }}</span>
+                                        <span ng-if="question.required || question.formControl == 'waiver'">*</span>
+                                    </label>
+                                </div>
+                                <!-- Text Output -->
+                                <h3 class="question-text-output" ng-if="question.formControl == 'text_output' && question.displayAsTitle">{{ question.title }}</h3>
+                                <p  class="question-text-output" ng-if="question.formControl == 'text_output' && !question.displayAsTitle">{{ question.title }}</p>
+                            </div>
+                            <hr ng-if="question.formControl == 'separator'">
+                        </div>
+                        <!-- End of Dynamic Questions -->
+
+
+                        <!-- Price Table -->
+                        <div class="alert priceTable" ng-if='hasSubtotal()' ng-class="{ 'alert-warning': psp == 'cash', 'alert-success': psp != 'cash' }">
+                            <div ng-if="psp == 'cash'">
+                                <strong>No payment required now. Payment will be collected at the venue.</strong>
+                                <br><br>
+                            </div>
+                            <table>
+                                <tr ng-if="order.subtotal != order.total">
+                                    <td>Subtotal:</td>
+                                    <td>{{ order.subtotal | currency:merchant.currency().code }}</td>
+                                </tr>
+                                <tr ng-if="order.tax != 0 && order.tax != null">
+                                    <td>Tax:</td>
+                                    <td>{{ order.tax | currency:merchant.currency().code }}</td>
+                                </tr>
+                                <tr ng-if="order.couponAmount != null">
+                                    <td>Discount:</td>
+                                    <td>-{{ order.couponAmount | currency:merchant.currency().code }}</td>
+                                </tr>
+                                <tr ng-class="{ 'borderTop': order.subtotal != order.total }">
+                                    <td><strong>Total:</strong></td>
+                                    <td>{{ order.total | currency:merchant.currency().code }}</td>
+                                </tr>
+                                <tr ng-if="order.outstandingBalance != order.total">
+                                    <td>Balance due:</td>
+                                    <td>{{ order.outstandingBalance | currency:merchant.currency().code }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- End Price Table -->
+                        <!-- Redeemables Section -->
+                        <div id="redeemables" ng-if="product.hasRedeemables && hasSubtotal()">
+                            <br><br>
+                            <h3>Gift Cards & Coupons</h3>
+                            <hr>
+
+                            <div class="form-group hasButton">
+                                <label class="control-label" for="redeemableInput">Gift Card Number or Coupon Code</label>
+                                <input type="text" id="redeemableInput" name="redeemableInput" class="form-control" placeholder="Gift Card Number or Coupon Code" ng-model="redeemableInput" />
+                                <input type="button" class="btn-primary btn" ng-if="activeRedeemable == null" value="Check" ng-click="checkRedeemable()" />
+                                <input type="button" class="btn-danger btn" ng-if="activeRedeemable != null" value="Remove" ng-click="removeRedeemable()" />
+                                <p class="appliedStatus" ng-if="redeemableStatus != null">{{ redeemableStatus }}</p>
+                                <p class="appliedError" ng-if="redeemableError != null">{{ redeemableError }}</p>
+                            </div>
+                        </div>
+                        <!-- End Redeemables Section -->
+
+                        <!-- Checkout Forms -->
+                        <div ng-show='requiresPayment()'>
+
+                            <!-- Spreedly Checkout Form -->
+                            <div id="payment-form" class="ccForm" ng-if="psp == 'spreedly'">
+                                <h3>Pay with Card</h3>
+                                <hr>
+
+                                <input type="hidden" name="payment_method_token" id="payment_method_token">
+
+                                <div class="form-group">
+                                    <label class="control-label" for="full_name">Name On Card</label>
+                                    <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Name On Card">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">Credit Card Number</label>
+                                    <div id="spreedly-number" class="spreedly-input"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="spreedly-exp-month">Expiration Date</label>
+                                    <input type="text" id="month" name="month" maxlength="2" class="form-control" placeholder="MM">
+                                    <input type="text" id="year" name="year" maxlength="4" class="form-control" placeholder="YYYY">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">CVV</label>
+                                    <div id="spreedly-cvv" class="spreedly-input"></div>
+                                </div>
+                            </div>
+                            <!-- End Spreedly Checkout Form -->
+
+                            <!-- Square Checkout Form -->
+                            <div id="sq-ccbox" ng-if="psp == 'square'">
+                                <h3>Pay with Card</h3>
+                                <hr>
+
+                                <div class="form-group">
+                                    <label class="control-label">Card Number:</label>
+                                    <div id="sq-card-number"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">CVV:</label>
+                                    <div id="sq-cvv"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">Expiration Date:</label>
+                                    <div id="sq-expiration-date"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">Postal Code:</label>
+                                    <div id="sq-postal-code"></div>
+                                </div>
+
+                                <input type="hidden" id="card-nonce" name="nonce">
+                            </div>
+                            <div id="sq-walletbox" ng-if="psp == 'square'">
+                                <div id="sq-apple-pay-label" class="wallet-not-enabled">Apple Pay for Web not enabled</div>
+                                <!-- Placholder for Apple Pay for Web button -->
+                                <button id="sq-apple-pay" class="button-apple-pay"></button>
+
+                                <div id="sq-masterpass-label" class="wallet-not-enabled">Masterpass not enabled</div>
+                                <!-- Placholder for Masterpass button -->
+                                <button id="sq-masterpass" class="button-masterpass"></button>
+                            </div>
+                            <!-- End Square Checkout Form -->
+                        </div>
+                        <!-- End Checkout Forms -->
+
+                        <!-- Errors Section -->
+                        <div class="alert alert-danger" ng-if="orderErrors != null && orderErrors.length > 0">
+                            <h4>There were issues with your order:</h4>
+                            <ul>
+                                <li ng-repeat="(errorIndex, errorValue) in orderErrors">{{ errorValue.message }}</li>
+                            </ul>
+                        </div>
+                        <!-- End Errors Section -->
+
+                        <!-- Order Submit -->
+                        <div class="form-submit">
+                            <button type="submit" ng-disabled='submitting' class="btn-primary btn animated pulse infinite finishButton">
+                                <span ng-if="!submitting">{{product.orderButtonText}}</span>
+                                <span ng-if="submitting" style="width: 30px; height: 30px;" us-spinner="{ color: '#8e93a8' }"></span>
+                            </button>
+                        </div>
+                        <!-- End Order Submit -->
+
+                    </form>
+                    <!-- End Question Form -->
+                </div>
         </div>
     </div>
 </main>

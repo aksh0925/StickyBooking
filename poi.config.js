@@ -1,6 +1,7 @@
 const pkg = require('./package.json');
 const path = require('path');
 const process = require('process');
+const GoogleFontsPlugin = require('google-fonts-webpack-plugin');
 
 module.exports = {
   // Entry is relative to process.cwd()
@@ -36,6 +37,12 @@ module.exports = {
         { loader: 'html-loader' }
       ]}
     );
+
+    config.plugins.push(new GoogleFontsPlugin({
+      fonts: [
+        { family: 'Lato', variants: [ '300', '400', '700', '900' ] }
+      ]
+    }));
 
     return config;
   }
