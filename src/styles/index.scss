@@ -217,7 +217,7 @@ body {
         padding-top: 25px;
         padding-bottom: 25px;
         background-color: lighten($sticky-dark-light, 50%);
-        color: lighten($sticky-dark, 20%);
+        color: $sticky-dark-light;
 
         &:hover {
             background-color: $sticky-blue;
