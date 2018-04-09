@@ -142,13 +142,6 @@ angular.module('StickyBooking')
                 if($scope.getDisplayClassForDay(day) == 'available-time-slot'){
                     $scope.selectedDate = day;
 
-                    $('.available-times').fadeIn();
-                    $scope.scrollToAnchor('time-slot-scroll');
-                    $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
-                    $("#booking-process-status .booking-step-2").addClass("booking-step-active");
-                    $("#booking-process-status .booking-step-2").addClass("booking-step-complete").removeClass("booking-step-active");
-                    $("#booking-process-status .booking-step-3").addClass("booking-step-active");
-
                     var availableTimeSlotsForDay =
                         $scope.getTimeSlotsForMonth($scope.activeCalendarMonth).select(function(timeSlot) {
                             return timeSlot.startsAt.isSame(day, 'day');

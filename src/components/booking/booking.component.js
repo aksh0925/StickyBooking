@@ -28,6 +28,9 @@ angular.module('StickyBooking')
               $scope.redeemableStatus = null;
               $scope.submitting = false;
 
+              $scope.maxStep = 0;
+              $scope.step = 0;
+
               $scope.loadInitialData();
           };
 
@@ -93,6 +96,17 @@ angular.module('StickyBooking')
             $scope.calendarDataLoaded = data.calendarDataLoaded;
           });
 
+          $scope.clickGoToStep = function(step) {
+            if(step <= $scope.maxStep) $scope.goToStep(step);
+          };
+
+          $scope.goToStep = function(step) {
+            $scope.step = step;
+            $scope.scrollToAnchor('step-' + step + '-scroller');
+
+            if(step > $scope.maxStep) $scope.maxStep = step;
+          };
+
           //When a user clicks get started
           $scope.getStarted = function(){
             $scope.displayLoading = true;
@@ -100,11 +114,8 @@ angular.module('StickyBooking')
             $scope.$watch('calendarDataLoaded', function(calendarDataLoaded) {
                 if(calendarDataLoaded) {
                   $scope.displayLoading = false;
-                  //Scroll Calendar into view
-                  $(".pane-calendar").fadeIn();
-                  $scope.scrollToAnchor('step-1-scroller');
-                  $("#booking-process-status .booking-step-1").addClass("booking-step-complete").removeClass("booking-step-active");
-                  $("#booking-process-status .booking-step-2").addClass("booking-step-active");
+
+                  $scope.goToStep(1);
                 }
             });
           };
@@ -113,6 +124,8 @@ angular.module('StickyBooking')
           $scope.$on('dateSelectedEvent', function(event, data){
               $scope.selectedDate = data.selectedDate;
               $scope.availableSlots = data.availableTimeSlots;
+
+              $scope.goToStep(2);
           });
 
           //When loading animation is started from sub component
@@ -267,11 +280,7 @@ angular.module('StickyBooking')
           $scope.startOrder = function(){
               $scope.optionsHolder = {};
 
-              //Scroll into customer info pane and hide the animation spinner
-              $('.pane-customer-information').addClass("step-visible");
-              $("#booking-process-status .booking-step-3").addClass("booking-step-complete").removeClass("booking-step-active");
-              $("#booking-process-status .booking-step-4").addClass("booking-step-active");
-              $scope.scrollToAnchor('customer-info-pane-scroller');
+              $scope.goToStep(3);
 
               //Calculate starting price
               $scope.order.calculatePrice()

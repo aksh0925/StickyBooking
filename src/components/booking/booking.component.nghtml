@@ -4,7 +4,7 @@
         <span us-spinner="{ color: '#fff' }"></span>
     </div>
 
-    <div class="booking-sidebar booking-sidebar-hidden">
+    <div class="booking-sidebar" ng-class='{ "booking-sidebar-hidden": step == 0 }'>
         <div ng-if="order.persisted()">
             <div class="booking-page-welcome-message animated slideInUp">
                 <p>Hello {{ order.customer().firstName }}, thanks for your purchase!</p>
@@ -17,14 +17,14 @@
         <div ng-if="!order.persisted() && initialDataLoaded">
             <div ng-if="product.status == 'active'">
                 <ol class="booking-process" id="booking-process-status">
-                    <li class="booking-step-1 booking-step">
-                      <a href>Select a Date</a>
+                    <li class="booking-step" ng-class='{ "booking-step-active": step == 1, "booking-step-complete": step > 1 }'>
+                      <a href ng-click='clickGoToStep(1)'>Select a Date</a>
                     </li>
-                    <li class="booking-step-2 booking-step">
-                      <a href>Select a Time</a>
+                    <li class="booking-step" ng-class='{ "booking-step-active": step == 2, "booking-step-complete": step > 2 }'>
+                      <a href ng-click='clickGoToStep(2)'>Select a Time</a>
                     </li>
-                    <li class="booking-step-3 booking-step">
-                      <a href>Your Information</a>
+                    <li class="booking-step" ng-class='{ "booking-step-active": step == 3, "booking-step-complete": step > 3 }'>
+                      <a href ng-click='clickGoToStep(3)'>Your Information</a>
                     </li>
                 </ol>
             </div>
@@ -112,7 +112,7 @@
             <div class="panes">
                 <!-- Calendar pane -->
                 <a name="step-1-scroller"></a>
-                <div class="pane pane-calendar pane-active" id="step-2" style="display:none;">
+                <div class="pane pane-calendar pane-active" id="step-2" ng-show='maxStep > 0'>
                     <div class="row">
                         <div class="col-md-6">
                             <h6>Availability</h6>
@@ -125,8 +125,8 @@
                 </div>
 
                 <!-- available times-->
-                <a name="time-slot-scroll"></a>
-                <div class="pane pane-available-times clearfix" style="display:none;">
+                <a name="step-2-scroller"></a>
+                <div class="pane pane-available-times clearfix" ng-show='maxStep > 1'>
                     <div class="col-md-12">
                         <h6>Available Time Slots</h6>
                         <h3>Select a time slot on {{ formatToDate(selectedDate) }} to continue booking:</h3>
@@ -168,8 +168,8 @@
                 </div>
 
                 <!--Customer information pane -->
-                <a name="customer-info-pane-scroller"></a>
-                <div class="pane pane-customer-information" style="display:none;" ng-if="orderLoaded">
+                <a name="step-3-scroller"></a>
+                <div class="pane pane-customer-information" ng-if='maxStep > 2'>
                     <h6>Your Info</h6>
                     <h3>We need to collect some information from you to confirm booking:</h3>
                     <hr />
