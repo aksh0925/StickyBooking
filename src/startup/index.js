@@ -14,13 +14,10 @@ require('bootstrap/dist/css/bootstrap.css');
 
 require('../styles/index.scss');
 
-angular.module('StickyBooking', ['angularSpinner', 'ngAnimate', 'ngSanitize'])
-  .controller('AppController', function($scope) {
-    $scope.$on('initialDataLoaded', function(event, data){
-      document.title = data.product.title;
-    });
-  });
+angular.module('StickyBooking', ['angularSpinner', 'ngAnimate', 'ngSanitize']);
 
-require('../components/booking/booking.component');
-require('../components/calendar/calendar.component');
-require('../services/occasionSDK.service');
+require('../components/occsnApp');
+
+angular.element(function() {
+  angular.bootstrap(document, ['StickyBooking']);
+});

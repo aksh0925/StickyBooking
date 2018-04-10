@@ -45,37 +45,43 @@ angular.module('StickyBooking')
                   occasionSDKService.getProductById($scope.staticProductID)
               ]).then((values) => {
                   // Populate global variables with returns from promises above
-                  $scope.merchant = values[0];
-                  $scope.product = values[1];
+                  var merchant = values[0];
+                  var product = values[1];
+
+                  $scope.merchant = merchant;
+                  $scope.product = product;
 
                   // Set PSP (payment service provider) to merchant's
                   // @example 'cash', 'spreedly', 'square'
-                  $scope.psp = $scope.merchant.pspName;
+                  $scope.psp = merchant.pspName;
 
                   // Set moment.js time zone to merchant's
-                  moment.tz.setDefault($scope.merchant.timeZone);
+                  moment.tz.setDefault(merchant.timeZone);
 
                   // Flash an alert to the merchant to add time slots if the product does not a first time slot
-                  if(_.isNull($scope.product.firstTimeSlotStartsAt)) {
+                  if(_.isNull(product.firstTimeSlotStartsAt)) {
                       alert(
                         'Listing has no timeslots. If you are the merchant who owns this listing, add time slots ' +
                         'so that there are times that can be booked.'
                       );
                   }
 
-                  $scope.$broadcast('initialDataLoaded', { product: $scope.product } );
-                  $scope.$emit('initialDataLoaded', { product: $scope.product } );
+                  $scope.$broadcast('initialDataLoaded', { product: product } );
+                  $scope.$emit('initialDataLoaded', { merchant: merchant, product: product } );
                   $scope.initialDataLoaded = true;
                   $scope.displayLoading = false;
                   $scope.$apply();
 
                   // New order for product
-                  occasionSDKService.createOrderForProduct($scope.product)
+                  occasionSDKService.createOrderForProduct(product)
                       .then( (order) => {
                           console.log("Order data loaded");
                           $scope.order = order;
                           $scope.orderLoaded = true;
-                      });
+
+                          $scope.$emit('orderDataLoaded', { order: order } );
+
+                  });
 
               }).catch( (errors) => {
                   console.log(errors);
@@ -589,16 +595,12 @@ angular.module('StickyBooking')
 
           //When users submits order form
           $scope.submitOrder = function() {
-              console.log("Order Submit", $scope.order);
-
               $scope.order.save(() => {
                 $scope.submitting = false;
 
                 if($scope.order.persisted()) {
-                  console.log("Order save was success");
+                  $scope.$emit('orderDataLoaded', { order: $scope.order } );
                 } else {
-                  console.log("Order save was not a success");
-                  console.log("ORDER ERRORS", $scope.order.errors().toArray());
                   $scope.orderErrors = $scope.order.errors().toArray();
                   $scope.order.removeCharge($scope.creditCard);
                 }

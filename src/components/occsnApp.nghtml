@@ -1,0 +1,2 @@
+<booking-page ng-if='!order.persisted()'></booking-page>
+<complete-page ng-if='order.persisted()' order='order'></complete-page>

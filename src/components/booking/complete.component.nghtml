@@ -1,0 +1,15 @@
+<main class="booking-confirm">
+  <div class="booking-confirmation-code">
+    <h6>Your Booking Number Is:</h6>
+    <h4>#{{ order.verificationCode }}</h4>
+  </div>
+  <div class="booking-confirmation-message">
+    <h3>Hello {{ order.customer().firstName }}, you are all set!</h3>
+    <p ng-if='product.postTransactionalMessage'>{{ product.postTransactionalMessage }}</p>
+    <p ng-if='!product.postTransactionalMessage'>Thank you for scheduling your consultation!</p>
+  </div>
+  <hr />
+  <div class="booking-confirmation-note">
+    <p><em>A confirmation email has been sent to {{ order.customer().email }}</em></p>
+  </div>
+</main>
