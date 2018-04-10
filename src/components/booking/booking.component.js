@@ -11,7 +11,7 @@ var templateUrl = require('./booking.component.nghtml');
 angular.module('StickyBooking')
     .component('bookingPage', {
         templateUrl: templateUrl,
-        controller: function BookingController($scope, $http, $filter, occasionSDKService) {
+        controller: function BookingController($scope, $http, $filter, $window, occasionSDKService) {
 
           //Runs On Init
           this.$onInit = function(){
@@ -26,10 +26,19 @@ angular.module('StickyBooking')
               $scope.activeRedeemable = null;
               $scope.redeemableError = null;
               $scope.redeemableStatus = null;
+              $scope.showNav = false;
               $scope.submitting = false;
 
               $scope.maxStep = 0;
               $scope.step = 0;
+
+              angular.element($window).bind('scroll', function() {
+                if(this.pageYOffset > 100) {
+                  $scope.showNav = true;
+
+                  $scope.$apply();
+                }
+              });
 
               $scope.loadInitialData();
           };

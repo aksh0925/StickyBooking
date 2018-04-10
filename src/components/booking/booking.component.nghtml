@@ -4,7 +4,7 @@
         <span us-spinner="{ color: '#fff' }"></span>
     </div>
 
-    <div class="booking-sidebar" ng-if="initialDataLoaded" ng-class='{ "booking-sidebar-hidden": step == 0 }'>
+    <div class="booking-sidebar" ng-if="initialDataLoaded" ng-class='{ "booking-sidebar-hidden": !showNav && step == 0 }'>
         <div ng-if="product.status == 'active'">
             <ol class="booking-process" id="booking-process-status">
                 <li class="booking-step" ng-class='{ "booking-step-active": step == 1, "booking-step-complete": step > 1 }'>
