@@ -582,6 +582,10 @@ label {
             .empty-date {
                 background-color: lighten($sticky-dark-light, 55%);
                 border-bottom: 1px solid lighten($sticky-dark-light, 40%);
+
+                .date {
+                    display: none;
+                }
             }
             .selected-date {
                 background-color: $sticky-blue !important;
