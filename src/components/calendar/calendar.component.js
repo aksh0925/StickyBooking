@@ -30,15 +30,7 @@ angular.module('StickyBooking')
             $scope.$on('initialDataLoaded', function(event, data) {
                 $scope.product = data.product;
 
-                var today = moment();
-                var startsThisMonth = $scope.product.firstTimeSlotStartsAt.isSame(today, 'month');
-
-                var firstDay;
-                if(startsThisMonth) {
-                    firstDay = today;
-                } else {
-                    firstDay = $scope.product.firstTimeSlotStartsAt;
-                }
+                var firstDay = $scope.product.firstTimeSlotStartsAt;
 
                 // Set starting month and year for the calendar to display
                 $scope.activeCalendarMonth = firstDay.startOf('month');
