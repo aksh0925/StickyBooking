@@ -30,11 +30,21 @@ angular.module('StickyBooking')
             $scope.$on('initialDataLoaded', function(event, data) {
                 $scope.product = data.product;
 
+                var today = moment();
+                var startsThisMonth = $scope.product.firstTimeSlotStartsAt.isSame(today, 'month');
+
+                var firstDay;
+                if(startsThisMonth) {
+                    firstDay = today;
+                } else {
+                    firstDay = $scope.product.firstTimeSlotStartsAt;
+                }
+
                 // Set starting month and year for the calendar to display
-                $scope.activeCalendarMonth = moment().startOf('month');
+                $scope.activeCalendarMonth = firstDay.startOf('month');
 
                 // Get all time slots for the month, starting at the current moment (i.e. day)
-                occasionSDKService.getTimeSlotsByMonth($scope.product, moment())
+                occasionSDKService.getTimeSlotsByMonth($scope.product, firstDay)
                 .then((timeSlots) => {
                     $scope.setTimeSlotsForMonth($scope.activeCalendarMonth, timeSlots);
 
