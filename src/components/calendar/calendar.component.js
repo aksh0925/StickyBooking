@@ -40,7 +40,10 @@ angular.module('StickyBooking')
                 .then((timeSlots) => {
                     $scope.setTimeSlotsForMonth($scope.activeCalendarMonth, timeSlots);
 
-                    $scope.$emit('calendarDataLoaded', { calendarDataLoaded: true });
+                    $scope.$emit('calendarDataLoaded', {
+                        calendarDataLoaded: true,
+                        duration: moment.duration(timeSlots.first().duration, 'minutes')
+                    });
 
                     $scope.$apply();
                 });

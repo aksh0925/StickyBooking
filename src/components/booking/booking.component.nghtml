@@ -48,7 +48,9 @@
             <div class="booking-page-hero-content animated slideInRight" ng-if="initialDataLoaded">
                 <h6 class="get-started-title">Get Started</h6>
                 <h1 class="page-title">{{ product.title }}</h1>
-                <h6 class="session-length">Session Length: 1 hour</h6>
+                <h6 ng-if='sessionDuration' class="session-length">
+                  Session Length: {{ sessionDuration }}
+                </h6>
 
                 <button class="get-started tada infinite"
                         ng-click="getStarted()"
@@ -71,6 +73,12 @@
                     <div class="col-md-6">
                         <h6>Availability</h6>
                         <h3>Select a date on the calendar below to view availability:</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="session-duration text-right">
+                            <h4 class="duration-count">{{ sessionDuration }}</h4>
+                            <h6>Session Duration</h6>
+                        </div>
                     </div>
                 </div>
                 <hr />

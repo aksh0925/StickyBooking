@@ -109,6 +109,12 @@ angular.module('StickyBooking')
 
           $scope.$on('calendarDataLoaded', function(event, data){
             $scope.calendarDataLoaded = data.calendarDataLoaded;
+            $scope.sessionDuration = data.duration.asHours();
+            if(data.duration.asHours() != 1) {
+              $scope.sessionDuration += ' hours';
+            } else {
+              $scope.sessionDuration += ' hour';
+            }
           });
 
           $scope.clickGoToStep = function(step) {
