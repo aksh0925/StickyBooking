@@ -29,8 +29,8 @@ angular.module('StickyBooking')
               $scope.showNav = false;
               $scope.submitting = false;
 
-              $scope.maxStep = 0;
-              $scope.step = 0;
+              $scope.maxStep = 1;
+              $scope.step = 1;
 
               angular.element($window).bind('scroll', function() {
                 if(this.pageYOffset > 100) {

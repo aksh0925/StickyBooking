@@ -391,6 +391,11 @@ label {
 							color: #fff;
 						}
 					}
+                    &-disabled {
+                        a {
+                            cursor: not-allowed;
+                        }
+                    }
 				}
 				.disabled-link {
 					a {

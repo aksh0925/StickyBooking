@@ -7,13 +7,13 @@
     <div class="booking-sidebar" ng-if="initialDataLoaded" ng-class='{ "booking-sidebar-hidden": !showNav && step == 0 }'>
         <div ng-if="product.status == 'active'">
             <ol class="booking-process" id="booking-process-status">
-                <li class="booking-step" ng-class='{ "booking-step-active": step == 1, "booking-step-complete": step > 1 }'>
+                <li class="booking-step" ng-class='{ "booking-step-active": step == 1, "booking-step-complete": step > 1, "booking-step-disabled": maxStep < 1 }'>
                   <a href ng-click='clickGoToStep(1)'>Select a Date</a>
                 </li>
-                <li class="booking-step" ng-class='{ "booking-step-active": step == 2, "booking-step-complete": step > 2 }'>
+                <li class="booking-step" ng-class='{ "booking-step-active": step == 2, "booking-step-complete": step > 2, "booking-step-disabled": maxStep < 2 }'>
                   <a href ng-click='clickGoToStep(2)'>Select a Time</a>
                 </li>
-                <li class="booking-step" ng-class='{ "booking-step-active": step == 3, "booking-step-complete": step > 3 }'>
+                <li class="booking-step" ng-class='{ "booking-step-active": step == 3, "booking-step-complete": step > 3, "booking-step-disabled": maxStep < 3 }'>
                   <a href ng-click='clickGoToStep(3)'>Your Information</a>
                 </li>
             </ol>
