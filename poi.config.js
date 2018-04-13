@@ -32,6 +32,7 @@ module.exports = {
   webpack(config) {
     config.module.rules.push(
       { test: require.resolve('jquery'), use: 'expose-loader?jQuery' },
+      { test: require.resolve('jquery'), use: 'expose-loader?$' },
       { test: /\.nghtml/, use: [
         { loader: 'ngtemplate-loader' },
         { loader: 'html-loader' }
