@@ -131,7 +131,7 @@
 
             <!--Customer information pane -->
             <a name="step-3-scroller"></a>
-            <div class="pane pane-customer-information" ng-if='maxStep > 2'>
+            <div class="pane pane-customer-information" ng-show='maxStep > 2'>
                 <h6>Your Info</h6>
                 <h3>We need to collect some information from you to confirm booking:</h3>
                 <hr />
