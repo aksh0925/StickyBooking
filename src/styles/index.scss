@@ -739,3 +739,48 @@ label {
 p {
 	margin: 0 0 13px;
 }
+
+.appliedError{
+    color: red;
+    padding: 10px;
+}
+.appliedStatus{
+    color: green;
+    padding: 10px;
+}
+
+.loadingAnimation {
+    background: rgba(46, 49, 60, 0.75);
+    position: fixed;
+    z-index: 999999;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    left: 0;
+}
+.loadingAnimation img {
+    margin: 0 auto;
+    max-width: 300px;
+}
+
+.borderTop{
+    border-top: 2px solid #666;
+}
+
+
+.clickable-label{
+    margin: 0 !important;
+    display: block !important;
+}
+
+.finishButton{
+    display: table !important;
+    margin: 0 auto !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+}
+
+.spreedly-input iframe{
+    max-height: 50px;
+}

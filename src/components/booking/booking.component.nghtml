@@ -187,16 +187,17 @@
                                 <span class="invisible"
                                       ng-init="optionsHolder[question.id] = defaultOptionFor(question); optionableQuestionChanged(answer, optionsHolder[question.id])">
                                 </span>
-                                <label class="clickable-label"
-                                       ng-repeat="option in question.options().target().toArray()">
-                                    <input class="question-radio" type="radio"
+                                <div class="radio" ng-repeat="option in question.options().target().toArray()">
+                                  <label>
+                                    <input type="radio"
                                            name="{{question.id}}"
                                            ng-value="option"
                                            ng-model="optionsHolder[question.id]"
                                            ng-change="optionableQuestionChanged(answer, optionsHolder[question.id])" />
 
                                     {{ titleForOption(option) }}
-                                </label>
+                                  </label>
+                                </div>
                             </div>
                             <!-- Drop Down -->
                             <select class="form-control"
@@ -299,13 +300,12 @@
                         <hr>
 
                         <div class="form-group hasButton">
-                            <label class="control-label" for="redeemableInput">Gift Card Number or Coupon Code</label>
                             <input type="text" id="redeemableInput" name="redeemableInput" class="form-control" placeholder="Gift Card Number or Coupon Code" ng-model="redeemableInput" />
                             <input type="button" class="btn-primary btn" ng-if="activeRedeemable == null" value="Check" ng-click="checkRedeemable()" />
                             <input type="button" class="btn-danger btn" ng-if="activeRedeemable != null" value="Remove" ng-click="removeRedeemable()" />
-                            <p class="appliedStatus" ng-if="redeemableStatus != null">{{ redeemableStatus }}</p>
-                            <p class="appliedError" ng-if="redeemableError != null">{{ redeemableError }}</p>
                         </div>
+                        <p class="appliedStatus" ng-if="redeemableStatus != null">{{ redeemableStatus }}</p>
+                        <p class="appliedError" ng-if="redeemableError != null">{{ redeemableError }}</p>
                     </div>
                     <!-- End Redeemables Section -->
 
