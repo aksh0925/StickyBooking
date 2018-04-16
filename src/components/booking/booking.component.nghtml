@@ -244,16 +244,18 @@
                                     </ng-bind-html>
                                 </div>
 
-                                <label class="clickable-label">
-                                    <input class="question-checkbox" type="checkbox"
-                                           ng-model="answer.value"
-                                           ng-change="answerChanged(answer)"
-                                           ng-required="question.required || question.formControl == 'waiver'"
-                                           ng-init="answer.value = false" />
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox"
+                                               ng-model="answer.value"
+                                               ng-change="answerChanged(answer)"
+                                               ng-required="question.required || question.formControl == 'waiver'"
+                                               ng-init="answer.value = false" />
 
-                                    <span>{{ titleForCheckbox(question) }}</span>
-                                    <span ng-if="question.required || question.formControl == 'waiver'">*</span>
-                                </label>
+                                        <span>{{ titleForCheckbox(question) }}</span>
+                                        <span ng-if="question.required || question.formControl == 'waiver'">*</span>
+                                    </label>
+                                </div>
                             </div>
                             <!-- Text Output -->
                             <h3 class="question-text-output" ng-if="question.formControl == 'text_output' && question.displayAsTitle">{{ question.title }}</h3>
