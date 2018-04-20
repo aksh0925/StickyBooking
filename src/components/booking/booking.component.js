@@ -67,6 +67,9 @@ angular.module('StickyBooking')
                   // Set moment.js time zone to merchant's
                   moment.tz.setDefault(merchant.timeZone);
 
+                  // TODO: Fix when moment.js is integrated into Occasion SDK
+                  $scope.product.firstTimeSlotStartsAt.tz(merchant.timeZone);
+
                   // Flash an alert to the merchant to add time slots if the product does not a first time slot
                   if(_.isNull(product.firstTimeSlotStartsAt)) {
                       alert(
