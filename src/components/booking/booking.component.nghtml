@@ -303,7 +303,7 @@
 
                         <div class="form-group hasButton">
                             <input type="text" id="redeemableInput" name="redeemableInput" class="form-control" placeholder="Gift Card Number or Coupon Code" ng-model="redeemableInput" />
-                            <input type="button" class="btn-primary btn" ng-if="activeRedeemable == null" value="Check" ng-click="checkRedeemable()" />
+                            <input type="button" class="btn-primary btn" ng-if="activeRedeemable == null" value="Apply" ng-click="checkRedeemable()" />
                             <input type="button" class="btn-danger btn" ng-if="activeRedeemable != null" value="Remove" ng-click="removeRedeemable()" />
                         </div>
                         <p class="appliedStatus" ng-if="redeemableStatus != null">{{ redeemableStatus }}</p>
