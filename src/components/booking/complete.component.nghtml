@@ -6,7 +6,7 @@
   <div class="booking-confirmation-message">
     <h3>Hello {{ order.customer().firstName }}, you are all set!</h3>
     <p ng-if='product.postTransactionalMessage'>{{ product.postTransactionalMessage }}</p>
-    <p ng-if='!product.postTransactionalMessage'>Thank you for scheduling your consultation!</p>
+    <p ng-if='!product.postTransactionalMessage'>Thanks for booking with us!</p>
   </div>
   <hr />
   <div class="booking-confirmation-note">
